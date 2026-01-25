@@ -104,7 +104,7 @@
         }
 
         .multiselect-btn {
-     padding: 10px 32px 10px 12px;
+            padding: 10px 32px 10px 12px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             font-size: 14px;
@@ -117,9 +117,14 @@
             width: 100%;
             text-align: left;
         }
- 
+
         .multiselect-btn:hover {
             border-color: #cbd5e0;
+        }
+
+        .multiselect-dropdown {
+            display: none;
+            position: absolute;
             top: 100%;
             left: 0;
             right: 0;
@@ -1210,7 +1215,7 @@
         // HTS Code reference data
         const htsData = [
             {hts: "4813.10.00.00", material: "Cigarette Paper", desc: "In booklets or tubes", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
-            {hts: "4813.20.00.00", material: "Tipping Paper", desc: "In rolls ‚â§5cm width", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
+            {hts: "4813.20.00.00", material: "Tipping Paper", desc: "In rolls ≤5cm width", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "4813.90.00.00", material: "Plugwrap", desc: "Other cigarette paper", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "5502.10.00.00", material: "Filter Tow", desc: "Cellulose acetate tow", mfn: "7.5%", special: "Free (FTA countries)", col2: "45%"},
             {hts: "5601.22.00.10", material: "Filter Rods", desc: "Man-made fiber rods for cigarettes", mfn: "6.3%", special: "Free (FTA countries)", col2: "74%"},
@@ -1808,4 +1813,3 @@
     </script>
 </body>
 </html>
-
