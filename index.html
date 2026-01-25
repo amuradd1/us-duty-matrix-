@@ -1000,7 +1000,10 @@
                 tbody.innerHTML = '<tr><td colspan="14" class="no-results">No results found. Try adjusting your filters.</td></tr>';
                 return;
             }
-
+                tbody.innerHTML = '<tr><td colspan="18" class="no-results">No results found. Try adjusting your filters.</td></tr>';
+                return;
+            }
+ 
             filteredData.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -1014,6 +1017,8 @@
                     <td>${row.region}</td>
                     <td><span class="trade-program ${getProgramClass(row.program)}">${getProgramLabel(row.program)}</span></td>
                     <td class="rate-cell ${getRateClass(row.cigarettePaper)}">${formatRate(row.cigarettePaper)}</td>
+                    <td class="rate-cell ${getRateClass(row.tippingPaper)}">${formatRate(row.tippingPaper)}</td>
+                    <td class="rate-cell ${getRateClass(row.plugwrap)}">${formatRate(row.plugwrap)}</td>
                     <td class="rate-cell ${getRateClass(row.filterTow)}">${formatRate(row.filterTow)}</td>
                     <td class="rate-cell ${getRateClass(row.filterRods)}">${formatRate(row.filterRods)}</td>
                     <td class="rate-cell ${getRateClass(row.adhesive)}">${formatRate(row.adhesive)}</td>
@@ -1022,9 +1027,8 @@
                     <td class="rate-cell ${getRateClass(row.adsorbent)}">${formatRate(row.adsorbent)}</td>
                     <td class="rate-cell ${getRateClass(row.boardPack)}">${formatRate(row.boardPack)}</td>
                     <td class="rate-cell ${getRateClass(row.paperPack)}">${formatRate(row.paperPack)}</td>
-                    <td class="alt-rate">${row.altRate || '-'}</td>
-                    <td class="notes-cell">${row.notes}</td>
-                `;
+                    <td class="rate-cell ${getRateClass(row.innerBundling)}">${formatRate(row.innerBundling)}</td>
+                    <td class="rate-cell ${getRateClass(row.boardInnerFrame)}">${formatRate(row.boardInnerFrame)}</td>
                 tbody.appendChild(tr);
             });
         }
@@ -1188,3 +1192,4 @@
     </script>
 </body>
 </html>
+
