@@ -491,7 +491,7 @@
         }
 
         .sources-list a::before {
-            content: "‚Üí";
+            content: "→";
             font-size: 10px;
         }
 
@@ -657,7 +657,9 @@
                                 <th class="sortable" onclick="sortTable('country')">Country</th>
                                 <th>Region</th>
                                 <th>Trade Program</th>
-                                <th class="sortable" onclick="sortTable('cigarettePaper')">Cigarette Paper<br><span class="hts-code">4813</span></th>
+                                <th class="sortable" onclick="sortTable('cigarettePaper')">Cigarette Paper<br><span class="hts-code">4813.10</span></th>
+                                <th class="sortable" onclick="sortTable('tippingPaper')">Tipping Paper<br><span class="hts-code">4813.20</span></th>
+                                <th class="sortable" onclick="sortTable('plugwrap')">Plugwrap<br><span class="hts-code">4813.90</span></th>
                                 <th class="sortable" onclick="sortTable('filterTow')">Filter Tow<br><span class="hts-code">5502</span></th>
                                 <th class="sortable" onclick="sortTable('filterRods')">Filter Rods<br><span class="hts-code">5601.22</span></th>
                                 <th class="sortable" onclick="sortTable('adhesive')">Adhesive<br><span class="hts-code">3506</span></th>
@@ -666,6 +668,8 @@
                                 <th class="sortable" onclick="sortTable('adsorbent')">Adsorbent<br><span class="hts-code">3802.10</span></th>
                                 <th class="sortable" onclick="sortTable('boardPack')">Board Pack<br><span class="hts-code">4819.10</span></th>
                                 <th class="sortable" onclick="sortTable('paperPack')">Paper Pack<br><span class="hts-code">4819.20</span></th>
+                                <th class="sortable" onclick="sortTable('innerBundling')">Inner Bundling<br><span class="hts-code">4811.90</span></th>
+                                <th class="sortable" onclick="sortTable('boardInnerFrame')">Board Frame<br><span class="hts-code">4819.10</span></th>
                                 <th>Alt. Rate</th>
                                 <th>Notes</th>
                             </tr>
@@ -791,15 +795,15 @@
         // HTS Code reference data
         const htsData = [
             {hts: "4813.10.00.00", material: "Cigarette Paper", desc: "In booklets or tubes", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
-            {hts: "4813.20.00.00", material: "Cigarette Paper", desc: "In rolls ‚â§5cm width", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
+            {hts: "4813.20.00.00", material: "Cigarette Paper", desc: "In rolls ≤5cm width", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
             {hts: "4813.90.00.00", material: "Cigarette Paper", desc: "Other", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
-            {hts: "4813.20.00.00", material: "Tipping Paper", desc: "In rolls ‚â§5cm width", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
+            {hts: "4813.20.00.00", material: "Tipping Paper", desc: "In rolls ≤5cm width", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "4813.90.00.00", material: "Plugwrap", desc: "Other cigarette paper", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "5502.10.00.00", material: "Filter Tow", desc: "Cellulose acetate tow", mfn: "7.5%", special: "Free (FTA countries)", col2: "45%"},
             {hts: "5502.90.00.00", material: "Filter Tow", desc: "Other artificial filament tow", mfn: "7.5%", special: "Free (FTA countries)", col2: "45%"},
             {hts: "5601.22.00.10", material: "Filter Rods", desc: "Man-made fiber rods for cigarettes", mfn: "6.3%", special: "Free (FTA countries)", col2: "74%"},
             {hts: "5601.22.00.50", material: "Filter Rods", desc: "Other man-made fiber wadding articles", mfn: "6.3%", special: "Free (FTA countries)", col2: "74%"},
-            {hts: "3506.91.10.00", material: "Adhesive", desc: "Adhesives based on rubber/plastic (‚â§1kg)", mfn: "2.1%", special: "Free (FTA countries)", col2: "20%"},
+            {hts: "3506.91.10.00", material: "Adhesive", desc: "Adhesives based on rubber/plastic (≤1kg)", mfn: "2.1%", special: "Free (FTA countries)", col2: "20%"},
             {hts: "3506.91.50.00", material: "Adhesive", desc: "Adhesives based on rubber/plastic (>1kg)", mfn: "2.1%", special: "Free (FTA countries)", col2: "20%"},
             {hts: "3926.90.99.90", material: "Capsules", desc: "Other articles of plastics", mfn: "5.3%", special: "Free (FTA countries)", col2: "25%"},
             {hts: "2917.12.50.00", material: "Plasticizer", desc: "Adipic acid esters (plasticizers)", mfn: "6.5%", special: "Free (FTA countries)", col2: "25%"},
@@ -813,7 +817,7 @@
         // Material group data with MFN base rates
         const materialData = [
             {material: "Cigarette Paper", hts: "4813.10-90", desc: "Cigarette paper in booklets, tubes, rolls", mfnBase: 0, col2: 60},
-            {material: "Tipping Paper", hts: "4813.20.00", desc: "Paper for cigarette tips, ‚â§5cm rolls", mfnBase: 0, col2: 60},
+            {material: "Tipping Paper", hts: "4813.20.00", desc: "Paper for cigarette tips, ≤5cm rolls", mfnBase: 0, col2: 60},
             {material: "Plugwrap", hts: "4813.90.00", desc: "Other cigarette paper for plug wrap", mfnBase: 0, col2: 60},
             {material: "Filter Tow", hts: "5502.10-90", desc: "Cellulose acetate and other artificial filament tow", mfnBase: 7.5, col2: 45},
             {material: "Filter Rods", hts: "5601.22.00", desc: "Man-made fiber wadding/articles (filter rods)", mfnBase: 6.3, col2: 74},
@@ -997,7 +1001,7 @@
             tbody.innerHTML = '';
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="14" class="no-results">No results found. Try adjusting your filters.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="18" class="no-results">No results found. Try adjusting your filters.</td></tr>';
                 return;
             }
 
@@ -1014,6 +1018,8 @@
                     <td>${row.region}</td>
                     <td><span class="trade-program ${getProgramClass(row.program)}">${getProgramLabel(row.program)}</span></td>
                     <td class="rate-cell ${getRateClass(row.cigarettePaper)}">${formatRate(row.cigarettePaper)}</td>
+                    <td class="rate-cell ${getRateClass(row.tippingPaper)}">${formatRate(row.tippingPaper)}</td>
+                    <td class="rate-cell ${getRateClass(row.plugwrap)}">${formatRate(row.plugwrap)}</td>
                     <td class="rate-cell ${getRateClass(row.filterTow)}">${formatRate(row.filterTow)}</td>
                     <td class="rate-cell ${getRateClass(row.filterRods)}">${formatRate(row.filterRods)}</td>
                     <td class="rate-cell ${getRateClass(row.adhesive)}">${formatRate(row.adhesive)}</td>
@@ -1022,8 +1028,10 @@
                     <td class="rate-cell ${getRateClass(row.adsorbent)}">${formatRate(row.adsorbent)}</td>
                     <td class="rate-cell ${getRateClass(row.boardPack)}">${formatRate(row.boardPack)}</td>
                     <td class="rate-cell ${getRateClass(row.paperPack)}">${formatRate(row.paperPack)}</td>
-                    <td class="notes-cell">${row.altRate || ''}</td>
-                    <td class="notes-cell">${row.notes || ''}</td>
+                    <td class="rate-cell ${getRateClass(row.innerBundling)}">${formatRate(row.innerBundling)}</td>
+                    <td class="rate-cell ${getRateClass(row.boardInnerFrame)}">${formatRate(row.boardInnerFrame)}</td>
+                    <td class="alt-rate">${row.altRate || '-'}</td>
+                    <td class="notes-cell">${row.notes}</td>
                 `;
                 tbody.appendChild(tr);
             });
