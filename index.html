@@ -104,33 +104,22 @@
         }
 
         .multiselect-btn {
-            padding: 10px 12px;
+     padding: 10px 32px 10px 12px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             font-size: 14px;
             background: white;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
             cursor: pointer;
             transition: border-color 0.2s, box-shadow 0.2s;
             width: 100%;
             text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-
+ 
         .multiselect-btn:hover {
             border-color: #cbd5e0;
-        }
-
-        .multiselect-btn::after {
-            content: '‚ñº';
-            font-size: 10px;
-            color: #666;
-        }
-
-        .multiselect-dropdown {
-            display: none;
-            position: absolute;
             top: 100%;
             left: 0;
             right: 0;
@@ -1819,3 +1808,4 @@
     </script>
 </body>
 </html>
+
