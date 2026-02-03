@@ -64,6 +64,148 @@
             gap: 15px;
         }
 
+        .supply-chain-section {
+            background: #fffbeb;
+            border: 1px solid #f6e05e;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .supply-chain-warning {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #c53030;
+        }
+
+        .supply-chain-warning.info {
+            background: #bee3f8;
+            border-color: #63b3ed;
+            color: #2b6cb0;
+        }
+
+        .rate-adjusted {
+            position: relative;
+        }
+
+        .rate-adjusted::after {
+            content: '⚠';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+        }
+
+        /* Row-level Tier 2 and Conversion columns */
+        .tier2-col, .conversion-col {
+            background: #fefce8;
+            min-width: 120px;
+            max-width: 140px;
+            font-size: 11px;
+        }
+
+        .tier2-cell, .conversion-cell {
+            padding: 4px !important;
+            background: #fffef5;
+        }
+
+        .row-tier2-select, .row-conversion-select {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 11px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .row-tier2-select:hover, .row-conversion-select:hover {
+            border-color: #f6e05e;
+        }
+
+        .row-tier2-select:focus, .row-conversion-select:focus {
+            outline: none;
+            border-color: #ecc94b;
+            box-shadow: 0 0 0 2px rgba(236, 201, 75, 0.2);
+        }
+
+        .conversion-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .row-conversion-rate {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 11px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .row-conversion-rate:focus {
+            outline: none;
+            border-color: #ecc94b;
+            box-shadow: 0 0 0 2px rgba(236, 201, 75, 0.2);
+        }
+
+        .row-conversion-rate::placeholder {
+            color: #a0aec0;
+        }
+
+        /* Adjustment wrapper for tier2/conversion cells */
+        .adjustment-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Material chips for selecting which materials to adjust */
+        .material-chips {
+            margin-top: 4px;
+        }
+
+        .chip-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        .mat-chip {
+            display: inline-block;
+            padding: 2px 5px;
+            font-size: 9px;
+            background: #e2e8f0;
+            color: #4a5568;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .mat-chip:hover {
+            background: #cbd5e0;
+        }
+
+        .mat-chip.selected {
+            background: #4299e1;
+            color: white;
+        }
+
+        .mat-chip.selected:hover {
+            background: #3182ce;
+        }
+
+        /* Highlight rows with adjustments */
+        tr:has(.mat-chip.selected) .rate-cell {
+            background: #fffbeb;
+        }
+
         .filter-group {
             display: flex;
             flex-direction: column;
@@ -526,6 +668,23 @@
 
         .export-btn:hover { background: #2f855a; }
 
+        .clear-adj-btn {
+            padding: 8px 14px;
+            background: #e2e8f0;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .clear-adj-btn:hover {
+            background: #cbd5e0;
+            color: #2d3748;
+        }
+
         .notes-cell {
             font-size: 10px;
             color: #666;
@@ -794,7 +953,7 @@
         <h1>US Import Duty Matrix - Tobacco Materials</h1>
         <p>Duty rates by material group, HTS code, and origin country</p>
         <div class="last-updated">
-            <div class="date">Last Updated: January 25, 2026</div>
+            <div class="date">Data Version: January 27, 2026 | Next Review: January 29, 2026</div>
             <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a>
             <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a>
         </div>
@@ -934,6 +1093,7 @@
                     </select>
                 </div>
             </div>
+
         </div>
 
         <div class="stats-bar">
@@ -962,6 +1122,7 @@
                     <h2>Duty Rates by Country <span style="font-size:11px;color:#718096;">(click rate to override)</span></h2>
                     <div class="view-toggle">
                         <input type="text" class="search-box" id="searchBox" placeholder="Search country..." oninput="applyFilters()">
+                        <button class="clear-adj-btn" onclick="clearAllAdjustments()" title="Clear all Tier 2 and Conversion adjustments">Clear Adjustments</button>
                         <button class="export-btn" onclick="exportToCSV()">Export CSV</button>
                     </div>
                 </div>
@@ -972,6 +1133,8 @@
                                 <th class="sortable" onclick="sortTable('country')">Country</th>
                                 <th>Region</th>
                                 <th>Program</th>
+                                <th class="tier2-col" title="Tier 2 Supplier - Select country then click material chips to apply">Tier 2<br><span class="hts-code">Supplier</span></th>
+                                <th class="conversion-col" title="Conversion - Select country, enter rate, then click material chips to apply">Conversion<br><span class="hts-code">Rate</span></th>
                                 <th class="sortable material-col" data-material="cigarettePaper" onclick="sortTable('cigarettePaper')">Cig Paper<br><span class="hts-code">4813.10</span></th>
                                 <th class="sortable material-col" data-material="tippingPaper" onclick="sortTable('tippingPaper')">Tipping<br><span class="hts-code">4813.20</span></th>
                                 <th class="sortable material-col" data-material="plugwrap" onclick="sortTable('plugwrap')">Plugwrap<br><span class="hts-code">4813.90</span></th>
@@ -1073,10 +1236,11 @@
                         <div class="quote-source">Source: <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a></div>
                     </div>
                     <div class="quote-block">
-                        "China: 20% IEEPA tariff applies in addition to MFN and Section 301 duties."<br>
-                        "Vietnam: 20% reciprocal rate"<br>
-                        "India, Thailand, Malaysia, Indonesia: 10% baseline rate"
-                        <div class="quote-source">Source: Executive Order on Reciprocal Trade, April 2025</div>
+                        "China: 10% Reciprocal + 10% Fentanyl IEEPA tariffs (CBP CSMS #66749380)"<br>
+                        "Vietnam: 20% (WH Framework Agreement Jul 2025)"<br>
+                        "Malaysia, Thailand, Indonesia, Philippines: 19% (WH Framework Agreements)"<br>
+                        "Japan, South Korea: 15% (WH Framework Agreements)"
+                        <div class="quote-source">Source: <a href="https://ustr.gov/trade-topics/presidential-tariff-actions" target="_blank">USTR Presidential Tariff Actions</a></div>
                     </div>
                 </div>
 
@@ -1118,7 +1282,73 @@
                 </div>
 
                 <div class="appendix-section">
-                    <h4>7. Disclaimer</h4>
+                    <h4>7. Data Maintenance Protocol</h4>
+                    <p style="font-size:12px;margin-bottom:10px;"><strong>Update Frequency:</strong> Every 48 hours</p>
+                    <p style="font-size:12px;margin-bottom:10px;"><strong>Official Sources to Check:</strong></p>
+                    <table style="width:100%;font-size:11px;border-collapse:collapse;margin-bottom:15px;">
+                        <tr style="background:#f7fafc;">
+                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Data Type</th>
+                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Official Source</th>
+                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">URL</th>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">HTS Base Rates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">USITC Data Catalog</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2024" target="_blank">data.gov HTS Dataset</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">IEEPA Country Rates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP IEEPA FAQ</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">IEEPA Annex I (Country List)</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">White House</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.whitehouse.gov/wp-content/uploads/2025/04/Annex-I.pdf" target="_blank">Annex-I.pdf</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">Section 301 (China)</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">USTR</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR Section 301</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">Trade Deal Updates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">USTR</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://ustr.gov/trade-topics/presidential-tariff-actions" target="_blank">Presidential Tariff Actions</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">Implementation Updates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP CSMS</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/automated/cargo-systems-messaging-service" target="_blank">CBP CSMS Messages</a></td>
+                        </tr>
+                    </table>
+                    <p style="font-size:11px;color:#666;"><strong>Last Data Verification:</strong> <span id="lastVerified">January 26, 2026</span></p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>8. Verified Rate Sources by Country</h4>
+                    <p style="font-size:12px;margin-bottom:10px;">Key country rates verified against official sources:</p>
+                    <table style="width:100%;font-size:11px;border-collapse:collapse;">
+                        <tr style="background:#f7fafc;">
+                            <th style="padding:6px;border:1px solid #e2e8f0;">Country</th>
+                            <th style="padding:6px;border:1px solid #e2e8f0;">IEEPA Rate</th>
+                            <th style="padding:6px;border:1px solid #e2e8f0;">Source</th>
+                        </tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">China</td><td style="padding:6px;border:1px solid #e2e8f0;">10% Reciprocal + 10% Fentanyl + 25% Sec 301</td><td style="padding:6px;border:1px solid #e2e8f0;">CBP CSMS #66749380</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Malaysia</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH US-Malaysia Agreement Oct 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Vietnam</td><td style="padding:6px;border:1px solid #e2e8f0;">20%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Jul 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Thailand</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Oct 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Indonesia</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Jul 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Philippines</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Japan</td><td style="padding:6px;border:1px solid #e2e8f0;">15%</td><td style="padding:6px;border:1px solid #e2e8f0;">CRS R48549 / WH Framework</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">South Korea</td><td style="padding:6px;border:1px solid #e2e8f0;">15%</td><td style="padding:6px;border:1px solid #e2e8f0;">CRS R48549 / KORUS FTA</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">UK</td><td style="padding:6px;border:1px solid #e2e8f0;">10%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH UK Economic Prosperity Deal May 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">EU</td><td style="padding:6px;border:1px solid #e2e8f0;">15% ceiling</td><td style="padding:6px;border:1px solid #e2e8f0;">EO 14326 / WH EU Framework Aug 2025</td></tr>
+                    </table>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>9. Disclaimer</h4>
                     <p style="font-size:11px;color:#666;">
                         This tool is for informational purposes only. Tariff rates change frequently based on trade policy decisions.
                         Always verify current rates with official sources (USITC, CBP) before making import decisions.
@@ -1249,7 +1479,7 @@
         // Country duty data - all 13 materials
         const dutyData = [
             // Section 301 + IEEPA (China) - MFN + 20% IEEPA + 25% Section 301
-            {country: "China", iso: "CN", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "MFN + 20% IEEPA + 25% Sec 301"},
+            {country: "China", iso: "CN", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "MFN + 10% Reciprocal + 10% Fentanyl + 25% Sec 301", source: "CBP CSMS #66749380"},
             {country: "Hong Kong", iso: "HK", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "Treated same as China"},
 
             // USMCA
@@ -1263,7 +1493,7 @@
             {country: "Colombia", iso: "CO", region: "South America", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Colombia TPA"},
             {country: "Israel", iso: "IL", region: "Middle East", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Israel FTA"},
             {country: "Jordan", iso: "JO", region: "Middle East", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Jordan FTA"},
-            {country: "Korea (South)", iso: "KR", region: "Asia Pacific", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "KORUS FTA"},
+            {country: "Korea (South)", iso: "KR", region: "Asia Pacific", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "KORUS FTA - duty free", source: "KORUS FTA / HTS Special Column"},
             {country: "Morocco", iso: "MA", region: "Africa", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Morocco FTA"},
             {country: "Oman", iso: "OM", region: "Middle East", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Oman FTA"},
             {country: "Panama", iso: "PA", region: "Central America", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Panama TPA"},
@@ -1298,21 +1528,21 @@
             {country: "Romania", iso: "RO", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
 
             // Japan
-            {country: "Japan", iso: "JP", region: "Asia Pacific", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "Japan deal - 15% ceiling"},
+            {country: "Japan", iso: "JP", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 22.5, filterRods: 21.3, adhesive: 17.1, capsules: 20.3, plasticizer: 21.5, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "15% per US-Japan Framework", source: "CRS R48549 / WH Framework"},
 
             // Switzerland
             {country: "Switzerland", iso: "CH", region: "Europe - Non-EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "Swiss deal - 15% ceiling"},
 
             // UK
-            {country: "United Kingdom", iso: "GB", region: "Europe - Non-EU", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "United Kingdom", iso: "GB", region: "Europe - Non-EU", program: "Trade Deal", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "10% per US-UK Deal May 2025", source: "WH UK Economic Prosperity Deal"},
 
             // MFN + IEEPA countries
             {country: "India", iso: "IN", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: "+25% Russia", notes: "MFN + 10% IEEPA"},
-            {country: "Indonesia", iso: "ID", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Vietnam", iso: "VN", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 20, tippingPaper: 20, plugwrap: 20, filterTow: 27.5, filterRods: 26.3, adhesive: 22.1, capsules: 25.3, plasticizer: 26.5, adsorbent: 20, boardPack: 20, paperPack: 20, innerBundling: 20, boardInnerFrame: 20, altRate: "40% transship", notes: "MFN + 20% IEEPA"},
-            {country: "Thailand", iso: "TH", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Malaysia", iso: "MY", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Philippines", iso: "PH", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "Indonesia", iso: "ID", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Indonesia Framework Jul 2025", source: "WH Framework Agreement"},
+            {country: "Vietnam", iso: "VN", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 20, tippingPaper: 20, plugwrap: 20, filterTow: 27.5, filterRods: 26.3, adhesive: 22.1, capsules: 25.3, plasticizer: 26.5, adsorbent: 20, boardPack: 20, paperPack: 20, innerBundling: 20, boardInnerFrame: 20, altRate: null, notes: "20% per US-Vietnam Framework Jul 2025", source: "WH Framework Agreement"},
+            {country: "Thailand", iso: "TH", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Thailand Framework Oct 2025", source: "WH Framework Agreement"},
+            {country: "Malaysia", iso: "MY", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Malaysia Agreement Oct 2025", source: "WH US-Malaysia Agreement"},
+            {country: "Philippines", iso: "PH", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Philippines Framework", source: "WH Framework Agreement"},
             {country: "Taiwan", iso: "TW", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 22.5, filterRods: 21.3, adhesive: 17.1, capsules: 20.3, plasticizer: 21.5, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "MFN + 15% IEEPA"},
             {country: "Brazil", iso: "BR", region: "South America", program: "MFN + IEEPA", cigarettePaper: 50, tippingPaper: 50, plugwrap: 50, filterTow: 57.5, filterRods: 56.3, adhesive: 52.1, capsules: 55.3, plasticizer: 56.5, adsorbent: 50, boardPack: 50, paperPack: 50, innerBundling: 50, boardInnerFrame: 50, altRate: null, notes: "MFN + 10% + 40% add'l"},
             {country: "Argentina", iso: "AR", region: "South America", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
@@ -1355,6 +1585,229 @@
         let selectedCountries = []; // Array for country multi-select
         let overrides = JSON.parse(localStorage.getItem('dutyOverrides') || '{}');
         let currentOverrideCell = null;
+        // Row-level adjustments storage: { 'ISO': { tier2: 'XX', conversion: 'XX', conversionRate: 12.5 } }
+        let rowAdjustments = JSON.parse(localStorage.getItem('rowAdjustments') || '{}');
+
+        // USMCA and FTA country codes for qualification logic
+        const usmcaCountries = ['US', 'CA', 'MX'];
+        const ftaCountries = ['AU', 'BH', 'CL', 'CO', 'CR', 'DO', 'SV', 'GT', 'HN', 'IL', 'JO', 'KR', 'MA', 'NI', 'OM', 'PA', 'PE', 'SG'];
+
+        // Non-qualifying rates for USMCA
+        const nonQualifyingRates = {
+            'CA': 25, // Canada non-qualifying
+            'MX': 25  // Mexico non-qualifying
+        };
+
+        // Materials that support Tier 2 / Conversion adjustments (paper and board only)
+        const tier2ConversionMaterials = [
+            'cigarettePaper',
+            'tippingPaper',
+            'plugwrap',
+            'boardPack',
+            'paperPack',
+            'innerBundling',
+            'boardInnerFrame'
+        ];
+
+        // Generate country options HTML for dropdowns
+        function getCountryOptionsHTML(selectedValue) {
+            let html = '';
+            // Add US as special option (for domestic conversion)
+            html += `<option value="US" ${selectedValue === 'US' ? 'selected' : ''}>US - United States</option>`;
+
+            dutyData.forEach(country => {
+                html += `<option value="${country.iso}" ${selectedValue === country.iso ? 'selected' : ''}>${country.iso} - ${country.country}</option>`;
+            });
+            return html;
+        }
+
+        // Short material names for chips
+        const materialShortNames = {
+            'cigarettePaper': 'Cig Paper',
+            'tippingPaper': 'Tipping',
+            'plugwrap': 'Plugwrap',
+            'boardPack': 'Board Pk',
+            'paperPack': 'Paper Pk',
+            'innerBundling': 'Bundling',
+            'boardInnerFrame': 'Bd Frame'
+        };
+
+        // Generate material chips HTML - only show when country/rate is selected
+        function getMaterialChipsHTML(selectedMats, rowIso, type, hasValue) {
+            if (!hasValue) return ''; // Don't show chips if no country/rate selected
+
+            let html = '<div class="chip-select">';
+            tier2ConversionMaterials.forEach(mat => {
+                const isSelected = selectedMats.includes(mat);
+                const shortName = materialShortNames[mat] || mat;
+                html += `<span class="mat-chip ${isSelected ? 'selected' : ''}"
+                              data-material="${mat}"
+                              onclick="toggleMaterialChip(this, '${rowIso}', '${type}')">${shortName}</span>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        // Toggle material chip selection
+        function toggleMaterialChip(chipEl, rowIso, type) {
+            const mat = chipEl.getAttribute('data-material');
+            chipEl.classList.toggle('selected');
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+
+            const materialsKey = type === 'tier2' ? 'tier2Materials' : 'conversionMaterials';
+            if (!rowAdjustments[rowIso][materialsKey]) {
+                rowAdjustments[rowIso][materialsKey] = [];
+            }
+
+            const idx = rowAdjustments[rowIso][materialsKey].indexOf(mat);
+            if (idx > -1) {
+                rowAdjustments[rowIso][materialsKey].splice(idx, 1);
+            } else {
+                rowAdjustments[rowIso][materialsKey].push(mat);
+            }
+
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+            updateRowRates(rowIso);
+        }
+
+        // Row-level Tier 2 update
+        function updateRowTier2(selectEl) {
+            const rowIso = selectEl.getAttribute('data-row-iso');
+            const tier2Value = selectEl.value;
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+            rowAdjustments[rowIso].tier2 = tier2Value;
+
+            // Save to localStorage
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+
+            // Re-render only the rates for this row (not full table to preserve selections)
+            updateRowRates(rowIso);
+        }
+
+        // Row-level Conversion country update
+        function updateRowConversion(selectEl) {
+            const rowIso = selectEl.getAttribute('data-row-iso');
+            const conversionValue = selectEl.value;
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+            rowAdjustments[rowIso].conversion = conversionValue;
+
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+            updateRowRates(rowIso);
+        }
+
+        // Row-level Conversion rate update
+        function updateRowConversionRate(inputEl) {
+            const rowIso = inputEl.getAttribute('data-row-iso');
+            const rateValue = inputEl.value;
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+            rowAdjustments[rowIso].conversionRate = rateValue ? parseFloat(rateValue) : null;
+
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+            updateRowRates(rowIso);
+        }
+
+        // Clear all row-level adjustments
+        function clearAllAdjustments() {
+            if (Object.keys(rowAdjustments).length === 0) {
+                return; // Nothing to clear
+            }
+
+            if (confirm('Clear all Tier 2 and Conversion adjustments?')) {
+                rowAdjustments = {};
+                localStorage.removeItem('rowAdjustments');
+                renderTable(); // Re-render to reset all dropdowns
+            }
+        }
+
+        // Update only the rate cells for a specific row (performance optimization)
+        function updateRowRates(rowIso) {
+            const row = dutyData.find(d => d.iso === rowIso);
+            if (!row) return;
+
+            const tr = document.querySelector(`tr[data-row-iso="${rowIso}"]`);
+            if (!tr) return;
+
+            const materials = Object.keys(materialColumns);
+            const rateCells = tr.querySelectorAll('.rate-cell');
+
+            materials.forEach((mat, idx) => {
+                const cell = rateCells[idx];
+                if (!cell) return;
+
+                const overrideKey = `${rowIso}_${mat}`;
+                const hasOverride = overrides[overrideKey] !== undefined;
+                let rate = hasOverride ? overrides[overrideKey] : row[mat];
+
+                // Apply row-level tier 2 / conversion adjustments
+                const adjustedRate = getRowAdjustedRate(rowIso, mat, rate, row);
+                const isAdjusted = adjustedRate !== rate && !hasOverride;
+                if (isAdjusted) rate = adjustedRate;
+
+                // Update cell
+                cell.className = `rate-cell ${getRateClass(rate)}`;
+                if (selectedMaterials.length > 0 && !selectedMaterials.includes(mat)) {
+                    cell.classList.add('hidden-col');
+                }
+                if (hasOverride) cell.classList.add('has-override');
+                if (isAdjusted) cell.classList.add('rate-adjusted');
+
+                cell.textContent = formatRate(rate);
+            });
+        }
+
+        // Helper to get country name from ISO code
+        function getCountryName(iso) {
+            const country = dutyData.find(d => d.iso === iso);
+            if (country) return country.country;
+
+            // Fallback for countries not in main list
+            const names = {
+                'US': 'United States',
+                'OTHER': 'Other Country'
+            };
+            return names[iso] || iso;
+        }
+
+        // Get row-level adjusted rate considering tier 2 and conversion
+        // Only applies to user-selected materials for that row
+        function getRowAdjustedRate(countryIso, materialKey, baseRate, rowData) {
+            const adj = rowAdjustments[countryIso];
+            if (!adj) return baseRate;
+
+            // Check if this material is selected for conversion adjustment
+            const conversionMaterials = adj.conversionMaterials || [];
+            if (adj.conversionRate !== null && adj.conversionRate !== undefined && !isNaN(adj.conversionRate)) {
+                if (conversionMaterials.includes(materialKey)) {
+                    return adj.conversionRate;
+                }
+            }
+
+            // Check if this material is selected for tier 2 adjustment
+            const tier2Materials = adj.tier2Materials || [];
+            if (adj.tier2 && tier2Materials.includes(materialKey)) {
+                // USMCA countries - check if tier 2 disqualifies
+                if (usmcaCountries.includes(countryIso) && countryIso !== 'US') {
+                    if (!usmcaCountries.includes(adj.tier2)) {
+                        // Tier 2 is outside USMCA - doesn't qualify for preferential rate
+                        return nonQualifyingRates[countryIso] || baseRate;
+                    }
+                }
+            }
+
+            return baseRate;
+        }
 
         // Material multi-select functions
         function toggleMaterialDropdown(event) {
@@ -1555,14 +2008,23 @@
             tbody.innerHTML = '';
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="18" class="no-results">No results found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="20" class="no-results">No results found.</td></tr>';
                 return;
             }
 
             const materials = Object.keys(materialColumns);
 
-            filteredData.forEach(row => {
+            filteredData.forEach((row, rowIndex) => {
                 const tr = document.createElement('tr');
+                tr.setAttribute('data-row-iso', row.iso);
+
+                // Get row-level adjustments
+                const rowAdj = rowAdjustments[row.iso] || {};
+                const rowTier2 = rowAdj.tier2 || '';
+                const rowTier2Materials = rowAdj.tier2Materials || [];
+                const rowConversion = rowAdj.conversion || '';
+                const rowConversionRate = rowAdj.conversionRate || '';
+                const rowConversionMaterials = rowAdj.conversionMaterials || [];
 
                 let html = `
                     <td>
@@ -1574,16 +2036,50 @@
                     </td>
                     <td>${row.region}</td>
                     <td><span class="trade-program ${getProgramClass(row.program)}">${getProgramLabel(row.program)}</span></td>
+                    <td class="tier2-cell">
+                        <div class="adjustment-wrapper">
+                            <select class="row-tier2-select" data-row-iso="${row.iso}" onchange="updateRowTier2(this)">
+                                <option value="">-</option>
+                                ${getCountryOptionsHTML(rowTier2)}
+                            </select>
+                            <div class="material-chips" data-row-iso="${row.iso}" data-type="tier2">
+                                ${getMaterialChipsHTML(rowTier2Materials, row.iso, 'tier2', rowTier2)}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="conversion-cell">
+                        <div class="adjustment-wrapper">
+                            <select class="row-conversion-select" data-row-iso="${row.iso}" onchange="updateRowConversion(this)">
+                                <option value="">-</option>
+                                ${getCountryOptionsHTML(rowConversion)}
+                            </select>
+                            <input type="number" class="row-conversion-rate" data-row-iso="${row.iso}"
+                                   placeholder="%" step="0.1" min="0" max="100"
+                                   value="${rowConversionRate}"
+                                   onchange="updateRowConversionRate(this)"
+                                   title="Override rate (%)">
+                            <div class="material-chips" data-row-iso="${row.iso}" data-type="conversion">
+                                ${getMaterialChipsHTML(rowConversionMaterials, row.iso, 'conversion', rowConversionRate)}
+                            </div>
+                        </div>
+                    </td>
                 `;
 
                 materials.forEach(mat => {
                     const overrideKey = `${row.iso}_${mat}`;
                     const hasOverride = overrides[overrideKey] !== undefined;
-                    const rate = hasOverride ? overrides[overrideKey] : row[mat];
+                    let rate = hasOverride ? overrides[overrideKey] : row[mat];
+
+                    // Apply row-level tier 2 / conversion adjustments
+                    const adjustedRate = getRowAdjustedRate(row.iso, mat, rate, row);
+                    const isAdjusted = adjustedRate !== rate && !hasOverride;
+                    if (isAdjusted) rate = adjustedRate;
+
                     const hiddenClass = (selectedMaterials.length > 0 && !selectedMaterials.includes(mat)) ? 'hidden-col' : '';
                     const overrideClass = hasOverride ? 'has-override' : '';
+                    const adjustedClass = isAdjusted ? 'rate-adjusted' : '';
 
-                    html += `<td class="rate-cell ${getRateClass(rate)} ${hiddenClass} ${overrideClass}"
+                    html += `<td class="rate-cell ${getRateClass(rate)} ${hiddenClass} ${overrideClass} ${adjustedClass}"
                                 data-country="${row.iso}" data-material="${mat}" data-original="${row[mat]}"
                                 onclick="openOverrideModal(this)">${formatRate(rate)}</td>`;
                 });
@@ -1756,13 +2252,23 @@
 
         function exportToCSV() {
             const materials = Object.keys(materialColumns);
-            const headers = ['Country', 'ISO', 'Region', 'Trade Program', ...materials.map(m => materialColumns[m]), 'Alt Rate', 'Notes'];
+            const headers = ['Country', 'ISO', 'Region', 'Trade Program', 'Tier 2 Supplier', 'Conversion Country', 'Conversion Rate', ...materials.map(m => materialColumns[m]), 'Alt Rate', 'Notes'];
             const rows = filteredData.map(row => {
+                const adj = rowAdjustments[row.iso] || {};
                 const rates = materials.map(m => {
                     const overrideKey = `${row.iso}_${m}`;
-                    return overrides[overrideKey] !== undefined ? overrides[overrideKey] : row[m];
+                    let rate = overrides[overrideKey] !== undefined ? overrides[overrideKey] : row[m];
+                    // Apply row-level adjustments for export
+                    const adjustedRate = getRowAdjustedRate(row.iso, m, rate, row);
+                    return adjustedRate;
                 });
-                return [row.country, row.iso, row.region, row.program, ...rates, row.altRate || '', row.notes];
+                return [
+                    row.country, row.iso, row.region, row.program,
+                    adj.tier2 ? getCountryName(adj.tier2) : '',
+                    adj.conversion ? getCountryName(adj.conversion) : '',
+                    adj.conversionRate || '',
+                    ...rates, row.altRate || '', row.notes
+                ];
             });
 
             let csv = headers.join(',') + '\n';
