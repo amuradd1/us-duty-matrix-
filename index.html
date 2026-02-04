@@ -1683,10 +1683,22 @@
             }
             rowAdjustments[rowIso].tier2 = tier2Value;
 
+            // Clear selected materials if country is cleared
+            if (!tier2Value) {
+                rowAdjustments[rowIso].tier2Materials = [];
+            }
+
             // Save to localStorage
             localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
 
-            // Re-render only the rates for this row (not full table to preserve selections)
+            // Update chips container for this row
+            const chipsContainer = document.querySelector(`.material-chips[data-row-iso="${rowIso}"][data-type="tier2"]`);
+            if (chipsContainer) {
+                const selectedMats = rowAdjustments[rowIso].tier2Materials || [];
+                chipsContainer.innerHTML = getMaterialChipsHTML(selectedMats, rowIso, 'tier2', tier2Value);
+            }
+
+            // Update rates for this row
             updateRowRates(rowIso);
         }
 
@@ -1700,7 +1712,21 @@
             }
             rowAdjustments[rowIso].conversion = conversionValue;
 
+            // Clear selected materials if country is cleared
+            if (!conversionValue) {
+                rowAdjustments[rowIso].conversionMaterials = [];
+            }
+
             localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+
+            // Update chips container for this row
+            const chipsContainer = document.querySelector(`.material-chips[data-row-iso="${rowIso}"][data-type="conversion"]`);
+            if (chipsContainer) {
+                const selectedMats = rowAdjustments[rowIso].conversionMaterials || [];
+                const hasRate = rowAdjustments[rowIso].conversionRate;
+                chipsContainer.innerHTML = getMaterialChipsHTML(selectedMats, rowIso, 'conversion', hasRate);
+            }
+
             updateRowRates(rowIso);
         }
 
@@ -1715,6 +1741,14 @@
             rowAdjustments[rowIso].conversionRate = rateValue ? parseFloat(rateValue) : null;
 
             localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+
+            // Update chips container for this row
+            const chipsContainer = document.querySelector(`.material-chips[data-row-iso="${rowIso}"][data-type="conversion"]`);
+            if (chipsContainer) {
+                const selectedMats = rowAdjustments[rowIso].conversionMaterials || [];
+                chipsContainer.innerHTML = getMaterialChipsHTML(selectedMats, rowIso, 'conversion', rateValue);
+            }
+
             updateRowRates(rowIso);
         }
 
