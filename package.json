@@ -1,0 +1,30 @@
+{
+  "name": "us-duty-matrix",
+  "version": "1.0.0",
+  "description": "US Import Duty Matrix for Tobacco Materials",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check-updates": "node scripts/check-tariff-updates.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amuradd1/us-duty-matrix-.git"
+  },
+  "keywords": [
+    "tariff",
+    "duty",
+    "import",
+    "hts",
+    "trade"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
