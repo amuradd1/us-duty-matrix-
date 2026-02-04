@@ -23,6 +23,7 @@
             color: white;
             padding: 20px 40px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .header h1 {
@@ -63,6 +64,148 @@
             gap: 15px;
         }
 
+        .supply-chain-section {
+            background: #fffbeb;
+            border: 1px solid #f6e05e;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .supply-chain-warning {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #c53030;
+        }
+
+        .supply-chain-warning.info {
+            background: #bee3f8;
+            border-color: #63b3ed;
+            color: #2b6cb0;
+        }
+
+        .rate-adjusted {
+            position: relative;
+        }
+
+        .rate-adjusted::after {
+            content: '⚠';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+        }
+
+        /* Row-level Tier 2 and Conversion columns */
+        .tier2-col, .conversion-col {
+            background: #fefce8;
+            min-width: 120px;
+            max-width: 140px;
+            font-size: 11px;
+        }
+
+        .tier2-cell, .conversion-cell {
+            padding: 4px !important;
+            background: #fffef5;
+        }
+
+        .row-tier2-select, .row-conversion-select {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 11px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .row-tier2-select:hover, .row-conversion-select:hover {
+            border-color: #f6e05e;
+        }
+
+        .row-tier2-select:focus, .row-conversion-select:focus {
+            outline: none;
+            border-color: #ecc94b;
+            box-shadow: 0 0 0 2px rgba(236, 201, 75, 0.2);
+        }
+
+        .conversion-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .row-conversion-rate {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 11px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .row-conversion-rate:focus {
+            outline: none;
+            border-color: #ecc94b;
+            box-shadow: 0 0 0 2px rgba(236, 201, 75, 0.2);
+        }
+
+        .row-conversion-rate::placeholder {
+            color: #a0aec0;
+        }
+
+        /* Adjustment wrapper for tier2/conversion cells */
+        .adjustment-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Material chips for selecting which materials to adjust */
+        .material-chips {
+            margin-top: 4px;
+        }
+
+        .chip-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        .mat-chip {
+            display: inline-block;
+            padding: 2px 5px;
+            font-size: 9px;
+            background: #e2e8f0;
+            color: #4a5568;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .mat-chip:hover {
+            background: #cbd5e0;
+        }
+
+        .mat-chip.selected {
+            background: #4299e1;
+            color: white;
+        }
+
+        .mat-chip.selected:hover {
+            background: #3182ce;
+        }
+
+        /* Highlight rows with adjustments */
+        tr:has(.mat-chip.selected) .rate-cell {
+            background: #fffbeb;
+        }
+
         .filter-group {
             display: flex;
             flex-direction: column;
@@ -97,9 +240,134 @@
             box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
         }
 
+        /* Multi-select dropdown */
+        .multiselect-container {
+            position: relative;
+        }
+
+        .multiselect-btn {
+            padding: 10px 32px 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+
+        .multiselect-btn:hover {
+            border-color: #cbd5e0;
+        }
+
+        .multiselect-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 4px;
+        }
+
+        .multiselect-dropdown.active {
+            display: block;
+        }
+
+        .multiselect-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .multiselect-option:hover {
+            background: #f7fafc;
+        }
+
+        .multiselect-option input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .multiselect-actions {
+            display: flex;
+            gap: 8px;
+            padding: 8px 12px;
+            border-top: 1px solid #e2e8f0;
+            background: #f7fafc;
+        }
+
+        .multiselect-actions button {
+            flex: 1;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .multiselect-actions .select-all {
+            background: #3182ce;
+            color: white;
+        }
+
+        .multiselect-actions .clear-all {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .selected-count {
+            font-size: 11px;
+            color: #666;
+            margin-left: 4px;
+        }
+
+        /* Country multi-select with search */
+        .multiselect-search {
+            padding: 8px 12px;
+            border: none;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .multiselect-search:focus {
+            border-bottom-color: #3182ce;
+        }
+
+        .multiselect-options {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .multiselect-option.hidden {
+            display: none;
+        }
+
+        .country-option-flag {
+            width: 18px;
+            height: 13px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+
         .stats-bar {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
@@ -107,19 +375,20 @@
         .stat-card {
             background: white;
             border-radius: 10px;
-            padding: 15px 20px;
+            padding: 12px 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            min-width: 150px;
+            min-width: 120px;
+            flex: 1;
         }
 
         .stat-card .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: #1a365d;
         }
 
         .stat-card .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -153,7 +422,8 @@
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             font-size: 14px;
-            width: 250px;
+            width: 200px;
+            max-width: 100%;
         }
 
         .search-box:focus {
@@ -165,12 +435,13 @@
             overflow-x: auto;
             max-height: 600px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         thead {
@@ -181,12 +452,13 @@
 
         th {
             background: #f8fafc;
-            padding: 10px 8px;
+            padding: 8px 6px;
             text-align: left;
             font-weight: 600;
             color: #4a5568;
             border-bottom: 2px solid #e2e8f0;
             white-space: nowrap;
+            font-size: 10px;
         }
 
         th.sortable {
@@ -203,8 +475,12 @@
             opacity: 0.4;
         }
 
+        th.hidden-col, td.hidden-col {
+            display: none;
+        }
+
         td {
-            padding: 10px 8px;
+            padding: 8px 6px;
             border-bottom: 1px solid #f0f0f0;
             vertical-align: middle;
         }
@@ -216,21 +492,34 @@
         .country-cell {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            min-width: 140px;
         }
 
         .country-flag {
-            width: 24px;
-            height: 16px;
+            width: 20px;
+            height: 14px;
             border-radius: 2px;
             object-fit: cover;
+            flex-shrink: 0;
         }
 
         .rate-cell {
             font-weight: 600;
             text-align: center;
-            padding: 4px 6px;
+            padding: 4px 5px;
             border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            min-width: 50px;
+        }
+
+        .rate-cell:hover {
+            opacity: 0.85;
+        }
+
+        .rate-cell.has-override {
+            border: 2px dashed #e53e3e;
         }
 
         .rate-free {
@@ -255,65 +544,40 @@
 
         .trade-program {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
         }
 
-        .program-fta {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .program-usmca {
-            background: #bee3f8;
-            color: #2a4365;
-        }
-
-        .program-mfn {
-            background: #feebc8;
-            color: #744210;
-        }
-
-        .program-15cap {
-            background: #e9d8fd;
-            color: #44337a;
-        }
-
-        .program-301 {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .program-col2 {
-            background: #718096;
-            color: white;
-        }
+        .program-fta { background: #c6f6d5; color: #22543d; }
+        .program-usmca { background: #bee3f8; color: #2a4365; }
+        .program-mfn { background: #feebc8; color: #744210; }
+        .program-15cap { background: #e9d8fd; color: #44337a; }
+        .program-301 { background: #fed7d7; color: #742a2a; }
+        .program-col2 { background: #718096; color: white; }
 
         .iso-tag {
             display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 9px;
             font-weight: 500;
             background: #edf2f7;
             color: #4a5568;
-            margin-left: 5px;
         }
 
         .hts-code {
             font-family: monospace;
-            font-size: 11px;
+            font-size: 9px;
             color: #666;
+            display: block;
         }
 
         .alt-rate {
-            font-size: 10px;
+            font-size: 9px;
             color: #e53e3e;
-            display: block;
-            margin-top: 2px;
         }
 
         .no-results {
@@ -340,14 +604,14 @@
         .legend-items {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
+            gap: 5px;
+            font-size: 11px;
         }
 
         .legend-color {
@@ -365,60 +629,66 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             width: fit-content;
+            flex-wrap: wrap;
         }
 
         .tab {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
             background: transparent;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: #666;
             transition: all 0.2s;
         }
 
-        .tab:hover {
-            background: #f0f0f0;
-        }
-
-        .tab.active {
-            background: #1a365d;
-            color: white;
-        }
+        .tab:hover { background: #f0f0f0; }
+        .tab.active { background: #1a365d; color: white; }
 
         .view-toggle {
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .export-btn {
-            padding: 8px 16px;
+            padding: 8px 14px;
             background: #38a169;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             transition: background 0.2s;
         }
 
-        .export-btn:hover {
-            background: #2f855a;
+        .export-btn:hover { background: #2f855a; }
+
+        .clear-adj-btn {
+            padding: 8px 14px;
+            background: #e2e8f0;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .clear-adj-btn:hover {
+            background: #cbd5e0;
+            color: #2d3748;
         }
 
         .notes-cell {
-            font-size: 11px;
+            font-size: 10px;
             color: #666;
-            max-width: 200px;
-        }
-
-        .warning-icon {
-            color: #d69e2e;
-            margin-right: 4px;
+            max-width: 150px;
         }
 
         .data-date {
@@ -432,30 +702,24 @@
             top: 20px;
             right: 40px;
             text-align: right;
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255,255,255,0.85);
         }
 
         .last-updated .date {
             font-weight: 600;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .last-updated a {
             color: rgba(255,255,255,0.9);
             text-decoration: none;
             display: block;
-            font-size: 11px;
-            margin-top: 2px;
+            font-size: 10px;
+            margin-top: 1px;
         }
 
-        .last-updated a:hover {
-            text-decoration: underline;
-        }
-
-        .header {
-            position: relative;
-        }
+        .last-updated a:hover { text-decoration: underline; }
 
         .sources-section {
             background: #edf2f7;
@@ -474,72 +738,222 @@
         .sources-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
         }
 
         .sources-list a {
-            font-size: 12px;
+            font-size: 11px;
             color: #3182ce;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
 
-        .sources-list a:hover {
-            text-decoration: underline;
+        .sources-list a:hover { text-decoration: underline; }
+
+        .view-container { display: none; }
+        .view-container.active { display: block; }
+
+        .material-table th, .material-table td { text-align: center; }
+        .material-table th:first-child, .material-table td:first-child { text-align: left; }
+
+        /* Appendix styles */
+        .appendix {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
-        .sources-list a::before {
-            content: "→";
-            font-size: 10px;
+        .appendix h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
         }
 
-        /* View containers */
-        .view-container {
+        .appendix-section {
+            margin-bottom: 20px;
+        }
+
+        .appendix-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .quote-block {
+            background: #f7fafc;
+            border-left: 4px solid #3182ce;
+            padding: 12px 15px;
+            margin: 10px 0;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        .quote-source {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .quote-source a {
+            color: #3182ce;
+        }
+
+        /* Override modal */
+        .modal-overlay {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
-        .view-container.active {
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-size: 16px;
+            color: #1a365d;
+            margin-bottom: 15px;
+        }
+
+        .modal-field {
+            margin-bottom: 15px;
+        }
+
+        .modal-field label {
             display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
         }
 
-        /* Material view table */
-        .material-table th, .material-table td {
-            text-align: center;
-        }
-        .material-table th:first-child, .material-table td:first-child {
-            text-align: left;
+        .modal-field input, .modal-field select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
         }
 
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal-btn.primary { background: #3182ce; color: white; }
+        .modal-btn.secondary { background: #e2e8f0; color: #4a5568; }
+        .modal-btn.danger { background: #e53e3e; color: white; }
+
+        /* Mobile responsive */
         @media (max-width: 768px) {
             .header {
-                padding: 15px 20px;
+                padding: 15px;
+                padding-bottom: 60px;
             }
 
-            .container {
-                padding: 10px;
+            .header h1 { font-size: 18px; }
+            .header p { font-size: 12px; }
+
+            .last-updated {
+                position: relative;
+                top: auto;
+                right: auto;
+                text-align: left;
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid rgba(255,255,255,0.2);
             }
 
-            .filters-grid {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 10px; }
 
-            .stats-bar {
-                flex-direction: column;
-            }
+            .filters-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+            .filter-group select { padding: 8px 10px; font-size: 13px; }
+
+            .stats-bar { gap: 8px; }
 
             .stat-card {
-                width: 100%;
+                padding: 10px 12px;
+                min-width: 70px;
             }
+
+            .stat-card .stat-value { font-size: 16px; }
+            .stat-card .stat-label { font-size: 9px; }
+
+            .tabs { width: 100%; }
+            .tab { padding: 8px 12px; font-size: 12px; flex: 1; text-align: center; }
+
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box { width: 100%; }
+
+            .view-toggle {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            table { font-size: 10px; }
+            th, td { padding: 6px 4px; }
+            th { font-size: 9px; }
+
+            .country-cell { min-width: 100px; }
+            .country-flag { width: 16px; height: 11px; }
+
+            .rate-cell { min-width: 40px; padding: 3px 4px; }
+
+            .legend-items { gap: 8px; }
+            .legend-item { font-size: 10px; }
+
+            .appendix { padding: 15px; }
+            .quote-block { padding: 10px; font-size: 11px; }
+        }
+
+        @media (max-width: 480px) {
+            .filters-grid { grid-template-columns: 1fr; }
+            .stats-bar { display: grid; grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>US Import Duty Matrix - Tobacco Materials</h1>
-        <p>Duty rates by material group, HTS code, and origin country | Data source: USITC HTS 2026 Rev 1 + IEEPA/Section 301</p>
+        <p>Duty rates by material group, HTS code, and origin country</p>
         <div class="last-updated">
-            <div class="date">Last Updated: January 25, 2026</div>
+            <div class="date">Data Version: January 27, 2026 | Next Review: January 29, 2026</div>
             <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a>
             <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a>
         </div>
@@ -550,6 +964,7 @@
             <button class="tab active" onclick="switchTab('country')">By Country</button>
             <button class="tab" onclick="switchTab('material')">By Material</button>
             <button class="tab" onclick="switchTab('hts')">By HTS Code</button>
+            <button class="tab" onclick="switchTab('appendix')">Appendix</button>
         </div>
 
         <div class="filters-section">
@@ -572,9 +987,21 @@
                 </div>
                 <div class="filter-group">
                     <label>Country</label>
-                    <select id="countryFilter" onchange="applyFilters()">
-                        <option value="">All Countries</option>
-                    </select>
+                    <div class="multiselect-container" id="countryMultiselect">
+                        <button class="multiselect-btn" onclick="toggleCountryDropdown(event)">
+                            <span id="countrySelectLabel">All Countries</span>
+                        </button>
+                        <div class="multiselect-dropdown" id="countryDropdown">
+                            <input type="text" class="multiselect-search" id="countrySearch" placeholder="Search countries..." oninput="filterCountryOptions()">
+                            <div class="multiselect-options" id="countryOptions">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <div class="multiselect-actions">
+                                <button class="select-all" onclick="selectAllCountries()">Select All</button>
+                                <button class="clear-all" onclick="clearAllCountries()">Clear All</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label>Trade Program</label>
@@ -584,29 +1011,76 @@
                         <option value="FTA">FTA Countries</option>
                         <option value="CAFTA-DR">CAFTA-DR</option>
                         <option value="EU/Japan 15% Cap">EU/Japan 15% Cap</option>
-                        <option value="MFN + IEEPA">MFN + IEEPA (Additive)</option>
+                        <option value="MFN + IEEPA">MFN + IEEPA</option>
                         <option value="Section 301">Section 301 (China)</option>
                         <option value="Column 2">Column 2 (Non-MFN)</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label>Material Group</label>
-                    <select id="materialFilter" onchange="applyFilters()">
-                        <option value="">All Materials</option>
-                        <option value="Cigarette Paper">Cigarette Paper</option>
-                        <option value="Tipping Paper">Tipping Paper</option>
-                        <option value="Plugwrap">Plugwrap</option>
-                        <option value="Filter Tow">Filter Tow</option>
-                        <option value="Filter Rods">Filter Rods</option>
-                        <option value="Adhesive">Adhesive</option>
-                        <option value="Capsules">Capsules</option>
-                        <option value="Plasticizer">Plasticizer</option>
-                        <option value="Adsorbent">Adsorbent</option>
-                        <option value="Board Packaging">Board Packaging</option>
-                        <option value="Paper Packaging">Paper Packaging</option>
-                        <option value="Inner Bundling">Inner Bundling</option>
-                        <option value="Board Inner Frame">Board Inner Frame</option>
-                    </select>
+                    <div class="multiselect-container" id="materialMultiselect">
+                        <button class="multiselect-btn" onclick="toggleMaterialDropdown(event)">
+                            <span id="materialSelectLabel">All Materials</span>
+                        </button>
+                        <div class="multiselect-dropdown" id="materialDropdown">
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_cigarettePaper" value="cigarettePaper" onchange="updateMaterialFilter()">
+                                <label for="mat_cigarettePaper">Cigarette Paper</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_tippingPaper" value="tippingPaper" onchange="updateMaterialFilter()">
+                                <label for="mat_tippingPaper">Tipping Paper</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_plugwrap" value="plugwrap" onchange="updateMaterialFilter()">
+                                <label for="mat_plugwrap">Plugwrap</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_filterTow" value="filterTow" onchange="updateMaterialFilter()">
+                                <label for="mat_filterTow">Filter Tow</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_filterRods" value="filterRods" onchange="updateMaterialFilter()">
+                                <label for="mat_filterRods">Filter Rods</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_adhesive" value="adhesive" onchange="updateMaterialFilter()">
+                                <label for="mat_adhesive">Adhesive</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_capsules" value="capsules" onchange="updateMaterialFilter()">
+                                <label for="mat_capsules">Capsules</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_plasticizer" value="plasticizer" onchange="updateMaterialFilter()">
+                                <label for="mat_plasticizer">Plasticizer</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_adsorbent" value="adsorbent" onchange="updateMaterialFilter()">
+                                <label for="mat_adsorbent">Adsorbent</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_boardPack" value="boardPack" onchange="updateMaterialFilter()">
+                                <label for="mat_boardPack">Board Packaging</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_paperPack" value="paperPack" onchange="updateMaterialFilter()">
+                                <label for="mat_paperPack">Paper Packaging</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_innerBundling" value="innerBundling" onchange="updateMaterialFilter()">
+                                <label for="mat_innerBundling">Inner Bundling</label>
+                            </div>
+                            <div class="multiselect-option">
+                                <input type="checkbox" id="mat_boardInnerFrame" value="boardInnerFrame" onchange="updateMaterialFilter()">
+                                <label for="mat_boardInnerFrame">Board Inner Frame</label>
+                            </div>
+                            <div class="multiselect-actions">
+                                <button class="select-all" onclick="selectAllMaterials()">Select All</button>
+                                <button class="clear-all" onclick="clearAllMaterials()">Clear All</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label>Duty Rate Range</label>
@@ -619,6 +1093,7 @@
                     </select>
                 </div>
             </div>
+
         </div>
 
         <div class="stats-bar">
@@ -628,10 +1103,10 @@
             </div>
             <div class="stat-card">
                 <div class="stat-value">13</div>
-                <div class="stat-label">Material Groups</div>
+                <div class="stat-label">Materials</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">35</div>
+                <div class="stat-value">17</div>
                 <div class="stat-label">HTS Codes</div>
             </div>
             <div class="stat-card">
@@ -644,29 +1119,36 @@
         <div id="countryView" class="view-container active">
             <div class="table-container">
                 <div class="table-header">
-                    <h2>Duty Rates by Country</h2>
+                    <h2>Duty Rates by Country <span style="font-size:11px;color:#718096;">(click rate to override)</span></h2>
                     <div class="view-toggle">
-                        <input type="text" class="search-box" id="searchBox" placeholder="Search country or code..." oninput="applyFilters()">
+                        <input type="text" class="search-box" id="searchBox" placeholder="Search country..." oninput="applyFilters()">
+                        <button class="clear-adj-btn" onclick="clearAllAdjustments()" title="Clear all Tier 2 and Conversion adjustments">Clear Adjustments</button>
                         <button class="export-btn" onclick="exportToCSV()">Export CSV</button>
                     </div>
                 </div>
                 <div class="table-scroll">
                     <table id="dutyTable">
                         <thead>
-                            <tr>
+                            <tr id="tableHeaderRow">
                                 <th class="sortable" onclick="sortTable('country')">Country</th>
                                 <th>Region</th>
-                                <th>Trade Program</th>
-                                <th class="sortable" onclick="sortTable('cigarettePaper')">Cigarette Paper<br><span class="hts-code">4813</span></th>
-                                <th class="sortable" onclick="sortTable('filterTow')">Filter Tow<br><span class="hts-code">5502</span></th>
-                                <th class="sortable" onclick="sortTable('filterRods')">Filter Rods<br><span class="hts-code">5601.22</span></th>
-                                <th class="sortable" onclick="sortTable('adhesive')">Adhesive<br><span class="hts-code">3506</span></th>
-                                <th class="sortable" onclick="sortTable('capsules')">Capsules<br><span class="hts-code">3926.90</span></th>
-                                <th class="sortable" onclick="sortTable('plasticizer')">Plasticizer<br><span class="hts-code">2917.12</span></th>
-                                <th class="sortable" onclick="sortTable('adsorbent')">Adsorbent<br><span class="hts-code">3802.10</span></th>
-                                <th class="sortable" onclick="sortTable('boardPack')">Board Pack<br><span class="hts-code">4819.10</span></th>
-                                <th class="sortable" onclick="sortTable('paperPack')">Paper Pack<br><span class="hts-code">4819.20</span></th>
-                                <th>Alt. Rate</th>
+                                <th>Program</th>
+                                <th class="tier2-col" title="Tier 2 Supplier - Select country then click material chips to apply">Tier 2<br><span class="hts-code">Supplier</span></th>
+                                <th class="conversion-col" title="Conversion - Select country, enter rate, then click material chips to apply">Conversion<br><span class="hts-code">Rate</span></th>
+                                <th class="sortable material-col" data-material="cigarettePaper" onclick="sortTable('cigarettePaper')">Cig Paper<br><span class="hts-code">4813.10</span></th>
+                                <th class="sortable material-col" data-material="tippingPaper" onclick="sortTable('tippingPaper')">Tipping<br><span class="hts-code">4813.20</span></th>
+                                <th class="sortable material-col" data-material="plugwrap" onclick="sortTable('plugwrap')">Plugwrap<br><span class="hts-code">4813.90</span></th>
+                                <th class="sortable material-col" data-material="filterTow" onclick="sortTable('filterTow')">Filter Tow<br><span class="hts-code">5502</span></th>
+                                <th class="sortable material-col" data-material="filterRods" onclick="sortTable('filterRods')">Filter Rods<br><span class="hts-code">5601.22</span></th>
+                                <th class="sortable material-col" data-material="adhesive" onclick="sortTable('adhesive')">Adhesive<br><span class="hts-code">3506</span></th>
+                                <th class="sortable material-col" data-material="capsules" onclick="sortTable('capsules')">Capsules<br><span class="hts-code">3926.90</span></th>
+                                <th class="sortable material-col" data-material="plasticizer" onclick="sortTable('plasticizer')">Plasticizer<br><span class="hts-code">2917.12</span></th>
+                                <th class="sortable material-col" data-material="adsorbent" onclick="sortTable('adsorbent')">Adsorbent<br><span class="hts-code">3802.10</span></th>
+                                <th class="sortable material-col" data-material="boardPack" onclick="sortTable('boardPack')">Board Pack<br><span class="hts-code">4819.10</span></th>
+                                <th class="sortable material-col" data-material="paperPack" onclick="sortTable('paperPack')">Paper Pack<br><span class="hts-code">4819.20</span></th>
+                                <th class="sortable material-col" data-material="innerBundling" onclick="sortTable('innerBundling')">Bundling<br><span class="hts-code">4811.90</span></th>
+                                <th class="sortable material-col" data-material="boardInnerFrame" onclick="sortTable('boardInnerFrame')">Bd Frame<br><span class="hts-code">4819.10</span></th>
+                                <th>Alt Rate</th>
                                 <th>Notes</th>
                             </tr>
                         </thead>
@@ -729,51 +1211,168 @@
             </div>
         </div>
 
+        <!-- Appendix View -->
+        <div id="appendixView" class="view-container">
+            <div class="appendix">
+                <h3>Appendix: Data Sources & Methodology</h3>
+
+                <div class="appendix-section">
+                    <h4>1. MFN Base Rates (Column 1 General)</h4>
+                    <p style="font-size:12px;margin-bottom:10px;">Base rates are sourced directly from the USITC Harmonized Tariff Schedule 2026 Revision 1.</p>
+                    <div class="quote-block">
+                        "4813.10.00.00 - Cigarette paper... General: Free"<br>
+                        "5502.10.00.00 - Cellulose acetate... General: 7.5%"<br>
+                        "5601.22.00.10 - Wadding of man-made fibers... General: 6.3%"<br>
+                        "3506.91 - Adhesives based on rubber or plastics... General: 2.1%"
+                        <div class="quote-source">Source: <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a></div>
+                    </div>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>2. IEEPA Reciprocal Tariffs</h4>
+                    <p style="font-size:12px;margin-bottom:10px;">Additional tariffs under the International Emergency Economic Powers Act.</p>
+                    <div class="quote-block">
+                        "The IEEPA tariff rates are ADDITIVE to existing duties... For most countries, the baseline rate is 10% on top of MFN duties."
+                        <div class="quote-source">Source: <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a></div>
+                    </div>
+                    <div class="quote-block">
+                        "China: 10% Reciprocal + 10% Fentanyl IEEPA tariffs (CBP CSMS #66749380)"<br>
+                        "Vietnam: 20% (WH Framework Agreement Jul 2025)"<br>
+                        "Malaysia, Thailand, Indonesia, Philippines: 19% (WH Framework Agreements)"<br>
+                        "Japan, South Korea: 15% (WH Framework Agreements)"
+                        <div class="quote-source">Source: <a href="https://ustr.gov/trade-topics/presidential-tariff-actions" target="_blank">USTR Presidential Tariff Actions</a></div>
+                    </div>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>3. EU/Japan 15% Ceiling</h4>
+                    <p style="font-size:12px;margin-bottom:10px;">Special trade deal caps tariffs at 15% maximum.</p>
+                    <div class="quote-block">
+                        "The U.S. will apply a 15% tariff to most imports from the EU. The 15% rate will generally act as an all-inclusive tariff ceiling, meaning it replaces rather than adds to existing duties for covered goods."
+                        <div class="quote-source">Source: White House Fact Sheet on EU Trade Agreement, January 2026</div>
+                    </div>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>4. Section 301 Tariffs (China)</h4>
+                    <div class="quote-block">
+                        "List 1-4 China tariffs remain at 25% for covered products... These are in addition to normal customs duties."
+                        <div class="quote-source">Source: <a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR Section 301 Tariff Actions</a></div>
+                    </div>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>5. USMCA Qualifying Goods</h4>
+                    <div class="quote-block">
+                        "Goods that qualify under USMCA rules of origin enter duty-free. Non-qualifying goods from Mexico face 25% tariff; from Canada face 35% tariff under IEEPA fentanyl provisions."
+                        <div class="quote-source">Source: <a href="https://www.cbp.gov/trade/priority-issues/trade-agreements/USMCA" target="_blank">CBP USMCA Guidance</a></div>
+                    </div>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>6. Calculation Methodology</h4>
+                    <p style="font-size:12px;">
+                        <strong>FTA Countries:</strong> 0% (duty-free under agreement)<br>
+                        <strong>USMCA:</strong> 0% if qualifying; 25%/35% if non-qualifying<br>
+                        <strong>EU/Japan/Switzerland:</strong> max(MFN, 15%) - ceiling applies<br>
+                        <strong>MFN + IEEPA:</strong> MFN base rate + IEEPA rate (additive)<br>
+                        <strong>China:</strong> MFN + 20% IEEPA + 25% Section 301<br>
+                        <strong>Column 2:</strong> Statutory rates for non-MFN countries (Cuba, Russia, North Korea, Belarus)
+                    </p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>7. Data Maintenance Protocol</h4>
+                    <p style="font-size:12px;margin-bottom:10px;"><strong>Update Frequency:</strong> Every 48 hours</p>
+                    <p style="font-size:12px;margin-bottom:10px;"><strong>Official Sources to Check:</strong></p>
+                    <table style="width:100%;font-size:11px;border-collapse:collapse;margin-bottom:15px;">
+                        <tr style="background:#f7fafc;">
+                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Data Type</th>
+                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Official Source</th>
+                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">URL</th>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">HTS Base Rates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">USITC Data Catalog</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2024" target="_blank">data.gov HTS Dataset</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">IEEPA Country Rates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP IEEPA FAQ</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">IEEPA Annex I (Country List)</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">White House</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.whitehouse.gov/wp-content/uploads/2025/04/Annex-I.pdf" target="_blank">Annex-I.pdf</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">Section 301 (China)</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">USTR</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR Section 301</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">Trade Deal Updates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">USTR</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://ustr.gov/trade-topics/presidential-tariff-actions" target="_blank">Presidential Tariff Actions</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">Implementation Updates</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP CSMS</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/automated/cargo-systems-messaging-service" target="_blank">CBP CSMS Messages</a></td>
+                        </tr>
+                    </table>
+                    <p style="font-size:11px;color:#666;"><strong>Last Data Verification:</strong> <span id="lastVerified">January 26, 2026</span></p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>8. Verified Rate Sources by Country</h4>
+                    <p style="font-size:12px;margin-bottom:10px;">Key country rates verified against official sources:</p>
+                    <table style="width:100%;font-size:11px;border-collapse:collapse;">
+                        <tr style="background:#f7fafc;">
+                            <th style="padding:6px;border:1px solid #e2e8f0;">Country</th>
+                            <th style="padding:6px;border:1px solid #e2e8f0;">IEEPA Rate</th>
+                            <th style="padding:6px;border:1px solid #e2e8f0;">Source</th>
+                        </tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">China</td><td style="padding:6px;border:1px solid #e2e8f0;">10% Reciprocal + 10% Fentanyl + 25% Sec 301</td><td style="padding:6px;border:1px solid #e2e8f0;">CBP CSMS #66749380</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Malaysia</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH US-Malaysia Agreement Oct 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Vietnam</td><td style="padding:6px;border:1px solid #e2e8f0;">20%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Jul 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Thailand</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Oct 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Indonesia</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Jul 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Philippines</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Japan</td><td style="padding:6px;border:1px solid #e2e8f0;">15%</td><td style="padding:6px;border:1px solid #e2e8f0;">CRS R48549 / WH Framework</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">South Korea</td><td style="padding:6px;border:1px solid #e2e8f0;">15%</td><td style="padding:6px;border:1px solid #e2e8f0;">CRS R48549 / KORUS FTA</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">UK</td><td style="padding:6px;border:1px solid #e2e8f0;">10%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH UK Economic Prosperity Deal May 2025</td></tr>
+                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">EU</td><td style="padding:6px;border:1px solid #e2e8f0;">15% ceiling</td><td style="padding:6px;border:1px solid #e2e8f0;">EO 14326 / WH EU Framework Aug 2025</td></tr>
+                    </table>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>9. Disclaimer</h4>
+                    <p style="font-size:11px;color:#666;">
+                        This tool is for informational purposes only. Tariff rates change frequently based on trade policy decisions.
+                        Always verify current rates with official sources (USITC, CBP) before making import decisions.
+                        Consult a licensed customs broker for binding rulings.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <div class="legend">
             <h3>Legend</h3>
             <div class="legend-items">
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #c6f6d5;"></div>
-                    <span>Free (0%)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #bee3f8;"></div>
-                    <span>Low (1-15%)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #feebc8;"></div>
-                    <span>Medium (15-30%)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #fed7d7;"></div>
-                    <span>High (30%+)</span>
-                </div>
-                <div class="legend-item">
-                    <span class="trade-program program-usmca">USMCA</span>
-                    <span>US-Mexico-Canada (qualifying goods)</span>
-                </div>
-                <div class="legend-item">
-                    <span class="trade-program program-fta">FTA</span>
-                    <span>Free Trade Agreement</span>
-                </div>
-                <div class="legend-item">
-                    <span class="trade-program program-15cap">15% CAP</span>
-                    <span>EU/Japan/Korea deal (15% ceiling)</span>
-                </div>
-                <div class="legend-item">
-                    <span class="trade-program program-mfn">MFN+IEEPA</span>
-                    <span>MFN + IEEPA Reciprocal (additive)</span>
-                </div>
-                <div class="legend-item">
-                    <span class="trade-program program-301">301</span>
-                    <span>Section 301 + IEEPA (China)</span>
-                </div>
-                <div class="legend-item">
-                    <span class="trade-program program-col2">COL2</span>
-                    <span>Column 2 (Non-MFN)</span>
-                </div>
+                <div class="legend-item"><div class="legend-color" style="background: #c6f6d5;"></div><span>Free (0%)</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #bee3f8;"></div><span>Low (1-15%)</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #feebc8;"></div><span>Medium (15-30%)</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #fed7d7;"></div><span>High (30%+)</span></div>
+                <div class="legend-item"><span class="trade-program program-usmca">USMCA</span></div>
+                <div class="legend-item"><span class="trade-program program-fta">FTA</span></div>
+                <div class="legend-item"><span class="trade-program program-15cap">15% CAP</span></div>
+                <div class="legend-item"><span class="trade-program program-mfn">MFN+IEEPA</span></div>
+                <div class="legend-item"><span class="trade-program program-301">301</span></div>
+                <div class="legend-item"><span class="trade-program program-col2">COL2</span></div>
             </div>
-            <p class="data-date">Data as of January 2026. Tariff rates subject to change. Alt. Rate shows non-USMCA or other conditional rates where applicable.</p>
+            <p class="data-date">Data as of January 2026. Click any rate cell to apply override.</p>
 
             <div class="sources-section">
                 <h4>Official Data Sources</h4>
@@ -781,26 +1380,76 @@
                     <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a>
                     <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a>
                     <a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR Section 301</a>
-                    <a href="https://www.cbp.gov/trade/free-trade-agreements" target="_blank">CBP Free Trade Agreements</a>
+                    <a href="https://www.cbp.gov/trade/free-trade-agreements" target="_blank">CBP FTAs</a>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Override Modal -->
+    <div class="modal-overlay" id="overrideModal">
+        <div class="modal">
+            <h3>Override Rate</h3>
+            <div class="modal-field">
+                <label>Country</label>
+                <input type="text" id="modalCountry" readonly>
+            </div>
+            <div class="modal-field">
+                <label>Material</label>
+                <input type="text" id="modalMaterial" readonly>
+            </div>
+            <div class="modal-field">
+                <label>Current Rate</label>
+                <input type="text" id="modalCurrentRate" readonly>
+            </div>
+            <div class="modal-field">
+                <label>Override Rate (%)</label>
+                <input type="number" id="modalOverrideRate" step="0.1" min="0" max="100" placeholder="Enter new rate">
+            </div>
+            <div class="modal-field">
+                <label>Reason (optional)</label>
+                <select id="modalReason">
+                    <option value="">Select reason...</option>
+                    <option value="non-usmca">Non-USMCA qualifying</option>
+                    <option value="transship">Transshipment risk</option>
+                    <option value="russia-oil">Russia oil connection</option>
+                    <option value="custom">Custom reason</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn danger" onclick="clearOverride()">Clear</button>
+                <button class="modal-btn primary" onclick="applyOverride()">Apply</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Material column mapping
+        const materialColumns = {
+            cigarettePaper: 'Cigarette Paper',
+            tippingPaper: 'Tipping Paper',
+            plugwrap: 'Plugwrap',
+            filterTow: 'Filter Tow',
+            filterRods: 'Filter Rods',
+            adhesive: 'Adhesive',
+            capsules: 'Capsules',
+            plasticizer: 'Plasticizer',
+            adsorbent: 'Adsorbent',
+            boardPack: 'Board Packaging',
+            paperPack: 'Paper Packaging',
+            innerBundling: 'Inner Bundling',
+            boardInnerFrame: 'Board Inner Frame'
+        };
+
         // HTS Code reference data
         const htsData = [
             {hts: "4813.10.00.00", material: "Cigarette Paper", desc: "In booklets or tubes", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
-            {hts: "4813.20.00.00", material: "Cigarette Paper", desc: "In rolls ≤5cm width", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
-            {hts: "4813.90.00.00", material: "Cigarette Paper", desc: "Other", mfn: "Free", special: "Free (A+,AU,BH,CL,CO,D,E,IL,JO,KR,MA,OM,P,PA,PE,S,SG)", col2: "60%"},
             {hts: "4813.20.00.00", material: "Tipping Paper", desc: "In rolls ≤5cm width", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "4813.90.00.00", material: "Plugwrap", desc: "Other cigarette paper", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "5502.10.00.00", material: "Filter Tow", desc: "Cellulose acetate tow", mfn: "7.5%", special: "Free (FTA countries)", col2: "45%"},
-            {hts: "5502.90.00.00", material: "Filter Tow", desc: "Other artificial filament tow", mfn: "7.5%", special: "Free (FTA countries)", col2: "45%"},
             {hts: "5601.22.00.10", material: "Filter Rods", desc: "Man-made fiber rods for cigarettes", mfn: "6.3%", special: "Free (FTA countries)", col2: "74%"},
-            {hts: "5601.22.00.50", material: "Filter Rods", desc: "Other man-made fiber wadding articles", mfn: "6.3%", special: "Free (FTA countries)", col2: "74%"},
-            {hts: "3506.91.10.00", material: "Adhesive", desc: "Adhesives based on rubber/plastic (≤1kg)", mfn: "2.1%", special: "Free (FTA countries)", col2: "20%"},
-            {hts: "3506.91.50.00", material: "Adhesive", desc: "Adhesives based on rubber/plastic (>1kg)", mfn: "2.1%", special: "Free (FTA countries)", col2: "20%"},
+            {hts: "3506.91.50.00", material: "Adhesive", desc: "Adhesives based on rubber/plastic", mfn: "2.1%", special: "Free (FTA countries)", col2: "20%"},
             {hts: "3926.90.99.90", material: "Capsules", desc: "Other articles of plastics", mfn: "5.3%", special: "Free (FTA countries)", col2: "25%"},
             {hts: "2917.12.50.00", material: "Plasticizer", desc: "Adipic acid esters (plasticizers)", mfn: "6.5%", special: "Free (FTA countries)", col2: "25%"},
             {hts: "3802.10.00.00", material: "Adsorbent", desc: "Activated carbon", mfn: "Free", special: "Free (FTA countries)", col2: "25%"},
@@ -810,139 +1459,469 @@
             {hts: "4819.10.00.40", material: "Board Inner Frame", desc: "Cartons of corrugated paperboard", mfn: "Free", special: "Free (FTA countries)", col2: "35%"}
         ];
 
-        // Material group data with MFN base rates
+        // Material group data
         const materialData = [
-            {material: "Cigarette Paper", hts: "4813.10-90", desc: "Cigarette paper in booklets, tubes, rolls", mfnBase: 0, col2: 60},
-            {material: "Tipping Paper", hts: "4813.20.00", desc: "Paper for cigarette tips, ≤5cm rolls", mfnBase: 0, col2: 60},
-            {material: "Plugwrap", hts: "4813.90.00", desc: "Other cigarette paper for plug wrap", mfnBase: 0, col2: 60},
-            {material: "Filter Tow", hts: "5502.10-90", desc: "Cellulose acetate and other artificial filament tow", mfnBase: 7.5, col2: 45},
-            {material: "Filter Rods", hts: "5601.22.00", desc: "Man-made fiber wadding/articles (filter rods)", mfnBase: 6.3, col2: 74},
+            {material: "Cigarette Paper", hts: "4813.10", desc: "Cigarette paper in booklets, tubes, rolls", mfnBase: 0, col2: 60},
+            {material: "Tipping Paper", hts: "4813.20", desc: "Paper for cigarette tips", mfnBase: 0, col2: 60},
+            {material: "Plugwrap", hts: "4813.90", desc: "Other cigarette paper for plug wrap", mfnBase: 0, col2: 60},
+            {material: "Filter Tow", hts: "5502.10", desc: "Cellulose acetate filament tow", mfnBase: 7.5, col2: 45},
+            {material: "Filter Rods", hts: "5601.22", desc: "Man-made fiber wadding (filter rods)", mfnBase: 6.3, col2: 74},
             {material: "Adhesive", hts: "3506.91", desc: "Adhesives based on rubber or plastics", mfnBase: 2.1, col2: 20},
-            {material: "Capsules", hts: "3926.90.99", desc: "Plastic articles (flavor capsules)", mfnBase: 5.3, col2: 25},
-            {material: "Plasticizer", hts: "2917.12.50", desc: "Adipic acid esters (triacetin/plasticizers)", mfnBase: 6.5, col2: 25},
-            {material: "Adsorbent", hts: "3802.10.00", desc: "Activated carbon for filters", mfnBase: 0, col2: 25},
-            {material: "Board Packaging", hts: "4819.10.00", desc: "Cartons, boxes of corrugated paperboard", mfnBase: 0, col2: 35},
-            {material: "Paper Packaging", hts: "4819.20.00", desc: "Folding cartons of non-corrugated paper", mfnBase: 0, col2: 35},
-            {material: "Inner Bundling", hts: "4811.90.90", desc: "Coated paper for inner bundling", mfnBase: 0, col2: 30},
-            {material: "Board Inner Frame", hts: "4819.10.00", desc: "Corrugated paperboard inner frames", mfnBase: 0, col2: 35}
+            {material: "Capsules", hts: "3926.90", desc: "Plastic articles (flavor capsules)", mfnBase: 5.3, col2: 25},
+            {material: "Plasticizer", hts: "2917.12", desc: "Adipic acid esters (triacetin)", mfnBase: 6.5, col2: 25},
+            {material: "Adsorbent", hts: "3802.10", desc: "Activated carbon for filters", mfnBase: 0, col2: 25},
+            {material: "Board Packaging", hts: "4819.10", desc: "Cartons of corrugated paperboard", mfnBase: 0, col2: 35},
+            {material: "Paper Packaging", hts: "4819.20", desc: "Folding cartons non-corrugated", mfnBase: 0, col2: 35},
+            {material: "Inner Bundling", hts: "4811.90", desc: "Coated paper for inner bundling", mfnBase: 0, col2: 30},
+            {material: "Board Inner Frame", hts: "4819.10", desc: "Corrugated paperboard inner frames", mfnBase: 0, col2: 35}
         ];
 
-        // MFN base rates by material (for calculation)
-        const mfnBaseRates = {
-            cigarettePaper: 0,
-            tippingPaper: 0,
-            plugwrap: 0,
-            filterTow: 7.5,
-            filterRods: 6.3,
-            adhesive: 2.1,
-            capsules: 5.3,
-            plasticizer: 6.5,
-            adsorbent: 0,
-            boardPack: 0,
-            paperPack: 0,
-            innerBundling: 0,
-            boardInnerFrame: 0
-        };
-
-        // Country duty data with corrected rates
+        // Country duty data - all 13 materials
         const dutyData = [
             // Section 301 + IEEPA (China) - MFN + 20% IEEPA + 25% Section 301
-            {country: "China", iso: "CN", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45.00, filterTow: 52.50, filterRods: 51.30, adhesive: 47.10, capsules: 50.30, plasticizer: 51.50, adsorbent: 45.00, boardPack: 45.00, paperPack: 45.00, altRate: null, notes: "MFN + 20% IEEPA + 25% Sec 301"},
-            {country: "Hong Kong", iso: "HK", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45.00, filterTow: 52.50, filterRods: 51.30, adhesive: 47.10, capsules: 50.30, plasticizer: 51.50, adsorbent: 45.00, boardPack: 45.00, paperPack: 45.00, altRate: null, notes: "Treated same as China"},
+            {country: "China", iso: "CN", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "MFN + 10% Reciprocal + 10% Fentanyl + 25% Sec 301", source: "CBP CSMS #66749380"},
+            {country: "Hong Kong", iso: "HK", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "Treated same as China"},
 
-            // USMCA - 0% for qualifying goods, 25% for non-qualifying
-            {country: "Mexico", iso: "MX", region: "North America", program: "USMCA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: "25% if non-USMCA", notes: "USMCA qualifying = Free"},
-            {country: "Canada", iso: "CA", region: "North America", program: "USMCA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: "35% if non-USMCA", notes: "USMCA qualifying = Free"},
+            // USMCA
+            {country: "Mexico", iso: "MX", region: "North America", program: "USMCA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: "25% non-USMCA", notes: "USMCA qualifying = Free"},
+            {country: "Canada", iso: "CA", region: "North America", program: "USMCA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: "35% non-USMCA", notes: "USMCA qualifying = Free"},
 
-            // FTA Countries - 0% duty
-            {country: "Australia", iso: "AU", region: "Oceania", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Australia FTA"},
-            {country: "Bahrain", iso: "BH", region: "Middle East", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Bahrain FTA"},
-            {country: "Chile", iso: "CL", region: "South America", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Chile FTA"},
-            {country: "Colombia", iso: "CO", region: "South America", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Colombia TPA"},
-            {country: "Israel", iso: "IL", region: "Middle East", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Israel FTA"},
-            {country: "Jordan", iso: "JO", region: "Middle East", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Jordan FTA"},
-            {country: "Korea (South)", iso: "KR", region: "Asia Pacific", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "KORUS FTA"},
-            {country: "Morocco", iso: "MA", region: "Africa", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Morocco FTA"},
-            {country: "Oman", iso: "OM", region: "Middle East", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Oman FTA"},
-            {country: "Panama", iso: "PA", region: "Central America", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Panama TPA"},
-            {country: "Peru", iso: "PE", region: "South America", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Peru TPA"},
-            {country: "Singapore", iso: "SG", region: "Asia Pacific", program: "FTA", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "US-Singapore FTA"},
+            // FTA Countries
+            {country: "Australia", iso: "AU", region: "Oceania", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Australia FTA"},
+            {country: "Bahrain", iso: "BH", region: "Middle East", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Bahrain FTA"},
+            {country: "Chile", iso: "CL", region: "South America", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Chile FTA"},
+            {country: "Colombia", iso: "CO", region: "South America", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Colombia TPA"},
+            {country: "Israel", iso: "IL", region: "Middle East", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Israel FTA"},
+            {country: "Jordan", iso: "JO", region: "Middle East", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Jordan FTA"},
+            {country: "Korea (South)", iso: "KR", region: "Asia Pacific", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "KORUS FTA - duty free", source: "KORUS FTA / HTS Special Column"},
+            {country: "Morocco", iso: "MA", region: "Africa", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Morocco FTA"},
+            {country: "Oman", iso: "OM", region: "Middle East", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Oman FTA"},
+            {country: "Panama", iso: "PA", region: "Central America", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Panama TPA"},
+            {country: "Peru", iso: "PE", region: "South America", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Peru TPA"},
+            {country: "Singapore", iso: "SG", region: "Asia Pacific", program: "FTA", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "US-Singapore FTA"},
 
-            // CAFTA-DR - 0% duty
-            {country: "Costa Rica", iso: "CR", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "CAFTA-DR"},
-            {country: "Dominican Republic", iso: "DO", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "CAFTA-DR"},
-            {country: "El Salvador", iso: "SV", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "CAFTA-DR"},
-            {country: "Guatemala", iso: "GT", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "CAFTA-DR"},
-            {country: "Honduras", iso: "HN", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "CAFTA-DR"},
-            {country: "Nicaragua", iso: "NI", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, altRate: null, notes: "CAFTA-DR"},
+            // CAFTA-DR
+            {country: "Costa Rica", iso: "CR", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "CAFTA-DR"},
+            {country: "Dominican Republic", iso: "DO", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "CAFTA-DR"},
+            {country: "El Salvador", iso: "SV", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "CAFTA-DR"},
+            {country: "Guatemala", iso: "GT", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "CAFTA-DR"},
+            {country: "Honduras", iso: "HN", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "CAFTA-DR"},
+            {country: "Nicaragua", iso: "NI", region: "Central America", program: "CAFTA-DR", cigarettePaper: 0, tippingPaper: 0, plugwrap: 0, filterTow: 0, filterRods: 0, adhesive: 0, capsules: 0, plasticizer: 0, adsorbent: 0, boardPack: 0, paperPack: 0, innerBundling: 0, boardInnerFrame: 0, altRate: null, notes: "CAFTA-DR"},
 
-            // EU 15% Cap - max(MFN, 15%) - all materials capped at 15%
-            {country: "Germany", iso: "DE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "France", iso: "FR", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Italy", iso: "IT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Spain", iso: "ES", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Netherlands", iso: "NL", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Belgium", iso: "BE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Austria", iso: "AT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Poland", iso: "PL", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Czech Republic", iso: "CZ", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Sweden", iso: "SE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Denmark", iso: "DK", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Finland", iso: "FI", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Ireland", iso: "IE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Portugal", iso: "PT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Greece", iso: "GR", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Hungary", iso: "HU", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Romania", iso: "RO", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Bulgaria", iso: "BG", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Slovakia", iso: "SK", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Slovenia", iso: "SI", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Croatia", iso: "HR", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Lithuania", iso: "LT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Latvia", iso: "LV", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Estonia", iso: "EE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Luxembourg", iso: "LU", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Malta", iso: "MT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
-            {country: "Cyprus", iso: "CY", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            // EU 15% Cap
+            {country: "Germany", iso: "DE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "France", iso: "FR", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Italy", iso: "IT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Spain", iso: "ES", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Netherlands", iso: "NL", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Belgium", iso: "BE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Austria", iso: "AT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Poland", iso: "PL", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Czech Republic", iso: "CZ", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Sweden", iso: "SE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Denmark", iso: "DK", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Finland", iso: "FI", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Ireland", iso: "IE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Portugal", iso: "PT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Greece", iso: "GR", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Hungary", iso: "HU", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Romania", iso: "RO", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
 
-            // Japan - 15% cap deal
-            {country: "Japan", iso: "JP", region: "Asia Pacific", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "Japan deal - 15% ceiling"},
+            // Japan
+            {country: "Japan", iso: "JP", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 22.5, filterRods: 21.3, adhesive: 17.1, capsules: 20.3, plasticizer: 21.5, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "15% per US-Japan Framework", source: "CRS R48549 / WH Framework"},
 
-            // Switzerland/Liechtenstein - 15% cap deal
-            {country: "Switzerland", iso: "CH", region: "Europe - Non-EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "Swiss deal - 15% ceiling"},
-            {country: "Liechtenstein", iso: "LI", region: "Europe - Non-EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "Swiss deal - 15% ceiling"},
+            // Switzerland
+            {country: "Switzerland", iso: "CH", region: "Europe - Non-EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "Swiss deal - 15% ceiling"},
 
-            // UK - 10% baseline IEEPA (additive)
-            {country: "United Kingdom", iso: "GB", region: "Europe - Non-EU", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            // UK
+            {country: "United Kingdom", iso: "GB", region: "Europe - Non-EU", program: "Trade Deal", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "10% per US-UK Deal May 2025", source: "WH UK Economic Prosperity Deal"},
 
-            // MFN + IEEPA (10% additive) countries
-            {country: "India", iso: "IN", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: "+25% Russia oil", notes: "MFN + 10% IEEPA (+25% if Russia oil)"},
-            {country: "Indonesia", iso: "ID", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Vietnam", iso: "VN", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 20, filterTow: 27.5, filterRods: 26.3, adhesive: 22.1, capsules: 25.3, plasticizer: 26.5, adsorbent: 20, boardPack: 20, paperPack: 20, altRate: "40% transship", notes: "MFN + 20% IEEPA"},
-            {country: "Thailand", iso: "TH", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Malaysia", iso: "MY", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Philippines", iso: "PH", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Taiwan", iso: "TW", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 15, filterTow: 22.5, filterRods: 21.3, adhesive: 17.1, capsules: 20.3, plasticizer: 21.5, adsorbent: 15, boardPack: 15, paperPack: 15, altRate: null, notes: "MFN + 15% IEEPA (Jan 2026 deal)"},
-            {country: "Brazil", iso: "BR", region: "South America", program: "MFN + IEEPA", cigarettePaper: 50, filterTow: 57.5, filterRods: 56.3, adhesive: 52.1, capsules: 55.3, plasticizer: 56.5, adsorbent: 50, boardPack: 50, paperPack: 50, altRate: null, notes: "MFN + 10% + 40% additional"},
-            {country: "Argentina", iso: "AR", region: "South America", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Turkey", iso: "TR", region: "Europe - Non-EU", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "South Africa", iso: "ZA", region: "Africa", program: "MFN + IEEPA", cigarettePaper: 30, filterTow: 37.5, filterRods: 36.3, adhesive: 32.1, capsules: 35.3, plasticizer: 36.5, adsorbent: 30, boardPack: 30, paperPack: 30, altRate: null, notes: "MFN + 30% IEEPA"},
-            {country: "Egypt", iso: "EG", region: "Africa", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Saudi Arabia", iso: "SA", region: "Middle East", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "UAE", iso: "AE", region: "Middle East", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "New Zealand", iso: "NZ", region: "Oceania", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
-            {country: "Norway", iso: "NO", region: "Europe - Non-EU", program: "MFN + IEEPA", cigarettePaper: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            // MFN + IEEPA countries
+            {country: "India", iso: "IN", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: "+25% Russia", notes: "MFN + 10% IEEPA"},
+            {country: "Indonesia", iso: "ID", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Indonesia Framework Jul 2025", source: "WH Framework Agreement"},
+            {country: "Vietnam", iso: "VN", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 20, tippingPaper: 20, plugwrap: 20, filterTow: 27.5, filterRods: 26.3, adhesive: 22.1, capsules: 25.3, plasticizer: 26.5, adsorbent: 20, boardPack: 20, paperPack: 20, innerBundling: 20, boardInnerFrame: 20, altRate: null, notes: "20% per US-Vietnam Framework Jul 2025", source: "WH Framework Agreement"},
+            {country: "Thailand", iso: "TH", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Thailand Framework Oct 2025", source: "WH Framework Agreement"},
+            {country: "Malaysia", iso: "MY", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Malaysia Agreement Oct 2025", source: "WH US-Malaysia Agreement"},
+            {country: "Philippines", iso: "PH", region: "Asia Pacific", program: "Trade Deal", cigarettePaper: 19, tippingPaper: 19, plugwrap: 19, filterTow: 26.5, filterRods: 25.3, adhesive: 21.1, capsules: 24.3, plasticizer: 25.5, adsorbent: 19, boardPack: 19, paperPack: 19, innerBundling: 19, boardInnerFrame: 19, altRate: null, notes: "19% per US-Philippines Framework", source: "WH Framework Agreement"},
+            {country: "Taiwan", iso: "TW", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 22.5, filterRods: 21.3, adhesive: 17.1, capsules: 20.3, plasticizer: 21.5, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "MFN + 15% IEEPA"},
+            {country: "Brazil", iso: "BR", region: "South America", program: "MFN + IEEPA", cigarettePaper: 50, tippingPaper: 50, plugwrap: 50, filterTow: 57.5, filterRods: 56.3, adhesive: 52.1, capsules: 55.3, plasticizer: 56.5, adsorbent: 50, boardPack: 50, paperPack: 50, innerBundling: 50, boardInnerFrame: 50, altRate: null, notes: "MFN + 10% + 40% add'l"},
+            {country: "Argentina", iso: "AR", region: "South America", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "Turkey", iso: "TR", region: "Europe - Non-EU", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "South Africa", iso: "ZA", region: "Africa", program: "MFN + IEEPA", cigarettePaper: 30, tippingPaper: 30, plugwrap: 30, filterTow: 37.5, filterRods: 36.3, adhesive: 32.1, capsules: 35.3, plasticizer: 36.5, adsorbent: 30, boardPack: 30, paperPack: 30, innerBundling: 30, boardInnerFrame: 30, altRate: null, notes: "MFN + 30% IEEPA"},
+            {country: "Egypt", iso: "EG", region: "Africa", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "Saudi Arabia", iso: "SA", region: "Middle East", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "UAE", iso: "AE", region: "Middle East", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "New Zealand", iso: "NZ", region: "Oceania", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "Norway", iso: "NO", region: "Europe - Non-EU", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
 
-            // Column 2 (Non-MFN) countries
-            {country: "Russia", iso: "RU", region: "Europe - Non-EU", program: "Column 2", cigarettePaper: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, altRate: null, notes: "Column 2 (Non-MFN)"},
-            {country: "Belarus", iso: "BY", region: "Europe - Non-EU", program: "Column 2", cigarettePaper: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, altRate: null, notes: "Column 2 (Non-MFN)"},
-            {country: "Cuba", iso: "CU", region: "Central America", program: "Column 2", cigarettePaper: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, altRate: null, notes: "Column 2 (Non-MFN)"},
-            {country: "North Korea", iso: "KP", region: "Asia Pacific", program: "Column 2", cigarettePaper: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, altRate: null, notes: "Column 2 (Non-MFN)"}
+            // Column 2
+            {country: "Russia", iso: "RU", region: "Europe - Non-EU", program: "Column 2", cigarettePaper: 60, tippingPaper: 60, plugwrap: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, innerBundling: 30, boardInnerFrame: 35, altRate: null, notes: "Column 2 (Non-MFN)"},
+            {country: "Belarus", iso: "BY", region: "Europe - Non-EU", program: "Column 2", cigarettePaper: 60, tippingPaper: 60, plugwrap: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, innerBundling: 30, boardInnerFrame: 35, altRate: null, notes: "Column 2 (Non-MFN)"},
+            {country: "Cuba", iso: "CU", region: "Central America", program: "Column 2", cigarettePaper: 60, tippingPaper: 60, plugwrap: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, innerBundling: 30, boardInnerFrame: 35, altRate: null, notes: "Column 2 (Non-MFN)"},
+            {country: "North Korea", iso: "KP", region: "Asia Pacific", program: "Column 2", cigarettePaper: 60, tippingPaper: 60, plugwrap: 60, filterTow: 45, filterRods: 74, adhesive: 20, capsules: 25, plasticizer: 25, adsorbent: 25, boardPack: 35, paperPack: 35, innerBundling: 30, boardInnerFrame: 35, altRate: null, notes: "Column 2 (Non-MFN)"},
+
+            // Additional EU Countries (15% Cap)
+            {country: "Bulgaria", iso: "BG", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Croatia", iso: "HR", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Slovakia", iso: "SK", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Slovenia", iso: "SI", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Lithuania", iso: "LT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Latvia", iso: "LV", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Estonia", iso: "EE", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Luxembourg", iso: "LU", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Cyprus", iso: "CY", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+            {country: "Malta", iso: "MT", region: "Europe - EU", program: "EU/Japan 15% Cap", cigarettePaper: 15, tippingPaper: 15, plugwrap: 15, filterTow: 15, filterRods: 15, adhesive: 15, capsules: 15, plasticizer: 15, adsorbent: 15, boardPack: 15, paperPack: 15, innerBundling: 15, boardInnerFrame: 15, altRate: null, notes: "EU deal - 15% ceiling"},
+
+            // Additional MFN + IEEPA countries
+            {country: "Pakistan", iso: "PK", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "Bangladesh", iso: "BD", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"},
+            {country: "Sri Lanka", iso: "LK", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"}
         ];
 
         let filteredData = [...dutyData];
         let currentSort = {column: 'country', ascending: true};
         let currentView = 'country';
+        let selectedMaterials = []; // Changed to array for multi-select
+        let selectedCountries = []; // Array for country multi-select
+        let overrides = JSON.parse(localStorage.getItem('dutyOverrides') || '{}');
+        let currentOverrideCell = null;
+        // Row-level adjustments storage: { 'ISO': { tier2: 'XX', conversion: 'XX', conversionRate: 12.5 } }
+        let rowAdjustments = JSON.parse(localStorage.getItem('rowAdjustments') || '{}');
+
+        // USMCA and FTA country codes for qualification logic
+        const usmcaCountries = ['US', 'CA', 'MX'];
+        const ftaCountries = ['AU', 'BH', 'CL', 'CO', 'CR', 'DO', 'SV', 'GT', 'HN', 'IL', 'JO', 'KR', 'MA', 'NI', 'OM', 'PA', 'PE', 'SG'];
+
+        // Non-qualifying rates for USMCA
+        const nonQualifyingRates = {
+            'CA': 25, // Canada non-qualifying
+            'MX': 25  // Mexico non-qualifying
+        };
+
+        // Materials that support Tier 2 / Conversion adjustments (paper and board only)
+        const tier2ConversionMaterials = [
+            'cigarettePaper',
+            'tippingPaper',
+            'plugwrap',
+            'boardPack',
+            'paperPack',
+            'innerBundling',
+            'boardInnerFrame'
+        ];
+
+        // Generate country options HTML for dropdowns
+        function getCountryOptionsHTML(selectedValue) {
+            let html = '';
+            // Add US as special option (for domestic conversion)
+            html += `<option value="US" ${selectedValue === 'US' ? 'selected' : ''}>US - United States</option>`;
+
+            dutyData.forEach(country => {
+                html += `<option value="${country.iso}" ${selectedValue === country.iso ? 'selected' : ''}>${country.iso} - ${country.country}</option>`;
+            });
+            return html;
+        }
+
+        // Short material names for chips
+        const materialShortNames = {
+            'cigarettePaper': 'Cig Paper',
+            'tippingPaper': 'Tipping',
+            'plugwrap': 'Plugwrap',
+            'boardPack': 'Board Pk',
+            'paperPack': 'Paper Pk',
+            'innerBundling': 'Bundling',
+            'boardInnerFrame': 'Bd Frame'
+        };
+
+        // Generate material chips HTML - only show when country/rate is selected
+        function getMaterialChipsHTML(selectedMats, rowIso, type, hasValue) {
+            if (!hasValue) return ''; // Don't show chips if no country/rate selected
+
+            let html = '<div class="chip-select">';
+            tier2ConversionMaterials.forEach(mat => {
+                const isSelected = selectedMats.includes(mat);
+                const shortName = materialShortNames[mat] || mat;
+                html += `<span class="mat-chip ${isSelected ? 'selected' : ''}"
+                              data-material="${mat}"
+                              onclick="toggleMaterialChip(this, '${rowIso}', '${type}')">${shortName}</span>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        // Toggle material chip selection
+        function toggleMaterialChip(chipEl, rowIso, type) {
+            const mat = chipEl.getAttribute('data-material');
+            chipEl.classList.toggle('selected');
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+
+            const materialsKey = type === 'tier2' ? 'tier2Materials' : 'conversionMaterials';
+            if (!rowAdjustments[rowIso][materialsKey]) {
+                rowAdjustments[rowIso][materialsKey] = [];
+            }
+
+            const idx = rowAdjustments[rowIso][materialsKey].indexOf(mat);
+            if (idx > -1) {
+                rowAdjustments[rowIso][materialsKey].splice(idx, 1);
+            } else {
+                rowAdjustments[rowIso][materialsKey].push(mat);
+            }
+
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+            updateRowRates(rowIso);
+        }
+
+        // Row-level Tier 2 update
+        function updateRowTier2(selectEl) {
+            const rowIso = selectEl.getAttribute('data-row-iso');
+            const tier2Value = selectEl.value;
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+            rowAdjustments[rowIso].tier2 = tier2Value;
+
+            // Save to localStorage
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+
+            // Re-render only the rates for this row (not full table to preserve selections)
+            updateRowRates(rowIso);
+        }
+
+        // Row-level Conversion country update
+        function updateRowConversion(selectEl) {
+            const rowIso = selectEl.getAttribute('data-row-iso');
+            const conversionValue = selectEl.value;
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+            rowAdjustments[rowIso].conversion = conversionValue;
+
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+            updateRowRates(rowIso);
+        }
+
+        // Row-level Conversion rate update
+        function updateRowConversionRate(inputEl) {
+            const rowIso = inputEl.getAttribute('data-row-iso');
+            const rateValue = inputEl.value;
+
+            if (!rowAdjustments[rowIso]) {
+                rowAdjustments[rowIso] = {};
+            }
+            rowAdjustments[rowIso].conversionRate = rateValue ? parseFloat(rateValue) : null;
+
+            localStorage.setItem('rowAdjustments', JSON.stringify(rowAdjustments));
+            updateRowRates(rowIso);
+        }
+
+        // Clear all row-level adjustments
+        function clearAllAdjustments() {
+            if (Object.keys(rowAdjustments).length === 0) {
+                return; // Nothing to clear
+            }
+
+            if (confirm('Clear all Tier 2 and Conversion adjustments?')) {
+                rowAdjustments = {};
+                localStorage.removeItem('rowAdjustments');
+                renderTable(); // Re-render to reset all dropdowns
+            }
+        }
+
+        // Update only the rate cells for a specific row (performance optimization)
+        function updateRowRates(rowIso) {
+            const row = dutyData.find(d => d.iso === rowIso);
+            if (!row) return;
+
+            const tr = document.querySelector(`tr[data-row-iso="${rowIso}"]`);
+            if (!tr) return;
+
+            const materials = Object.keys(materialColumns);
+            const rateCells = tr.querySelectorAll('.rate-cell');
+
+            materials.forEach((mat, idx) => {
+                const cell = rateCells[idx];
+                if (!cell) return;
+
+                const overrideKey = `${rowIso}_${mat}`;
+                const hasOverride = overrides[overrideKey] !== undefined;
+                let rate = hasOverride ? overrides[overrideKey] : row[mat];
+
+                // Apply row-level tier 2 / conversion adjustments
+                const adjustedRate = getRowAdjustedRate(rowIso, mat, rate, row);
+                const isAdjusted = adjustedRate !== rate && !hasOverride;
+                if (isAdjusted) rate = adjustedRate;
+
+                // Update cell
+                cell.className = `rate-cell ${getRateClass(rate)}`;
+                if (selectedMaterials.length > 0 && !selectedMaterials.includes(mat)) {
+                    cell.classList.add('hidden-col');
+                }
+                if (hasOverride) cell.classList.add('has-override');
+                if (isAdjusted) cell.classList.add('rate-adjusted');
+
+                cell.textContent = formatRate(rate);
+            });
+        }
+
+        // Helper to get country name from ISO code
+        function getCountryName(iso) {
+            const country = dutyData.find(d => d.iso === iso);
+            if (country) return country.country;
+
+            // Fallback for countries not in main list
+            const names = {
+                'US': 'United States',
+                'OTHER': 'Other Country'
+            };
+            return names[iso] || iso;
+        }
+
+        // Get row-level adjusted rate considering tier 2 and conversion
+        // Only applies to user-selected materials for that row
+        function getRowAdjustedRate(countryIso, materialKey, baseRate, rowData) {
+            const adj = rowAdjustments[countryIso];
+            if (!adj) return baseRate;
+
+            // Check if this material is selected for conversion adjustment
+            const conversionMaterials = adj.conversionMaterials || [];
+            if (adj.conversionRate !== null && adj.conversionRate !== undefined && !isNaN(adj.conversionRate)) {
+                if (conversionMaterials.includes(materialKey)) {
+                    return adj.conversionRate;
+                }
+            }
+
+            // Check if this material is selected for tier 2 adjustment
+            const tier2Materials = adj.tier2Materials || [];
+            if (adj.tier2 && tier2Materials.includes(materialKey)) {
+                // USMCA countries - check if tier 2 disqualifies
+                if (usmcaCountries.includes(countryIso) && countryIso !== 'US') {
+                    if (!usmcaCountries.includes(adj.tier2)) {
+                        // Tier 2 is outside USMCA - doesn't qualify for preferential rate
+                        return nonQualifyingRates[countryIso] || baseRate;
+                    }
+                }
+            }
+
+            return baseRate;
+        }
+
+        // Material multi-select functions
+        function toggleMaterialDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('materialDropdown');
+            dropdown.classList.toggle('active');
+            // Close country dropdown
+            document.getElementById('countryDropdown').classList.remove('active');
+        }
+
+        function updateMaterialFilter() {
+            const checkboxes = document.querySelectorAll('#materialDropdown input[type="checkbox"]:checked');
+            selectedMaterials = Array.from(checkboxes).map(cb => cb.value);
+
+            // Update button label
+            const label = document.getElementById('materialSelectLabel');
+            if (selectedMaterials.length === 0) {
+                label.textContent = 'All Materials';
+            } else if (selectedMaterials.length === 1) {
+                label.textContent = materialColumns[selectedMaterials[0]];
+            } else if (selectedMaterials.length === 13) {
+                label.textContent = 'All Materials';
+            } else {
+                label.textContent = `${selectedMaterials.length} selected`;
+            }
+
+            applyFilters();
+        }
+
+        function selectAllMaterials() {
+            const checkboxes = document.querySelectorAll('#materialDropdown input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            updateMaterialFilter();
+        }
+
+        function clearAllMaterials() {
+            const checkboxes = document.querySelectorAll('#materialDropdown input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateMaterialFilter();
+        }
+
+        // Country multi-select functions
+        function toggleCountryDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('countryDropdown');
+            dropdown.classList.toggle('active');
+            // Close material dropdown
+            document.getElementById('materialDropdown').classList.remove('active');
+            // Focus search box when opening
+            if (dropdown.classList.contains('active')) {
+                document.getElementById('countrySearch').focus();
+            }
+        }
+
+        function filterCountryOptions() {
+            const searchTerm = document.getElementById('countrySearch').value.toLowerCase();
+            const options = document.querySelectorAll('#countryOptions .multiselect-option');
+            options.forEach(opt => {
+                const text = opt.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    opt.classList.remove('hidden');
+                } else {
+                    opt.classList.add('hidden');
+                }
+            });
+        }
+
+        function updateCountryFilter() {
+            const checkboxes = document.querySelectorAll('#countryOptions input[type="checkbox"]:checked');
+            selectedCountries = Array.from(checkboxes).map(cb => cb.value);
+
+            // Update button label
+            const label = document.getElementById('countrySelectLabel');
+            const totalCountries = dutyData.length;
+            if (selectedCountries.length === 0) {
+                label.textContent = 'All Countries';
+            } else if (selectedCountries.length === 1) {
+                const country = dutyData.find(d => d.iso === selectedCountries[0]);
+                label.textContent = country ? country.country : selectedCountries[0];
+            } else if (selectedCountries.length === totalCountries) {
+                label.textContent = 'All Countries';
+            } else {
+                label.textContent = `${selectedCountries.length} selected`;
+            }
+
+            applyFilters();
+        }
+
+        function selectAllCountries() {
+            const checkboxes = document.querySelectorAll('#countryOptions input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            updateCountryFilter();
+        }
+
+        function clearAllCountries() {
+            const checkboxes = document.querySelectorAll('#countryOptions input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateCountryFilter();
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const materialDropdown = document.getElementById('materialDropdown');
+            const materialContainer = document.getElementById('materialMultiselect');
+            if (materialDropdown && materialContainer && !materialContainer.contains(event.target)) {
+                materialDropdown.classList.remove('active');
+            }
+
+            const countryDropdown = document.getElementById('countryDropdown');
+            const countryContainer = document.getElementById('countryMultiselect');
+            if (countryDropdown && countryContainer && !countryContainer.contains(event.target)) {
+                countryDropdown.classList.remove('active');
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -954,30 +1933,47 @@
         });
 
         function populateCountryFilter() {
-            const countryFilter = document.getElementById('countryFilter');
-            const countries = [...new Set(dutyData.map(d => d.country))].sort();
-            countries.forEach(country => {
-                const option = document.createElement('option');
-                option.value = country;
-                option.textContent = country;
-                countryFilter.appendChild(option);
+            const countryOptions = document.getElementById('countryOptions');
+            const countries = dutyData.map(d => ({country: d.country, iso: d.iso})).sort((a, b) => a.country.localeCompare(b.country));
+
+            countries.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'multiselect-option';
+                div.innerHTML = `
+                    <input type="checkbox" id="country_${c.iso}" value="${c.iso}" onchange="updateCountryFilter()">
+                    <img src="https://flagcdn.com/18x14/${c.iso.toLowerCase()}.png" class="country-option-flag" onerror="this.style.display='none'">
+                    <label for="country_${c.iso}">${c.country}</label>
+                `;
+                countryOptions.appendChild(div);
             });
         }
 
         function applyFilters() {
             const region = document.getElementById('regionFilter').value;
-            const country = document.getElementById('countryFilter').value;
             const program = document.getElementById('programFilter').value;
             const rate = document.getElementById('rateFilter').value;
             const search = document.getElementById('searchBox').value.toLowerCase();
+            // selectedMaterials and selectedCountries are updated by their respective functions
 
             filteredData = dutyData.filter(row => {
                 if (region && row.region !== region) return false;
-                if (country && row.country !== country) return false;
+                // Country filter - if countries selected, only show those
+                if (selectedCountries.length > 0 && !selectedCountries.includes(row.iso)) return false;
                 if (program && row.program !== program) return false;
                 if (search && !row.country.toLowerCase().includes(search) && !row.iso.toLowerCase().includes(search)) return false;
 
-                if (rate) {
+                if (rate && selectedMaterials.length > 0) {
+                    // Check if any selected material matches the rate filter
+                    const matchesRate = selectedMaterials.some(mat => {
+                        const rateVal = row[mat];
+                        if (rate === 'free') return rateVal === 0;
+                        if (rate === 'low') return rateVal > 0 && rateVal <= 15;
+                        if (rate === 'medium') return rateVal > 15 && rateVal <= 30;
+                        if (rate === 'high') return rateVal > 30;
+                        return true;
+                    });
+                    if (!matchesRate) return false;
+                } else if (rate) {
                     const avgRate = (row.cigarettePaper + row.filterTow + row.filterRods) / 3;
                     if (rate === 'free' && avgRate !== 0) return false;
                     if (rate === 'low' && (avgRate === 0 || avgRate > 15)) return false;
@@ -988,8 +1984,23 @@
                 return true;
             });
 
+            // Update column visibility
+            updateColumnVisibility();
             renderTable();
             updateStats();
+        }
+
+        function updateColumnVisibility() {
+            const materialCols = document.querySelectorAll('.material-col');
+            materialCols.forEach(col => {
+                const material = col.dataset.material;
+                // Show column if no materials selected OR if this material is selected
+                if (selectedMaterials.length > 0 && !selectedMaterials.includes(material)) {
+                    col.classList.add('hidden-col');
+                } else {
+                    col.classList.remove('hidden-col');
+                }
+            });
         }
 
         function renderTable() {
@@ -997,13 +2008,25 @@
             tbody.innerHTML = '';
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="14" class="no-results">No results found. Try adjusting your filters.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="20" class="no-results">No results found.</td></tr>';
                 return;
             }
 
-            filteredData.forEach(row => {
+            const materials = Object.keys(materialColumns);
+
+            filteredData.forEach((row, rowIndex) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
+                tr.setAttribute('data-row-iso', row.iso);
+
+                // Get row-level adjustments
+                const rowAdj = rowAdjustments[row.iso] || {};
+                const rowTier2 = rowAdj.tier2 || '';
+                const rowTier2Materials = rowAdj.tier2Materials || [];
+                const rowConversion = rowAdj.conversion || '';
+                const rowConversionRate = rowAdj.conversionRate || '';
+                const rowConversionMaterials = rowAdj.conversionMaterials || [];
+
+                let html = `
                     <td>
                         <div class="country-cell">
                             <img src="https://flagcdn.com/24x18/${row.iso.toLowerCase()}.png" class="country-flag" onerror="this.style.display='none'">
@@ -1013,18 +2036,60 @@
                     </td>
                     <td>${row.region}</td>
                     <td><span class="trade-program ${getProgramClass(row.program)}">${getProgramLabel(row.program)}</span></td>
-                    <td class="rate-cell ${getRateClass(row.cigarettePaper)}">${formatRate(row.cigarettePaper)}</td>
-                    <td class="rate-cell ${getRateClass(row.filterTow)}">${formatRate(row.filterTow)}</td>
-                    <td class="rate-cell ${getRateClass(row.filterRods)}">${formatRate(row.filterRods)}</td>
-                    <td class="rate-cell ${getRateClass(row.adhesive)}">${formatRate(row.adhesive)}</td>
-                    <td class="rate-cell ${getRateClass(row.capsules)}">${formatRate(row.capsules)}</td>
-                    <td class="rate-cell ${getRateClass(row.plasticizer)}">${formatRate(row.plasticizer)}</td>
-                    <td class="rate-cell ${getRateClass(row.adsorbent)}">${formatRate(row.adsorbent)}</td>
-                    <td class="rate-cell ${getRateClass(row.boardPack)}">${formatRate(row.boardPack)}</td>
-                    <td class="rate-cell ${getRateClass(row.paperPack)}">${formatRate(row.paperPack)}</td>
+                    <td class="tier2-cell">
+                        <div class="adjustment-wrapper">
+                            <select class="row-tier2-select" data-row-iso="${row.iso}" onchange="updateRowTier2(this)">
+                                <option value="">-</option>
+                                ${getCountryOptionsHTML(rowTier2)}
+                            </select>
+                            <div class="material-chips" data-row-iso="${row.iso}" data-type="tier2">
+                                ${getMaterialChipsHTML(rowTier2Materials, row.iso, 'tier2', rowTier2)}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="conversion-cell">
+                        <div class="adjustment-wrapper">
+                            <select class="row-conversion-select" data-row-iso="${row.iso}" onchange="updateRowConversion(this)">
+                                <option value="">-</option>
+                                ${getCountryOptionsHTML(rowConversion)}
+                            </select>
+                            <input type="number" class="row-conversion-rate" data-row-iso="${row.iso}"
+                                   placeholder="%" step="0.1" min="0" max="100"
+                                   value="${rowConversionRate}"
+                                   onchange="updateRowConversionRate(this)"
+                                   title="Override rate (%)">
+                            <div class="material-chips" data-row-iso="${row.iso}" data-type="conversion">
+                                ${getMaterialChipsHTML(rowConversionMaterials, row.iso, 'conversion', rowConversionRate)}
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                materials.forEach(mat => {
+                    const overrideKey = `${row.iso}_${mat}`;
+                    const hasOverride = overrides[overrideKey] !== undefined;
+                    let rate = hasOverride ? overrides[overrideKey] : row[mat];
+
+                    // Apply row-level tier 2 / conversion adjustments
+                    const adjustedRate = getRowAdjustedRate(row.iso, mat, rate, row);
+                    const isAdjusted = adjustedRate !== rate && !hasOverride;
+                    if (isAdjusted) rate = adjustedRate;
+
+                    const hiddenClass = (selectedMaterials.length > 0 && !selectedMaterials.includes(mat)) ? 'hidden-col' : '';
+                    const overrideClass = hasOverride ? 'has-override' : '';
+                    const adjustedClass = isAdjusted ? 'rate-adjusted' : '';
+
+                    html += `<td class="rate-cell ${getRateClass(rate)} ${hiddenClass} ${overrideClass} ${adjustedClass}"
+                                data-country="${row.iso}" data-material="${mat}" data-original="${row[mat]}"
+                                onclick="openOverrideModal(this)">${formatRate(rate)}</td>`;
+                });
+
+                html += `
                     <td class="alt-rate">${row.altRate || '-'}</td>
                     <td class="notes-cell">${row.notes}</td>
                 `;
+
+                tr.innerHTML = html;
                 tbody.appendChild(tr);
             });
         }
@@ -1058,7 +2123,7 @@
                     <td>${row.material}</td>
                     <td>${row.desc}</td>
                     <td>${row.mfn}</td>
-                    <td style="font-size:10px;">${row.special}</td>
+                    <td style="font-size:9px;">${row.special}</td>
                     <td class="rate-cell rate-high">${row.col2}</td>
                 `;
                 tbody.appendChild(tr);
@@ -1066,11 +2131,13 @@
         }
 
         function formatRate(rate) {
+            if (rate === undefined || rate === null) return '-';
             if (rate === 0) return 'Free';
             return rate.toFixed(1) + '%';
         }
 
         function getRateClass(rate) {
+            if (rate === undefined || rate === null) return '';
             if (rate === 0) return 'rate-free';
             if (rate <= 15) return 'rate-low';
             if (rate <= 30) return 'rate-medium';
@@ -1090,7 +2157,7 @@
             if (program.includes('USMCA')) return 'USMCA';
             if (program.includes('CAFTA')) return 'CAFTA';
             if (program.includes('FTA')) return 'FTA';
-            if (program.includes('15% Cap')) return '15% CAP';
+            if (program.includes('15% Cap')) return '15%CAP';
             if (program.includes('301')) return '301';
             if (program.includes('Column 2')) return 'COL2';
             return 'MFN+IEEPA';
@@ -1131,14 +2198,78 @@
             document.getElementById(tab + 'View').classList.add('active');
         }
 
+        // Override modal functions
+        function openOverrideModal(cell) {
+            currentOverrideCell = cell;
+            const country = cell.dataset.country;
+            const material = cell.dataset.material;
+            const original = parseFloat(cell.dataset.original);
+            const overrideKey = `${country}_${material}`;
+
+            document.getElementById('modalCountry').value = country;
+            document.getElementById('modalMaterial').value = materialColumns[material];
+            document.getElementById('modalCurrentRate').value = formatRate(original);
+            document.getElementById('modalOverrideRate').value = overrides[overrideKey] !== undefined ? overrides[overrideKey] : '';
+            document.getElementById('modalReason').value = '';
+
+            document.getElementById('overrideModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('overrideModal').classList.remove('active');
+            currentOverrideCell = null;
+        }
+
+        function applyOverride() {
+            const overrideRate = parseFloat(document.getElementById('modalOverrideRate').value);
+            if (isNaN(overrideRate) || overrideRate < 0 || overrideRate > 100) {
+                alert('Please enter a valid rate between 0 and 100');
+                return;
+            }
+
+            const country = currentOverrideCell.dataset.country;
+            const material = currentOverrideCell.dataset.material;
+            const overrideKey = `${country}_${material}`;
+
+            overrides[overrideKey] = overrideRate;
+            localStorage.setItem('dutyOverrides', JSON.stringify(overrides));
+
+            closeModal();
+            renderTable();
+        }
+
+        function clearOverride() {
+            const country = currentOverrideCell.dataset.country;
+            const material = currentOverrideCell.dataset.material;
+            const overrideKey = `${country}_${material}`;
+
+            delete overrides[overrideKey];
+            localStorage.setItem('dutyOverrides', JSON.stringify(overrides));
+
+            closeModal();
+            renderTable();
+        }
+
         function exportToCSV() {
-            const headers = ['Country', 'ISO', 'Region', 'Trade Program', 'Cigarette Paper (4813)', 'Filter Tow (5502)', 'Filter Rods (5601.22)', 'Adhesive (3506)', 'Capsules (3926.90)', 'Plasticizer (2917.12)', 'Adsorbent (3802.10)', 'Board Pack (4819.10)', 'Paper Pack (4819.20)', 'Alt Rate', 'Notes'];
-            const rows = filteredData.map(row => [
-                row.country, row.iso, row.region, row.program,
-                row.cigarettePaper, row.filterTow, row.filterRods, row.adhesive,
-                row.capsules, row.plasticizer, row.adsorbent, row.boardPack, row.paperPack,
-                row.altRate || '', row.notes
-            ]);
+            const materials = Object.keys(materialColumns);
+            const headers = ['Country', 'ISO', 'Region', 'Trade Program', 'Tier 2 Supplier', 'Conversion Country', 'Conversion Rate', ...materials.map(m => materialColumns[m]), 'Alt Rate', 'Notes'];
+            const rows = filteredData.map(row => {
+                const adj = rowAdjustments[row.iso] || {};
+                const rates = materials.map(m => {
+                    const overrideKey = `${row.iso}_${m}`;
+                    let rate = overrides[overrideKey] !== undefined ? overrides[overrideKey] : row[m];
+                    // Apply row-level adjustments for export
+                    const adjustedRate = getRowAdjustedRate(row.iso, m, rate, row);
+                    return adjustedRate;
+                });
+                return [
+                    row.country, row.iso, row.region, row.program,
+                    adj.tier2 ? getCountryName(adj.tier2) : '',
+                    adj.conversion ? getCountryName(adj.conversion) : '',
+                    adj.conversionRate || '',
+                    ...rates, row.altRate || '', row.notes
+                ];
+            });
 
             let csv = headers.join(',') + '\n';
             rows.forEach(row => {
