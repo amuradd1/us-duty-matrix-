@@ -2619,19 +2619,41 @@
         }
 
         function buildContext() {
-            // Get current filters and view to provide context
+            // Build context with ACTUAL duty data from the dashboard
+            let context = 'CURRENT DASHBOARD DATA:\n\n';
+
+            // Include all duty data (or filtered if filters applied)
+            const dataToSend = filteredData.length > 0 ? filteredData : dutyData;
+
+            // Limit to 30 countries to avoid token limits
+            const limitedData = dataToSend.slice(0, 30);
+
+            limitedData.forEach(row => {
+                context += `${row.country} (${row.iso}) - Program: ${row.program}\n`;
+                context += `  Cig Paper: ${row.cigarettePaper}%, Tipping: ${row.tippingPaper}%, Plugwrap: ${row.plugwrap}%\n`;
+                context += `  Filter Tow: ${row.filterTow}%, Filter Rods: ${row.filterRods}%\n`;
+                context += `  Adhesive: ${row.adhesive}%, Capsules: ${row.capsules}%, Plasticizer: ${row.plasticizer}%\n`;
+                context += `  Adsorbent: ${row.adsorbent}%, Board Pack: ${row.boardPack}%, Paper Pack: ${row.paperPack}%\n`;
+                context += `  Notes: ${row.notes}\n\n`;
+            });
+
+            if (dataToSend.length > 30) {
+                context += `(Showing 30 of ${dataToSend.length} countries. User can filter to see specific countries.)\n`;
+            }
+
+            // Add info about current filters
             const selectedCountries = Array.from(document.querySelectorAll('#countryDropdown input:checked'))
                 .map(cb => cb.value);
             const selectedMats = Array.from(document.querySelectorAll('#materialDropdown input:checked'))
                 .map(cb => cb.value);
 
-            let context = '';
             if (selectedCountries.length > 0 && selectedCountries.length < 10) {
-                context += `User is viewing countries: ${selectedCountries.join(', ')}. `;
+                context += `\nUser is currently filtering by countries: ${selectedCountries.join(', ')}`;
             }
             if (selectedMats.length > 0) {
-                context += `User is filtering by materials: ${selectedMats.join(', ')}. `;
+                context += `\nUser is currently filtering by materials: ${selectedMats.join(', ')}`;
             }
+
             return context;
         }
 
