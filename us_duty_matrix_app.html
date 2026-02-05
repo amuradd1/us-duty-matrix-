@@ -2620,38 +2620,32 @@
 
         function buildContext() {
             // Build context with ACTUAL duty data from the dashboard
-            let context = 'CURRENT DASHBOARD DATA:\n\n';
+            let context = 'COMPLETE DASHBOARD DATA (all countries):\n\n';
 
-            // Include all duty data (or filtered if filters applied)
-            const dataToSend = filteredData.length > 0 ? filteredData : dutyData;
+            // Send ALL duty data - it's compact enough
+            const dataToSend = dutyData;
 
-            // Limit to 30 countries to avoid token limits
-            const limitedData = dataToSend.slice(0, 30);
-
-            limitedData.forEach(row => {
-                context += `${row.country} (${row.iso}) - Program: ${row.program}\n`;
-                context += `  Cig Paper: ${row.cigarettePaper}%, Tipping: ${row.tippingPaper}%, Plugwrap: ${row.plugwrap}%\n`;
-                context += `  Filter Tow: ${row.filterTow}%, Filter Rods: ${row.filterRods}%\n`;
-                context += `  Adhesive: ${row.adhesive}%, Capsules: ${row.capsules}%, Plasticizer: ${row.plasticizer}%\n`;
-                context += `  Adsorbent: ${row.adsorbent}%, Board Pack: ${row.boardPack}%, Paper Pack: ${row.paperPack}%\n`;
-                context += `  Notes: ${row.notes}\n\n`;
+            dataToSend.forEach(row => {
+                context += `${row.country} (${row.iso}): `;
+                context += `CigPaper:${row.cigarettePaper}% Tipping:${row.tippingPaper}% Plugwrap:${row.plugwrap}% `;
+                context += `Tow:${row.filterTow}% Rods:${row.filterRods}% Adhesive:${row.adhesive}% `;
+                context += `Capsules:${row.capsules}% Plasticizer:${row.plasticizer}% Adsorbent:${row.adsorbent}% `;
+                context += `BoardPk:${row.boardPack}% PaperPk:${row.paperPack}% | ${row.program}\n`;
             });
 
-            if (dataToSend.length > 30) {
-                context += `(Showing 30 of ${dataToSend.length} countries. User can filter to see specific countries.)\n`;
-            }
+            context += `\nTotal: ${dataToSend.length} countries.\n`;
 
-            // Add info about current filters
+            // Add info about current filters if any
             const selectedCountries = Array.from(document.querySelectorAll('#countryDropdown input:checked'))
                 .map(cb => cb.value);
             const selectedMats = Array.from(document.querySelectorAll('#materialDropdown input:checked'))
                 .map(cb => cb.value);
 
-            if (selectedCountries.length > 0 && selectedCountries.length < 10) {
-                context += `\nUser is currently filtering by countries: ${selectedCountries.join(', ')}`;
+            if (selectedCountries.length > 0) {
+                context += `\nUser is filtering by: ${selectedCountries.join(', ')}`;
             }
             if (selectedMats.length > 0) {
-                context += `\nUser is currently filtering by materials: ${selectedMats.join(', ')}`;
+                context += `\nMaterial filter: ${selectedMats.join(', ')}`;
             }
 
             return context;
