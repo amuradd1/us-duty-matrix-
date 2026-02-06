@@ -2905,8 +2905,27 @@
         }
 
         function buildContext() {
-            let context = 'DUTY RATES BY COUNTRY (11 materials each):\n\n';
+            // Calculate averages dynamically from current data
+            const withAverages = dutyData.map(row => {
+                const rates = [
+                    row.cigarettePaper, row.tippingPaper, row.plugwrap,
+                    row.filterTow, row.filterRods, row.adhesive,
+                    row.capsules, row.plasticizer, row.adsorbent,
+                    row.boardPack, row.paperPack
+                ];
+                const avg = rates.reduce((sum, r) => sum + r, 0) / 11;
+                return { ...row, average: Math.round(avg * 100) / 100 };
+            });
 
+            // Pre-sort by average (highest first) for ranking queries
+            const sorted = [...withAverages].sort((a, b) => b.average - a.average);
+
+            let context = '=== COUNTRIES RANKED BY AVERAGE DUTY (highest first) ===\n';
+            sorted.forEach((row, idx) => {
+                context += `RANK ${idx + 1}: ${row.country} (${row.iso}) - AVG: ${row.average}% [${row.program}]\n`;
+            });
+
+            context += '\n=== DETAILED RATES BY COUNTRY ===\n';
             dutyData.forEach(row => {
                 context += `${row.country} (${row.iso}) [${row.program}]: `;
                 context += `CigPaper=${row.cigarettePaper}, Tipping=${row.tippingPaper}, Plugwrap=${row.plugwrap}, `;
