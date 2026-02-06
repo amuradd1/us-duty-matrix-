@@ -2905,41 +2905,14 @@
         }
 
         function buildContext() {
-            let context = '';
-
-            // Calculate averages for each country
-            const countryAverages = dutyData.map(row => {
-                const rates = [
-                    row.cigarettePaper, row.tippingPaper, row.plugwrap,
-                    row.filterTow, row.filterRods, row.adhesive,
-                    row.capsules, row.plasticizer, row.adsorbent,
-                    row.boardPack, row.paperPack
-                ];
-                const avg = rates.reduce((sum, r) => sum + r, 0) / rates.length;
-                return {
-                    country: row.country,
-                    iso: row.iso,
-                    average: Math.round(avg * 100) / 100,
-                    program: row.program
-                };
-            });
-
-            // Sort by average descending for ranking
-            const sorted = [...countryAverages].sort((a, b) => b.average - a.average);
-
-            // Add pre-calculated rankings to context
-            context += '=== PRE-CALCULATED COUNTRY RANKINGS BY AVERAGE DUTY RATE ===\n';
-            sorted.forEach((item, idx) => {
-                context += `#${idx + 1}: ${item.country} (${item.iso}) - Average: ${item.average}% | ${item.program}\n`;
-            });
-            context += '\n=== DETAILED MATERIAL RATES BY COUNTRY ===\n';
+            let context = 'DUTY RATES BY COUNTRY (11 materials each):\n\n';
 
             dutyData.forEach(row => {
-                context += `${row.country} (${row.iso}): `;
-                context += `CigPaper:${row.cigarettePaper}% Tipping:${row.tippingPaper}% Plugwrap:${row.plugwrap}% `;
-                context += `Tow:${row.filterTow}% Rods:${row.filterRods}% Adhesive:${row.adhesive}% `;
-                context += `Capsules:${row.capsules}% Plasticizer:${row.plasticizer}% Adsorbent:${row.adsorbent}% `;
-                context += `BoardPk:${row.boardPack}% PaperPk:${row.paperPack}% | ${row.program}\n`;
+                context += `${row.country} (${row.iso}) [${row.program}]: `;
+                context += `CigPaper=${row.cigarettePaper}, Tipping=${row.tippingPaper}, Plugwrap=${row.plugwrap}, `;
+                context += `Tow=${row.filterTow}, Rods=${row.filterRods}, Adhesive=${row.adhesive}, `;
+                context += `Capsules=${row.capsules}, Plasticizer=${row.plasticizer}, Adsorbent=${row.adsorbent}, `;
+                context += `BoardPk=${row.boardPack}, PaperPk=${row.paperPack}\n`;
             });
 
             return context;
