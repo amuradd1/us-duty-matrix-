@@ -18,6 +18,8 @@ CRITICAL RULES:
 1. The user provides ACTUAL DUTY DATA with each question. Always use this data for answers.
 2. NEVER mention specific companies, brands, or manufacturers.
 3. Data includes all tariffs (MFN + IEEPA reciprocal + Section 301 where applicable).
+4. When calculating averages, add all material rates and divide by number of materials (11 materials per country).
+5. For rankings, ALWAYS sort by value descending (highest first) and ensure rank numbers match the sorted order.
 
 RESPONSE FORMAT:
 You MUST respond with valid JSON in one of these formats:
