@@ -11,69 +11,110 @@ const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY
 });
 
-// System prompt for the duty matrix assistant
-const SYSTEM_PROMPT = `You are an expert assistant for US import duties. You help users understand duty rates shown in their dashboard.
+// System prompt for Import DutyGPT
+const SYSTEM_PROMPT = `You are Import DutyGPT, an expert assistant for US import duties. You help users understand duty rates from their dashboard data.
 
-IMPORTANT RULES:
-1. The user will provide ACTUAL DUTY DATA from their dashboard with each question. Always use this data for your answers.
-2. NEVER mention or reference any specific companies, brands, or manufacturers. Keep all responses generic and focused only on duty rates and trade regulations.
-3. The data contains rates including all tariffs (MFN + IEEPA reciprocal + Section 301 where applicable).
+CRITICAL RULES:
+1. The user provides ACTUAL DUTY DATA with each question. Always use this data for answers.
+2. NEVER mention specific companies, brands, or manufacturers.
+3. Data includes all tariffs (MFN + IEEPA reciprocal + Section 301 where applicable).
 
-Material groups and HTS codes:
-- Cigarette Paper (HTS 4813.10)
-- Tipping Paper (HTS 4813.20)
-- Plugwrap (HTS 4813.90)
-- Filter Tow (HTS 5502)
-- Filter Rods (HTS 5601.22)
-- Adhesive (HTS 3506)
-- Capsules (HTS 3926.90)
-- Plasticizer (HTS 2917.12)
-- Adsorbent (HTS 3802.10)
-- Board Packaging (HTS 4819.10)
-- Paper Packaging (HTS 4819.20)
-- Inner Bundling (HTS 4811.90)
-- Board Inner Frame (HTS 4819.10)
+RESPONSE FORMAT:
+You MUST respond with valid JSON in one of these formats:
 
-Key concepts you understand:
-- USMCA: Canada/Mexico get 0% if goods qualify under rules of origin, 25% if non-qualifying
-- Tier 2 suppliers: If raw materials come from outside USMCA region, goods may not qualify for preferential rates
-- Section 301: Additional 25% tariff on Chinese goods
-- IEEPA Reciprocal tariffs: Country-specific additional tariffs (e.g., 19% for Malaysia, 10% for UK)
-- FTA countries: Korea, Australia, Singapore, etc. typically get 0%
+For RANKED LISTS (top/bottom countries, comparisons):
+{
+  "type": "ranked_list",
+  "title": "Top 5 Countries by Average Duty Rate",
+  "items": [
+    {"rank": 1, "country": "China", "iso": "CN", "value": 47.7, "label": "47.7%", "detail": "Section 301 + IEEPA"},
+    {"rank": 2, "country": "Hong Kong", "iso": "HK", "value": 47.7, "label": "47.7%", "detail": "Same as China"}
+  ],
+  "summary": "Brief explanation if needed"
+}
 
-Be concise and direct. Reference the actual data provided. If comparing countries, use the real numbers from the dashboard data.`;
+For SINGLE VALUE queries (what is the rate for X from Y):
+{
+  "type": "single_value",
+  "title": "Filter Tow from Malaysia",
+  "value": 26.5,
+  "label": "26.5%",
+  "breakdown": [
+    {"name": "MFN Base", "value": 7.5},
+    {"name": "IEEPA Reciprocal", "value": 19}
+  ],
+  "summary": "Trade Deal rate applied"
+}
 
-// Chat endpoint
-app.post('/api/chat', async (req, res) => {
+For COMPARISON queries:
+{
+  "type": "comparison",
+  "title": "Malaysia vs Thailand - Filter Tow",
+  "items": [
+    {"country": "Malaysia", "iso": "MY", "value": 26.5, "label": "26.5%"},
+    {"country": "Thailand", "iso": "TH", "value": 26.5, "label": "26.5%"}
+  ],
+  "summary": "Both countries have same Trade Deal rates"
+}
+
+For EXPLANATIONS (how does X work, what is Y):
+{
+  "type": "explanation",
+  "title": "How Tier 2 Suppliers Affect USMCA",
+  "content": "Markdown formatted explanation here...",
+  "related": ["USMCA Rules of Origin", "Non-qualifying rates"]
+}
+
+Material groups: Cigarette Paper (4813.10), Tipping Paper (4813.20), Plugwrap (4813.90), Filter Tow (5502), Filter Rods (5601.22), Adhesive (3506), Capsules (3926.90), Plasticizer (2917.12), Adsorbent (3802.10), Board Packaging (4819.10), Paper Packaging (4819.20), Inner Bundling (4811.90), Board Inner Frame (4819.10).
+
+Key concepts: USMCA (0% qualifying, 25% non-qualifying), Section 301 (+25% China), IEEPA Reciprocal (country-specific), FTA countries (0%).
+
+ALWAYS respond with valid JSON only. No text outside the JSON object.`;
+
+// Search endpoint
+app.post('/api/search', async (req, res) => {
     try {
-        const { message, context } = req.body;
+        const { query, context } = req.body;
 
-        if (!message) {
-            return res.status(400).json({ error: 'Message is required' });
+        if (!query) {
+            return res.status(400).json({ error: 'Query is required' });
         }
 
-        // Build messages array
-        const messages = [
-            { role: 'user', content: message }
-        ];
-
-        // Add context about current view if provided
         let systemPrompt = SYSTEM_PROMPT;
         if (context) {
-            systemPrompt += `\n\nCurrent user context: ${context}`;
+            systemPrompt += `\n\nDASHBOARD DATA:\n${context}`;
         }
 
         const response = await anthropic.messages.create({
             model: 'claude-sonnet-4-20250514',
-            max_tokens: 1024,
+            max_tokens: 2048,
             system: systemPrompt,
-            messages: messages
+            messages: [{ role: 'user', content: query }]
         });
 
-        const answer = response.content[0].text;
+        const rawAnswer = response.content[0].text;
+
+        // Try to parse as JSON
+        let structuredResponse;
+        try {
+            // Extract JSON from response (in case there's extra text)
+            const jsonMatch = rawAnswer.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                structuredResponse = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error('No JSON found');
+            }
+        } catch (parseError) {
+            // Fallback to text response
+            structuredResponse = {
+                type: 'explanation',
+                title: 'Response',
+                content: rawAnswer
+            };
+        }
 
         res.json({
-            answer,
+            ...structuredResponse,
             usage: {
                 input_tokens: response.usage.input_tokens,
                 output_tokens: response.usage.output_tokens
@@ -84,9 +125,18 @@ app.post('/api/chat', async (req, res) => {
         console.error('Claude API error:', error);
         res.status(500).json({
             error: 'Failed to get response',
+            type: 'error',
             details: error.message
         });
     }
+});
+
+// Keep old chat endpoint for compatibility
+app.post('/api/chat', async (req, res) => {
+    const { message, context } = req.body;
+    // Redirect to search
+    req.body.query = message;
+    return res.redirect(307, '/api/search');
 });
 
 // Health check

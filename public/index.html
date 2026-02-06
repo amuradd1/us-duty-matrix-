@@ -721,14 +721,13 @@
 
         .last-updated a:hover { text-decoration: underline; }
 
-        /* Chat Box Styles */
-        .chat-toggle {
+        /* Import DutyGPT Search Styles */
+        .dutygpt-toggle {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
+            padding: 12px 20px;
+            border-radius: 30px;
             background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
             color: white;
             border: none;
@@ -736,172 +735,367 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
             z-index: 1000;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .chat-toggle:hover {
-            transform: scale(1.05);
+        .dutygpt-toggle:hover {
+            transform: scale(1.02);
             box-shadow: 0 6px 16px rgba(0,0,0,0.25);
         }
 
-        .chat-container {
+        .dutygpt-overlay {
             position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 380px;
-            height: 500px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            display: none;
-            flex-direction: column;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
             z-index: 1000;
-            overflow: hidden;
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 10vh;
         }
 
-        .chat-container.active {
+        .dutygpt-overlay.active {
             display: flex;
         }
 
-        .chat-header {
-            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-            color: white;
-            padding: 16px;
+        .dutygpt-container {
+            width: 90%;
+            max-width: 700px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dutygpt-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .chat-header h3 {
-            font-size: 15px;
-            font-weight: 600;
+        .dutygpt-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dutygpt-brand h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a365d;
             margin: 0;
         }
 
-        .chat-header span {
+        .dutygpt-brand span {
             font-size: 11px;
-            opacity: 0.8;
+            color: #718096;
+            background: #edf2f7;
+            padding: 3px 8px;
+            border-radius: 4px;
         }
 
-        .chat-close {
+        .dutygpt-close {
             background: none;
             border: none;
-            color: white;
-            font-size: 20px;
+            font-size: 24px;
+            color: #a0aec0;
             cursor: pointer;
             padding: 0;
             line-height: 1;
-            opacity: 0.8;
         }
 
-        .chat-close:hover { opacity: 1; }
+        .dutygpt-close:hover { color: #4a5568; }
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
+        .dutygpt-search {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dutygpt-input-wrapper {
             display: flex;
-            flex-direction: column;
             gap: 12px;
+            align-items: center;
         }
 
-        .chat-message {
-            max-width: 85%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .chat-message.user {
-            background: #3182ce;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-message.assistant {
-            background: #f7fafc;
-            color: #2d3748;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .chat-message.error {
-            background: #fed7d7;
-            color: #c53030;
-            align-self: center;
-            font-size: 12px;
-        }
-
-        .chat-message.typing {
-            background: #f7fafc;
-            border: 1px solid #e2e8f0;
-            align-self: flex-start;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: #a0aec0;
-            border-radius: 50%;
-            animation: typing 1.2s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-4px); }
-        }
-
-        .chat-input-area {
-            padding: 12px 16px;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            gap: 8px;
-        }
-
-        .chat-input {
+        .dutygpt-input {
             flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .chat-input:focus {
+        .dutygpt-input:focus {
             border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
         }
 
-        .chat-send {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #3182ce;
+        .dutygpt-submit {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
             color: white;
             border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
+            transition: transform 0.2s;
         }
 
-        .chat-send:hover { background: #2c5282; }
-        .chat-send:disabled { background: #a0aec0; cursor: not-allowed; }
+        .dutygpt-submit:hover { transform: scale(1.02); }
+        .dutygpt-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .dutygpt-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .dutygpt-suggestion {
+            padding: 6px 12px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dutygpt-suggestion:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .dutygpt-results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            min-height: 200px;
+        }
+
+        .dutygpt-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .dutygpt-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #3182ce;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Result Cards */
+        .result-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 16px;
+        }
+
+        .result-summary {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* Ranked List */
+        .ranked-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ranked-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+
+        .ranked-item:hover {
+            transform: translateX(4px);
+        }
+
+        .ranked-rank {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a365d;
+            min-width: 30px;
+        }
+
+        .ranked-flag {
+            width: 32px;
+            height: 24px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .ranked-info {
+            flex: 1;
+        }
+
+        .ranked-country {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .ranked-detail {
+            font-size: 11px;
+            color: #718096;
+        }
+
+        .ranked-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #c53030;
+        }
+
+        .ranked-value.low { color: #38a169; }
+        .ranked-value.medium { color: #d69e2e; }
+
+        .ranked-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .ranked-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3182ce, #805ad5);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Single Value Result */
+        .single-value-card {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 16px;
+        }
+
+        .single-value-number {
+            font-size: 64px;
+            font-weight: 800;
+            color: #1a365d;
+            line-height: 1;
+        }
+
+        .single-value-breakdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .breakdown-item {
+            text-align: center;
+        }
+
+        .breakdown-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3182ce;
+        }
+
+        .breakdown-label {
+            font-size: 11px;
+            color: #718096;
+            text-transform: uppercase;
+        }
+
+        /* Comparison Result */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .comparison-card {
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .comparison-flag {
+            width: 48px;
+            height: 36px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .comparison-country {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .comparison-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a365d;
+        }
+
+        /* Explanation Result */
+        .explanation-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #4a5568;
+        }
+
+        .explanation-content p {
+            margin-bottom: 12px;
+        }
+
+        .explanation-related {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .related-tag {
+            padding: 4px 10px;
+            background: #edf2f7;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #4a5568;
+        }
 
         .sources-section {
             background: #edf2f7;
@@ -2533,99 +2727,187 @@
             window.URL.revokeObjectURL(url);
         }
 
-        // ============ CHAT FUNCTIONALITY ============
+        // ============ IMPORT DUTYGPT ============
 
-        const API_URL = '/api/chat'; // Will be same origin on Azure
+        const API_URL = '/api/search';
 
-        function toggleChat() {
-            const container = document.getElementById('chatContainer');
-            container.classList.toggle('active');
-            if (container.classList.contains('active')) {
-                document.getElementById('chatInput').focus();
-            }
+        function openDutyGPT() {
+            document.getElementById('dutyGptOverlay').classList.add('active');
+            document.getElementById('dutyGptInput').focus();
         }
 
-        function closeChat() {
-            document.getElementById('chatContainer').classList.remove('active');
+        function closeDutyGPT() {
+            document.getElementById('dutyGptOverlay').classList.remove('active');
         }
 
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (!message) return;
+        function useSuggestion(text) {
+            document.getElementById('dutyGptInput').value = text;
+            submitSearch();
+        }
 
-            const messagesContainer = document.getElementById('chatMessages');
-            const sendBtn = document.getElementById('chatSendBtn');
+        async function submitSearch() {
+            const input = document.getElementById('dutyGptInput');
+            const query = input.value.trim();
+            if (!query) return;
 
-            // Add user message
-            addMessage(message, 'user');
-            input.value = '';
-            sendBtn.disabled = true;
+            const resultsContainer = document.getElementById('dutyGptResults');
+            const submitBtn = document.getElementById('dutyGptSubmit');
 
-            // Show typing indicator
-            const typingId = showTyping();
+            // Show loading
+            resultsContainer.innerHTML = `
+                <div class="dutygpt-loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 16px;">Analyzing duty data...</p>
+                </div>
+            `;
+            submitBtn.disabled = true;
 
             try {
-                // Build context from current view
                 const context = buildContext();
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, context })
+                    body: JSON.stringify({ query, context })
                 });
 
-                removeTyping(typingId);
-
-                if (!response.ok) {
-                    throw new Error('Failed to get response');
-                }
+                if (!response.ok) throw new Error('Failed to get response');
 
                 const data = await response.json();
-                addMessage(data.answer, 'assistant');
+                renderResult(data);
 
             } catch (error) {
-                removeTyping(typingId);
-                addMessage('Sorry, I could not connect to the server. Please try again.', 'error');
-                console.error('Chat error:', error);
+                resultsContainer.innerHTML = `
+                    <div style="text-align: center; color: #c53030; padding: 40px;">
+                        <p>Sorry, could not connect to the server.</p>
+                        <p style="font-size: 12px; margin-top: 8px;">Please try again.</p>
+                    </div>
+                `;
+                console.error('DutyGPT error:', error);
             }
 
-            sendBtn.disabled = false;
+            submitBtn.disabled = false;
         }
 
-        function addMessage(text, type) {
-            const container = document.getElementById('chatMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `chat-message ${type}`;
-            msgDiv.textContent = text;
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
+        function renderResult(data) {
+            const container = document.getElementById('dutyGptResults');
+
+            if (data.type === 'ranked_list') {
+                container.innerHTML = renderRankedList(data);
+            } else if (data.type === 'single_value') {
+                container.innerHTML = renderSingleValue(data);
+            } else if (data.type === 'comparison') {
+                container.innerHTML = renderComparison(data);
+            } else if (data.type === 'explanation') {
+                container.innerHTML = renderExplanation(data);
+            } else {
+                container.innerHTML = renderExplanation({ title: 'Response', content: JSON.stringify(data) });
+            }
         }
 
-        function showTyping() {
-            const container = document.getElementById('chatMessages');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'chat-message typing';
-            typingDiv.id = 'typing-' + Date.now();
-            typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-            container.appendChild(typingDiv);
-            container.scrollTop = container.scrollHeight;
-            return typingDiv.id;
+        function renderRankedList(data) {
+            const maxValue = Math.max(...data.items.map(i => i.value));
+
+            let html = `<div class="result-title">${data.title}</div>`;
+            html += '<div class="ranked-list">';
+
+            data.items.forEach(item => {
+                const barWidth = (item.value / maxValue) * 100;
+                const valueClass = item.value === 0 ? 'low' : (item.value <= 15 ? 'medium' : '');
+
+                html += `
+                    <div class="ranked-item">
+                        <div class="ranked-rank">#${item.rank}</div>
+                        <img class="ranked-flag" src="https://flagcdn.com/48x36/${item.iso.toLowerCase()}.png" onerror="this.style.display='none'">
+                        <div class="ranked-info">
+                            <div class="ranked-country">${item.country}</div>
+                            <div class="ranked-detail">${item.detail || ''}</div>
+                            <div class="ranked-bar"><div class="ranked-bar-fill" style="width: ${barWidth}%"></div></div>
+                        </div>
+                        <div class="ranked-value ${valueClass}">${item.label}</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            if (data.summary) {
+                html += `<div class="result-summary">${data.summary}</div>`;
+            }
+
+            return html;
         }
 
-        function removeTyping(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
+        function renderSingleValue(data) {
+            let html = `
+                <div class="single-value-card">
+                    <div class="result-title">${data.title}</div>
+                    <div class="single-value-number">${data.label}</div>
+            `;
+
+            if (data.breakdown && data.breakdown.length > 0) {
+                html += '<div class="single-value-breakdown">';
+                data.breakdown.forEach(b => {
+                    html += `
+                        <div class="breakdown-item">
+                            <div class="breakdown-value">${b.value}%</div>
+                            <div class="breakdown-label">${b.name}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            if (data.summary) {
+                html += `<div class="result-summary" style="border-top: none; text-align: center;">${data.summary}</div>`;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function renderComparison(data) {
+            let html = `<div class="result-title">${data.title}</div>`;
+            html += '<div class="comparison-grid">';
+
+            data.items.forEach(item => {
+                html += `
+                    <div class="comparison-card">
+                        <img class="comparison-flag" src="https://flagcdn.com/48x36/${item.iso.toLowerCase()}.png" onerror="this.style.display='none'">
+                        <div class="comparison-country">${item.country}</div>
+                        <div class="comparison-value">${item.label}</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            if (data.summary) {
+                html += `<div class="result-summary">${data.summary}</div>`;
+            }
+
+            return html;
+        }
+
+        function renderExplanation(data) {
+            let html = `<div class="result-title">${data.title}</div>`;
+            html += `<div class="explanation-content">${data.content}</div>`;
+
+            if (data.related && data.related.length > 0) {
+                html += '<div class="explanation-related">';
+                data.related.forEach(tag => {
+                    html += `<span class="related-tag">${tag}</span>`;
+                });
+                html += '</div>';
+            }
+
+            return html;
         }
 
         function buildContext() {
-            // Build context with ACTUAL duty data from the dashboard
-            let context = 'COMPLETE DASHBOARD DATA (all countries):\n\n';
+            let context = '';
 
-            // Send ALL duty data - it's compact enough
-            const dataToSend = dutyData;
-
-            dataToSend.forEach(row => {
+            dutyData.forEach(row => {
                 context += `${row.country} (${row.iso}): `;
                 context += `CigPaper:${row.cigarettePaper}% Tipping:${row.tippingPaper}% Plugwrap:${row.plugwrap}% `;
                 context += `Tow:${row.filterTow}% Rods:${row.filterRods}% Adhesive:${row.adhesive}% `;
@@ -2633,67 +2915,77 @@
                 context += `BoardPk:${row.boardPack}% PaperPk:${row.paperPack}% | ${row.program}\n`;
             });
 
-            context += `\nTotal: ${dataToSend.length} countries.\n`;
-
-            // Add info about current filters if any
-            const selectedCountries = Array.from(document.querySelectorAll('#countryDropdown input:checked'))
-                .map(cb => cb.value);
-            const selectedMats = Array.from(document.querySelectorAll('#materialDropdown input:checked'))
-                .map(cb => cb.value);
-
-            if (selectedCountries.length > 0) {
-                context += `\nUser is filtering by: ${selectedCountries.join(', ')}`;
-            }
-            if (selectedMats.length > 0) {
-                context += `\nMaterial filter: ${selectedMats.join(', ')}`;
-            }
-
             return context;
         }
 
-        // Handle Enter key in chat input
+        // Handle Enter key and Escape
         document.addEventListener('DOMContentLoaded', function() {
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput) {
-                chatInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+            const input = document.getElementById('dutyGptInput');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
                         e.preventDefault();
-                        sendMessage();
+                        submitSearch();
                     }
                 });
             }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeDutyGPT();
+                }
+                // Cmd/Ctrl + K to open
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    openDutyGPT();
+                }
+            });
         });
     </script>
 
-    <!-- Chat Toggle Button -->
-    <button class="chat-toggle" onclick="toggleChat()" title="Ask a question">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    <!-- Import DutyGPT Toggle Button -->
+    <button class="dutygpt-toggle" onclick="openDutyGPT()" title="Ask Import DutyGPT (Cmd+K)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
         </svg>
+        Import DutyGPT
     </button>
 
-    <!-- Chat Container -->
-    <div class="chat-container" id="chatContainer">
-        <div class="chat-header">
-            <div>
-                <h3>Duty Matrix Assistant</h3>
-                <span>Powered by Claude</span>
+    <!-- Import DutyGPT Overlay -->
+    <div class="dutygpt-overlay" id="dutyGptOverlay" onclick="if(event.target === this) closeDutyGPT()">
+        <div class="dutygpt-container">
+            <div class="dutygpt-header">
+                <div class="dutygpt-brand">
+                    <h2>Import DutyGPT</h2>
+                    <span>Powered by Claude</span>
+                </div>
+                <button class="dutygpt-close" onclick="closeDutyGPT()">&times;</button>
             </div>
-            <button class="chat-close" onclick="closeChat()">&times;</button>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="chat-message assistant">
-                Hi! I can help you with US import duties for materials. Ask me about rates, HTS codes, FTAs, or how tier 2 suppliers affect your duties.
+
+            <div class="dutygpt-search">
+                <div class="dutygpt-input-wrapper">
+                    <input type="text" class="dutygpt-input" id="dutyGptInput" placeholder="Ask about duty rates, compare countries, find lowest rates...">
+                    <button class="dutygpt-submit" id="dutyGptSubmit" onclick="submitSearch()">Search</button>
+                </div>
+                <div class="dutygpt-suggestions">
+                    <span class="dutygpt-suggestion" onclick="useSuggestion('Top 5 countries by average duty rate')">Top 5 highest duty</span>
+                    <span class="dutygpt-suggestion" onclick="useSuggestion('What is the filter tow rate from Malaysia?')">Malaysia filter tow</span>
+                    <span class="dutygpt-suggestion" onclick="useSuggestion('Compare China vs Vietnam rates')">China vs Vietnam</span>
+                    <span class="dutygpt-suggestion" onclick="useSuggestion('Which FTA countries have 0% duty?')">FTA countries</span>
+                </div>
             </div>
-        </div>
-        <div class="chat-input-area">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about duties, rates, FTAs...">
-            <button class="chat-send" id="chatSendBtn" onclick="sendMessage()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
+
+            <div class="dutygpt-results" id="dutyGptResults">
+                <div style="text-align: center; color: #718096; padding: 40px;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 16px; opacity: 0.5;">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <p>Ask any question about import duties</p>
+                    <p style="font-size: 12px; margin-top: 8px;">Try the suggestions above or type your own query</p>
+                </div>
+            </div>
         </div>
     </div>
 </body>
