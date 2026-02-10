@@ -156,6 +156,72 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// EU TARIC API Proxy - bypasses CORS
+app.get('/api/eu-rate/:cnCode/:countryCode', async (req, res) => {
+    const { cnCode, countryCode } = req.params;
+    const today = new Date().toISOString().split('T')[0];
+
+    const soapRequest = `<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://goodsNomenclatureForWS.ws.taric.dds.s/">
+  <soap:Body>
+    <tns:goodsMeasForWs>
+      <tns:goodsCode>${cnCode}</tns:goodsCode>
+      <tns:countryCode>${countryCode}</tns:countryCode>
+      <tns:referenceDate>${today}</tns:referenceDate>
+      <tns:tradeMovement>I</tns:tradeMovement>
+    </tns:goodsMeasForWs>
+  </soap:Body>
+</soap:Envelope>`;
+
+    try {
+        const response = await fetch('https://ec.europa.eu/taxation_customs/dds2/taric/services/goods', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/xml; charset=utf-8',
+                'SOAPAction': '""'
+            },
+            body: soapRequest
+        });
+
+        const xml = await response.text();
+
+        // Parse measures from XML
+        const measures = [];
+        const measureRegex = /<measure>([\s\S]*?)<\/measure>/g;
+        let match;
+
+        while ((match = measureRegex.exec(xml)) !== null) {
+            const measureXml = match[1];
+            const typeMatch = measureXml.match(/<measure_type>(\d+)<\/measure_type>/);
+            const rateMatch = measureXml.match(/<duty_rate>([\d.]+)\s*%/);
+            const descMatch = measureXml.match(/<description>([^<]+)<\/description>/);
+
+            if (typeMatch && rateMatch) {
+                measures.push({
+                    type: parseInt(typeMatch[1]),
+                    rate: parseFloat(rateMatch[1]),
+                    description: descMatch ? descMatch[1] : ''
+                });
+            }
+        }
+
+        // Priority: Tariff preference (142) > Third country duty (103)
+        const preference = measures.find(m => m.type === 142);
+        const thirdCountry = measures.find(m => m.type === 103);
+
+        if (preference) {
+            res.json({ rate: preference.rate, type: 'FTA', cnCode, countryCode });
+        } else if (thirdCountry) {
+            res.json({ rate: thirdCountry.rate, type: 'MFN', cnCode, countryCode });
+        } else {
+            res.json({ rate: null, type: 'N/A', cnCode, countryCode, measures });
+        }
+    } catch (error) {
+        console.error('TARIC API error:', error);
+        res.status(500).json({ error: error.message, cnCode, countryCode });
+    }
+});
+
 // Serve the main app
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
