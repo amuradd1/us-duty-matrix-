@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Duty Comparison - Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 20px 40px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left sidebar - Material selector */
+        .sidebar {
+            width: 280px;
+            background: #1e293b;
+            border-right: 1px solid #334155;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .material-list {
+            list-style: none;
+        }
+
+        .material-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .material-item:hover {
+            background: #334155;
+        }
+
+        .material-item.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .material-item .name {
+            font-weight: 500;
+        }
+
+        .material-item .code {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .material-item.active .code {
+            color: #bfdbfe;
+        }
+
+        /* Main content */
+        .content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .content-header h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .content-header .subtitle {
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sort-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .sort-btn:hover {
+            border-color: #3b82f6;
+        }
+
+        .sort-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        /* Dumbbell chart */
+        .chart-container {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.us { background: #f59e0b; }
+        .legend-dot.eu { background: #3b82f6; }
+
+        .dumbbell-row {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .dumbbell-row:hover {
+            background: #334155;
+            margin: 0 -24px;
+            padding: 16px 24px;
+            border-radius: 8px;
+        }
+
+        .country-info {
+            width: 180px;
+            flex-shrink: 0;
+        }
+
+        .country-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .country-flag {
+            font-size: 1.2rem;
+        }
+
+        .country-program {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .dumbbell-chart {
+            flex: 1;
+            position: relative;
+            height: 40px;
+            margin: 0 20px;
+        }
+
+        .dumbbell-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #334155;
+            transform: translateY(-50%);
+        }
+
+        .dumbbell-line {
+            position: absolute;
+            top: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #f59e0b);
+            transform: translateY(-50%);
+            border-radius: 2px;
+        }
+
+        .dumbbell-dot {
+            position: absolute;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #0f172a;
+        }
+
+        .dumbbell-dot.us { background: #f59e0b; }
+        .dumbbell-dot.eu { background: #3b82f6; }
+
+        .dumbbell-label {
+            position: absolute;
+            top: -20px;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .dumbbell-label.us { color: #f59e0b; }
+        .dumbbell-label.eu { color: #3b82f6; }
+
+        .rate-values {
+            width: 200px;
+            display: flex;
+            gap: 20px;
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .rate-value {
+            flex: 1;
+        }
+
+        .rate-value .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .rate-value .value.us { color: #f59e0b; }
+        .rate-value .value.eu { color: #3b82f6; }
+
+        .rate-value .label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .savings {
+            width: 120px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .savings-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .savings-value.positive { color: #10b981; }
+        .savings-value.negative { color: #ef4444; }
+        .savings-value.neutral { color: #64748b; }
+
+        .savings-label {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        /* Summary cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .summary-card .label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .summary-card .subtext {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .summary-card.highlight {
+            background: linear-gradient(135deg, #065f46, #064e3b);
+        }
+
+        .summary-card.highlight .value {
+            color: #10b981;
+        }
+
+        /* Heat map section */
+        .heatmap-section {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .heatmap-section h3 {
+            font-size: 1rem;
+            margin-bottom: 16px;
+            color: #94a3b8;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: 140px repeat(2, 1fr);
+            gap: 2px;
+        }
+
+        .heatmap-header {
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: #334155;
+        }
+
+        .heatmap-row-label {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .heatmap-cell {
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .heatmap-cell.rate-0 { background: #065f46; color: #10b981; }
+        .heatmap-cell.rate-low { background: #14532d; color: #4ade80; }
+        .heatmap-cell.rate-med { background: #78350f; color: #fbbf24; }
+        .heatmap-cell.rate-high { background: #7f1d1d; color: #f87171; }
+        .heatmap-cell.rate-vhigh { background: #991b1b; color: #fca5a5; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+            .rate-values, .savings {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Import Duty Comparison Tool</h1>
+        <p>Compare duty rates across origin countries and import destinations</p>
+    </div>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h2>Select Material</h2>
+            <ul class="material-list">
+                <li class="material-item" onclick="selectMaterial(this, 'Cigarette Paper')">
+                    <div>
+                        <div class="name">Cigarette Paper</div>
+                        <div class="code">HTS 4813.10 / CN 4813100000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Tipping Paper')">
+                    <div>
+                        <div class="name">Tipping Paper</div>
+                        <div class="code">HTS 4813.20 / CN 4813200000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Plugwrap')">
+                    <div>
+                        <div class="name">Plugwrap</div>
+                        <div class="code">HTS 4813.90 / CN 4813900000</div>
+                    </div>
+                </li>
+                <li class="material-item active" onclick="selectMaterial(this, 'Filter Tow')">
+                    <div>
+                        <div class="name">Filter Tow</div>
+                        <div class="code">HTS 5502.10 / CN 5502100000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Filter Rods')">
+                    <div>
+                        <div class="name">Filter Rods</div>
+                        <div class="code">HTS 5601.22 / CN 5601220000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Adhesive')">
+                    <div>
+                        <div class="name">Adhesive</div>
+                        <div class="code">HTS 3506.91 / CN 3506910000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Capsules')">
+                    <div>
+                        <div class="name">Capsules</div>
+                        <div class="code">HTS 3926.90 / CN 3926909990</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Plasticizer')">
+                    <div>
+                        <div class="name">Plasticizer</div>
+                        <div class="code">HTS 2917.12 / CN 2917125000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Adsorbent')">
+                    <div>
+                        <div class="name">Adsorbent</div>
+                        <div class="code">HTS 3802.10 / CN 3802100000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Board Packaging')">
+                    <div>
+                        <div class="name">Board Packaging</div>
+                        <div class="code">HTS 4819.10 / CN 4819100000</div>
+                    </div>
+                </li>
+                <li class="material-item" onclick="selectMaterial(this, 'Paper Packaging')">
+                    <div>
+                        <div class="name">Paper Packaging</div>
+                        <div class="code">HTS 4819.20 / CN 4819200000</div>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="content-header">
+                <div>
+                    <h2 id="materialTitle">Filter Tow</h2>
+                    <p class="subtitle">Cellulose acetate filament tow for cigarette filters</p>
+                </div>
+                <div class="sort-controls">
+                    <button class="sort-btn active" onclick="sortBy('savings')">Sort by EU Savings</button>
+                    <button class="sort-btn" onclick="sortBy('us')">Sort by US Rate</button>
+                    <button class="sort-btn" onclick="sortBy('eu')">Sort by EU Rate</button>
+                </div>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="label">Average US Rate</div>
+                    <div class="value" style="color: #f59e0b;">18.4%</div>
+                    <div class="subtext">Across 10 origins</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Average EU Rate</div>
+                    <div class="value" style="color: #3b82f6;">2.8%</div>
+                    <div class="subtext">Across 10 origins</div>
+                </div>
+                <div class="summary-card highlight">
+                    <div class="label">Best Origin for EU</div>
+                    <div class="value">Japan</div>
+                    <div class="subtext">0% FTA preference</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Biggest US-EU Gap</div>
+                    <div class="value" style="color: #10b981;">-48.5%</div>
+                    <div class="subtext">China (52.5% vs 4%)</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot us"></div>
+                        <span>US Duty Rate</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot eu"></div>
+                        <span>EU Duty Rate</span>
+                    </div>
+                    <div class="legend-item" style="margin-left: auto; color: #64748b;">
+                        <span>Scale: 0% ────────────────────── 60%</span>
+                    </div>
+                </div>
+
+                <div id="dumbbellChart">
+                    <!-- Rows will be generated by JS -->
+                </div>
+            </div>
+
+            <div class="heatmap-section">
+                <h3>Quick View: All Materials from China</h3>
+                <div class="heatmap-grid">
+                    <div class="heatmap-header"></div>
+                    <div class="heatmap-header">🇺🇸 US</div>
+                    <div class="heatmap-header">🇪🇺 EU</div>
+
+                    <div class="heatmap-row-label">Cigarette Paper</div>
+                    <div class="heatmap-cell rate-med">45%</div>
+                    <div class="heatmap-cell rate-0">0%</div>
+
+                    <div class="heatmap-row-label">Filter Tow</div>
+                    <div class="heatmap-cell rate-vhigh">52.5%</div>
+                    <div class="heatmap-cell rate-low">4%</div>
+
+                    <div class="heatmap-row-label">Adhesive</div>
+                    <div class="heatmap-cell rate-med">47.1%</div>
+                    <div class="heatmap-cell rate-low">2.1%</div>
+
+                    <div class="heatmap-row-label">Capsules</div>
+                    <div class="heatmap-cell rate-vhigh">50.3%</div>
+                    <div class="heatmap-cell rate-med">6.5%</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sample data for Filter Tow (HTS 5502.10)
+        const filterTowData = [
+            { country: 'China', flag: '🇨🇳', us: 52.5, eu: 4, usProgram: 'Section 301 + IEEPA', euProgram: 'MFN' },
+            { country: 'Japan', flag: '🇯🇵', us: 7.5, eu: 0, usProgram: 'MFN', euProgram: 'FTA' },
+            { country: 'South Korea', flag: '🇰🇷', us: 0, eu: 0, usProgram: 'KORUS FTA', euProgram: 'FTA' },
+            { country: 'Vietnam', flag: '🇻🇳', us: 17.5, eu: 0, usProgram: 'MFN + IEEPA', euProgram: 'EVFTA' },
+            { country: 'India', flag: '🇮🇳', us: 33.5, eu: 4, usProgram: 'MFN + IEEPA', euProgram: 'GSP' },
+            { country: 'Brazil', flag: '🇧🇷', us: 57.5, eu: 4, usProgram: 'MFN + IEEPA 50%', euProgram: 'MFN' },
+            { country: 'Mexico', flag: '🇲🇽', us: 0, eu: 0, usProgram: 'USMCA', euProgram: 'EU-Mexico' },
+            { country: 'Thailand', flag: '🇹🇭', us: 43.5, eu: 4, usProgram: 'MFN + IEEPA 36%', euProgram: 'GSP' },
+            { country: 'Malaysia', flag: '🇲🇾', us: 26.5, eu: 4, usProgram: 'MFN + IEEPA', euProgram: 'MFN' },
+            { country: 'Indonesia', flag: '🇮🇩', us: 39.5, eu: 4, usProgram: 'MFN + IEEPA 32%', euProgram: 'GSP' },
+        ];
+
+        function renderDumbbellChart(data) {
+            const container = document.getElementById('dumbbellChart');
+            const maxRate = 60; // Scale maximum
+
+            // Sort by EU savings (US - EU), descending
+            const sorted = [...data].sort((a, b) => (b.us - b.eu) - (a.us - a.eu));
+
+            container.innerHTML = sorted.map(row => {
+                const usPos = (row.us / maxRate) * 100;
+                const euPos = (row.eu / maxRate) * 100;
+                const leftPos = Math.min(usPos, euPos);
+                const rightPos = Math.max(usPos, euPos);
+                const savings = row.eu - row.us;
+                const savingsClass = savings < 0 ? 'positive' : savings > 0 ? 'negative' : 'neutral';
+
+                return `
+                    <div class="dumbbell-row">
+                        <div class="country-info">
+                            <div class="country-name">
+                                <span class="country-flag">${row.flag}</span>
+                                ${row.country}
+                            </div>
+                            <div class="country-program">${row.usProgram}</div>
+                        </div>
+                        <div class="dumbbell-chart">
+                            <div class="dumbbell-track"></div>
+                            <div class="dumbbell-line" style="left: ${leftPos}%; width: ${rightPos - leftPos}%;"></div>
+                            <div class="dumbbell-dot eu" style="left: ${euPos}%;">
+                                <span class="dumbbell-label eu">${row.eu}%</span>
+                            </div>
+                            <div class="dumbbell-dot us" style="left: ${usPos}%;">
+                                <span class="dumbbell-label us">${row.us}%</span>
+                            </div>
+                        </div>
+                        <div class="rate-values">
+                            <div class="rate-value">
+                                <div class="value us">${row.us}%</div>
+                                <div class="label">US Rate</div>
+                            </div>
+                            <div class="rate-value">
+                                <div class="value eu">${row.eu}%</div>
+                                <div class="label">EU Rate</div>
+                            </div>
+                        </div>
+                        <div class="savings">
+                            <div class="savings-value ${savingsClass}">${savings > 0 ? '+' : ''}${savings.toFixed(1)}%</div>
+                            <div class="savings-label">EU vs US</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectMaterial(el, materialName) {
+            document.querySelectorAll('.material-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('materialTitle').textContent = materialName;
+            // In real app, would load data for selected material
+        }
+
+        function sortBy(field) {
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let sorted;
+            if (field === 'savings') {
+                sorted = [...filterTowData].sort((a, b) => (b.us - b.eu) - (a.us - a.eu));
+            } else if (field === 'us') {
+                sorted = [...filterTowData].sort((a, b) => b.us - a.us);
+            } else if (field === 'eu') {
+                sorted = [...filterTowData].sort((a, b) => a.eu - b.eu);
+            }
+            renderDumbbellChart(sorted);
+        }
+
+        // Initial render
+        renderDumbbellChart(filterTowData);
+    </script>
+</body>
+</html>
