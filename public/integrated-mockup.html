@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materials Duty Matrix - Integrated App Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 40px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .logo-text span {
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        /* Main Nav Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .nav-tab {
+            padding: 20px 24px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .nav-tab:hover {
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        .nav-tab .flag {
+            font-size: 1.1rem;
+        }
+
+        .nav-tab .badge {
+            background: #3b82f6;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Search in nav */
+        .nav-search {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #334155;
+            border-radius: 8px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .search-trigger:hover {
+            background: #475569;
+            color: #e2e8f0;
+        }
+
+        .search-trigger kbd {
+            background: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: inherit;
+        }
+
+        /* Main Content Container */
+        .main-content {
+            display: none;
+            padding: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        /* Page Headers */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #94a3b8;
+        }
+
+        .destination-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 12px;
+            vertical-align: middle;
+        }
+
+        .destination-badge.eu {
+            background: linear-gradient(135deg, #003399, #0052cc);
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-card .label {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .stat-card .change {
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        .stat-card .change.positive { color: #10b981; }
+        .stat-card .change.negative { color: #ef4444; }
+
+        /* Filters Bar */
+        .filters-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .filter-select {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .filter-select:hover {
+            border-color: #3b82f6;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            background: #334155;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover {
+            background: #475569;
+        }
+
+        .filter-chip.active {
+            background: #3b82f6;
+        }
+
+        /* Data Table */
+        .data-table-container {
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #334155;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .data-table tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .country-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .country-flag {
+            font-size: 1.3rem;
+        }
+
+        .country-name {
+            font-weight: 500;
+        }
+
+        .country-program {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .rate-cell {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .rate-cell.free { color: #10b981; }
+        .rate-cell.low { color: #a3e635; }
+        .rate-cell.medium { color: #fbbf24; }
+        .rate-cell.high { color: #f87171; }
+
+        /* Compare View Specific */
+        .compare-layout {
+            display: flex;
+            gap: 24px;
+        }
+
+        .compare-sidebar {
+            width: 260px;
+            flex-shrink: 0;
+        }
+
+        .compare-main {
+            flex: 1;
+        }
+
+        .material-selector {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .material-selector h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .material-option {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .material-option:hover {
+            background: #334155;
+        }
+
+        .material-option.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .material-option .name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .material-option .code {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .material-option.active .code {
+            color: #bfdbfe;
+        }
+
+        /* Dumbbell Chart */
+        .compare-chart {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 24px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.us { background: #f59e0b; }
+        .legend-dot.eu { background: #3b82f6; }
+
+        .sort-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sort-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sort-btn:hover {
+            border-color: #3b82f6;
+            color: #e2e8f0;
+        }
+
+        .sort-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .dumbbell-row {
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .dumbbell-country {
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .dumbbell-country .name {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dumbbell-country .program {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .dumbbell-visual {
+            flex: 1;
+            height: 32px;
+            position: relative;
+            margin: 0 20px;
+        }
+
+        .dumbbell-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #334155;
+            transform: translateY(-50%);
+        }
+
+        .dumbbell-line {
+            position: absolute;
+            top: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #f59e0b);
+            transform: translateY(-50%);
+            border-radius: 2px;
+        }
+
+        .dumbbell-dot {
+            position: absolute;
+            top: 50%;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #0f172a;
+        }
+
+        .dumbbell-dot.us { background: #f59e0b; }
+        .dumbbell-dot.eu { background: #3b82f6; }
+
+        .dumbbell-values {
+            width: 180px;
+            display: flex;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .dumbbell-value {
+            text-align: center;
+            flex: 1;
+        }
+
+        .dumbbell-value .rate {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .dumbbell-value .rate.us { color: #f59e0b; }
+        .dumbbell-value .rate.eu { color: #3b82f6; }
+
+        .dumbbell-value .label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .dumbbell-savings {
+            width: 100px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .dumbbell-savings .value {
+            font-weight: 700;
+        }
+
+        .dumbbell-savings .value.positive { color: #10b981; }
+        .dumbbell-savings .value.negative { color: #ef4444; }
+
+        .dumbbell-savings .label {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        /* DutyGPT View */
+        .dutygpt-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 40px;
+        }
+
+        .dutygpt-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .dutygpt-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dutygpt-search {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .dutygpt-input-wrapper {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dutygpt-input {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        .dutygpt-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .dutygpt-submit {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dutygpt-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .dutygpt-suggestions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .dutygpt-suggestion {
+            background: #334155;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dutygpt-suggestion:hover {
+            background: #475569;
+        }
+
+        .dutygpt-results {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            min-height: 300px;
+        }
+
+        .dutygpt-placeholder {
+            text-align: center;
+            color: #64748b;
+            padding: 60px 20px;
+        }
+
+        .dutygpt-placeholder svg {
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Quick Access Cards on Home */
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .quick-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .quick-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .quick-card.us .icon { background: linear-gradient(135deg, #1e40af, #3b82f6); }
+        .quick-card.eu .icon { background: linear-gradient(135deg, #003399, #0052cc); }
+        .quick-card.compare .icon { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+
+        .quick-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .quick-card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .quick-card .arrow {
+            margin-top: 16px;
+            color: #3b82f6;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            padding: 40px 0 32px;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .welcome-section p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        .app-footer {
+            border-top: 1px solid #334155;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #3b82f6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .quick-access {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .compare-layout {
+                flex-direction: column;
+            }
+            .compare-sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="logo">
+            <div class="logo-icon">📦</div>
+            <div class="logo-text">Materials <span>Duty Matrix</span></div>
+        </div>
+
+        <div class="nav-tabs">
+            <a class="nav-tab active" onclick="showView('home')">
+                Home
+            </a>
+            <a class="nav-tab" onclick="showView('us')">
+                <span class="flag">🇺🇸</span> US Import
+            </a>
+            <a class="nav-tab" onclick="showView('eu')">
+                <span class="flag">🇪🇺</span> EU Import
+            </a>
+            <a class="nav-tab" onclick="showView('compare')">
+                Compare
+                <span class="badge">NEW</span>
+            </a>
+        </div>
+
+        <div class="nav-search">
+            <div class="search-trigger" onclick="showView('dutygpt')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                Ask DutyGPT
+                <kbd>⌘K</kbd>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HOME VIEW -->
+    <div id="view-home" class="main-content active">
+        <div class="welcome-section">
+            <h1>Welcome to Materials Duty Matrix</h1>
+            <p>Your central hub for import duty rates across global sourcing destinations. Compare rates, find savings, and make informed procurement decisions.</p>
+        </div>
+
+        <div class="quick-access">
+            <div class="quick-card us" onclick="showView('us')">
+                <div class="icon">🇺🇸</div>
+                <h3>US Import Duties</h3>
+                <p>View current US duty rates including MFN, IEEPA reciprocal, and Section 301 tariffs across all material groups.</p>
+                <div class="arrow">View US Matrix →</div>
+            </div>
+
+            <div class="quick-card eu" onclick="showView('eu')">
+                <div class="icon">🇪🇺</div>
+                <h3>EU Import Duties</h3>
+                <p>Access Common Customs Tariff rates from TARIC database with FTA preferences for eligible origins.</p>
+                <div class="arrow">View EU Matrix →</div>
+            </div>
+
+            <div class="quick-card compare" onclick="showView('compare')">
+                <div class="icon">⚖️</div>
+                <h3>Compare Destinations</h3>
+                <p>Side-by-side comparison of US vs EU rates by material. Find the optimal import destination for each origin.</p>
+                <div class="arrow">Open Comparison Tool →</div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="label">Origin Countries</div>
+                <div class="value">75</div>
+                <div class="change">Full global coverage</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Material Groups</div>
+                <div class="value">11</div>
+                <div class="change">Papers, tow, additives, packaging</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Destinations</div>
+                <div class="value">2</div>
+                <div class="change positive">EU recently added</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Last Updated</div>
+                <div class="value">Today</div>
+                <div class="change">Live TARIC data for EU</div>
+            </div>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Recent Activity</th>
+                        <th>Details</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>EU TARIC Integration</td>
+                        <td>Live duty rates now available for EU imports</td>
+                        <td>Just now</td>
+                    </tr>
+                    <tr>
+                        <td>US IEEPA Update</td>
+                        <td>Reciprocal tariff rates verified against CBP CSMS</td>
+                        <td>2 days ago</td>
+                    </tr>
+                    <tr>
+                        <td>New Material Added</td>
+                        <td>Inner Bundling (HTS 4811.90) added to matrix</td>
+                        <td>1 week ago</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- US VIEW -->
+    <div id="view-us" class="main-content">
+        <div class="page-header">
+            <h1>US Import Duty Rates <span class="destination-badge">🇺🇸 United States</span></h1>
+            <p>Effective rates including MFN base, IEEPA reciprocal tariffs, and Section 301 (China)</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="label">Average Duty Rate</div>
+                <div class="value" style="color: #f59e0b;">18.4%</div>
+                <div class="change">Across all origins</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">FTA Countries</div>
+                <div class="value" style="color: #10b981;">12</div>
+                <div class="change">0% duty eligible</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Highest Rate</div>
+                <div class="value" style="color: #ef4444;">52.5%</div>
+                <div class="change">China (Section 301)</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">IEEPA Countries</div>
+                <div class="value">45</div>
+                <div class="change">10-50% reciprocal</div>
+            </div>
+        </div>
+
+        <div class="filters-bar">
+            <div class="filter-group">
+                <span class="filter-label">Material:</span>
+                <select class="filter-select">
+                    <option>All Materials</option>
+                    <option>Cigarette Paper</option>
+                    <option>Filter Tow</option>
+                    <option>Adhesive</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Program:</span>
+                <select class="filter-select">
+                    <option>All Programs</option>
+                    <option>FTA (0%)</option>
+                    <option>MFN Only</option>
+                    <option>MFN + IEEPA</option>
+                    <option>Section 301</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Region:</span>
+                <div class="filter-chips">
+                    <span class="filter-chip active">All</span>
+                    <span class="filter-chip">Asia Pacific</span>
+                    <span class="filter-chip">Europe</span>
+                    <span class="filter-chip">Americas</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Origin Country</th>
+                        <th>Program</th>
+                        <th>Cig Paper</th>
+                        <th>Filter Tow</th>
+                        <th>Adhesive</th>
+                        <th>Capsules</th>
+                        <th>Avg Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇨🇳</span>
+                                <div>
+                                    <div class="country-name">China</div>
+                                    <div class="country-program">Sec 301 + IEEPA</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Section 301</td>
+                        <td class="rate-cell high">45%</td>
+                        <td class="rate-cell high">52.5%</td>
+                        <td class="rate-cell high">47.1%</td>
+                        <td class="rate-cell high">50.3%</td>
+                        <td class="rate-cell high">47.7%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇯🇵</span>
+                                <div>
+                                    <div class="country-name">Japan</div>
+                                    <div class="country-program">MFN</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>MFN</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell low">7.5%</td>
+                        <td class="rate-cell low">2.1%</td>
+                        <td class="rate-cell low">5.3%</td>
+                        <td class="rate-cell low">3.7%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇰🇷</span>
+                                <div>
+                                    <div class="country-name">South Korea</div>
+                                    <div class="country-program">KORUS FTA</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>FTA</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇻🇳</span>
+                                <div>
+                                    <div class="country-name">Vietnam</div>
+                                    <div class="country-program">MFN + IEEPA 10%</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>MFN + IEEPA</td>
+                        <td class="rate-cell medium">10%</td>
+                        <td class="rate-cell medium">17.5%</td>
+                        <td class="rate-cell medium">12.1%</td>
+                        <td class="rate-cell medium">15.3%</td>
+                        <td class="rate-cell medium">13.7%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇲🇽</span>
+                                <div>
+                                    <div class="country-name">Mexico</div>
+                                    <div class="country-program">USMCA</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>FTA</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- EU VIEW -->
+    <div id="view-eu" class="main-content">
+        <div class="page-header">
+            <h1>EU Import Duty Rates <span class="destination-badge eu">🇪🇺 European Union</span></h1>
+            <p>Common Customs Tariff rates from TARIC database with applicable FTA preferences</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="label">Average Duty Rate</div>
+                <div class="value" style="color: #3b82f6;">2.8%</div>
+                <div class="change">Across all origins</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">FTA Countries</div>
+                <div class="value" style="color: #10b981;">18</div>
+                <div class="change">0% preference eligible</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Highest Rate</div>
+                <div class="value" style="color: #fbbf24;">6.5%</div>
+                <div class="change">Plasticizers (MFN)</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Data Source</div>
+                <div class="value">TARIC</div>
+                <div class="change positive">Live API</div>
+            </div>
+        </div>
+
+        <div class="filters-bar">
+            <div class="filter-group">
+                <span class="filter-label">Material:</span>
+                <select class="filter-select">
+                    <option>All Materials</option>
+                    <option>Cigarette Paper</option>
+                    <option>Filter Tow</option>
+                    <option>Adhesive</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Rate Type:</span>
+                <select class="filter-select">
+                    <option>All Types</option>
+                    <option>FTA Preference</option>
+                    <option>MFN (Third Country)</option>
+                    <option>GSP</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Origin Country</th>
+                        <th>Rate Type</th>
+                        <th>Cig Paper</th>
+                        <th>Filter Tow</th>
+                        <th>Adhesive</th>
+                        <th>Capsules</th>
+                        <th>Avg Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇨🇳</span>
+                                <div>
+                                    <div class="country-name">China</div>
+                                    <div class="country-program">MFN</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>MFN</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell low">4%</td>
+                        <td class="rate-cell low">2.1%</td>
+                        <td class="rate-cell medium">6.5%</td>
+                        <td class="rate-cell low">3.2%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇯🇵</span>
+                                <div>
+                                    <div class="country-name">Japan</div>
+                                    <div class="country-program">EU-Japan EPA</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>FTA</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇰🇷</span>
+                                <div>
+                                    <div class="country-name">South Korea</div>
+                                    <div class="country-program">EU-Korea FTA</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>FTA</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇻🇳</span>
+                                <div>
+                                    <div class="country-name">Vietnam</div>
+                                    <div class="country-program">EVFTA</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>FTA</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell free">0%</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">🇺🇸</span>
+                                <div>
+                                    <div class="country-name">United States</div>
+                                    <div class="country-program">MFN</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>MFN</td>
+                        <td class="rate-cell free">0%</td>
+                        <td class="rate-cell low">4%</td>
+                        <td class="rate-cell low">2.1%</td>
+                        <td class="rate-cell medium">6.5%</td>
+                        <td class="rate-cell low">3.2%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- COMPARE VIEW -->
+    <div id="view-compare" class="main-content">
+        <div class="page-header">
+            <h1>Compare Import Destinations</h1>
+            <p>Side-by-side comparison of US vs EU duty rates by material and origin</p>
+        </div>
+
+        <div class="compare-layout">
+            <aside class="compare-sidebar">
+                <div class="material-selector">
+                    <h3>Select Material</h3>
+                    <div class="material-option" onclick="selectMaterial(this)">
+                        <div class="name">Cigarette Paper</div>
+                        <div class="code">HTS 4813.10</div>
+                    </div>
+                    <div class="material-option active" onclick="selectMaterial(this)">
+                        <div class="name">Filter Tow</div>
+                        <div class="code">HTS 5502.10</div>
+                    </div>
+                    <div class="material-option" onclick="selectMaterial(this)">
+                        <div class="name">Adhesive</div>
+                        <div class="code">HTS 3506.91</div>
+                    </div>
+                    <div class="material-option" onclick="selectMaterial(this)">
+                        <div class="name">Capsules</div>
+                        <div class="code">HTS 3926.90</div>
+                    </div>
+                    <div class="material-option" onclick="selectMaterial(this)">
+                        <div class="name">Plasticizer</div>
+                        <div class="code">HTS 2917.12</div>
+                    </div>
+                    <div class="material-option" onclick="selectMaterial(this)">
+                        <div class="name">Adsorbent</div>
+                        <div class="code">HTS 3802.10</div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="compare-main">
+                <div class="stats-row" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="stat-card">
+                        <div class="label">US Average</div>
+                        <div class="value" style="color: #f59e0b;">18.4%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">EU Average</div>
+                        <div class="value" style="color: #3b82f6;">2.8%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Best for EU</div>
+                        <div class="value" style="color: #10b981;">Japan</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Biggest Gap</div>
+                        <div class="value" style="color: #10b981;">-48.5%</div>
+                        <div class="change">China: US vs EU</div>
+                    </div>
+                </div>
+
+                <div class="compare-chart">
+                    <div class="chart-header">
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-dot us"></div>
+                                <span>US Duty</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot eu"></div>
+                                <span>EU Duty</span>
+                            </div>
+                        </div>
+                        <div class="sort-buttons">
+                            <button class="sort-btn active">EU Savings</button>
+                            <button class="sort-btn">US Rate</button>
+                            <button class="sort-btn">EU Rate</button>
+                        </div>
+                    </div>
+
+                    <div id="compareChart">
+                        <!-- Dumbbell rows -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- DUTYGPT VIEW -->
+    <div id="view-dutygpt" class="main-content">
+        <div class="dutygpt-container">
+            <div class="dutygpt-header">
+                <h1>DutyGPT</h1>
+                <p style="color: #94a3b8;">Ask anything about import duties across US and EU</p>
+            </div>
+
+            <div class="dutygpt-search">
+                <div class="dutygpt-input-wrapper">
+                    <input type="text" class="dutygpt-input" placeholder="Ask about duty rates, compare countries, find savings...">
+                    <button class="dutygpt-submit">Search</button>
+                </div>
+                <div class="dutygpt-suggestions">
+                    <span class="dutygpt-suggestion">Top 5 countries by US duty</span>
+                    <span class="dutygpt-suggestion">Compare China US vs EU</span>
+                    <span class="dutygpt-suggestion">Best origin for filter tow?</span>
+                    <span class="dutygpt-suggestion">Which FTAs cover both US and EU?</span>
+                </div>
+            </div>
+
+            <div class="dutygpt-results">
+                <div class="dutygpt-placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <p>Ask any question about import duties</p>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">Now includes both US and EU data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div>Materials Duty Matrix v2.0 • Data sources: USITC HTS, EU TARIC, CBP CSMS</div>
+        <div class="footer-links">
+            <a href="#">Documentation</a>
+            <a href="#">Data Sources</a>
+            <a href="#">Methodology</a>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data for dumbbell chart
+        const compareData = [
+            { country: 'China', flag: '🇨🇳', us: 52.5, eu: 4, program: 'Sec 301 vs MFN' },
+            { country: 'Brazil', flag: '🇧🇷', us: 57.5, eu: 4, program: 'IEEPA 50% vs MFN' },
+            { country: 'India', flag: '🇮🇳', us: 33.5, eu: 4, program: 'IEEPA 26% vs GSP' },
+            { country: 'Thailand', flag: '🇹🇭', us: 43.5, eu: 4, program: 'IEEPA 36% vs GSP' },
+            { country: 'Vietnam', flag: '🇻🇳', us: 17.5, eu: 0, program: 'IEEPA vs EVFTA' },
+            { country: 'Japan', flag: '🇯🇵', us: 7.5, eu: 0, program: 'MFN vs EPA' },
+            { country: 'Malaysia', flag: '🇲🇾', us: 26.5, eu: 4, program: 'IEEPA vs MFN' },
+            { country: 'Indonesia', flag: '🇮🇩', us: 39.5, eu: 4, program: 'IEEPA vs GSP' },
+            { country: 'S. Korea', flag: '🇰🇷', us: 0, eu: 0, program: 'KORUS vs EU-KR FTA' },
+            { country: 'Mexico', flag: '🇲🇽', us: 0, eu: 0, program: 'USMCA vs EU-MX' },
+        ];
+
+        function showView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.main-content').forEach(v => v.classList.remove('active'));
+            // Show selected view
+            document.getElementById('view-' + viewName).classList.add('active');
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.closest('.nav-tab')?.classList.add('active');
+
+            // Render compare chart if needed
+            if (viewName === 'compare') {
+                renderCompareChart();
+            }
+        }
+
+        function renderCompareChart() {
+            const container = document.getElementById('compareChart');
+            const maxRate = 60;
+            const sorted = [...compareData].sort((a, b) => (b.us - b.eu) - (a.us - a.eu));
+
+            container.innerHTML = sorted.map(row => {
+                const usPos = (row.us / maxRate) * 100;
+                const euPos = (row.eu / maxRate) * 100;
+                const leftPos = Math.min(usPos, euPos);
+                const rightPos = Math.max(usPos, euPos);
+                const savings = row.eu - row.us;
+                const savingsClass = savings < 0 ? 'positive' : savings > 0 ? 'negative' : '';
+
+                return `
+                    <div class="dumbbell-row">
+                        <div class="dumbbell-country">
+                            <div class="name">${row.flag} ${row.country}</div>
+                            <div class="program">${row.program}</div>
+                        </div>
+                        <div class="dumbbell-visual">
+                            <div class="dumbbell-track"></div>
+                            <div class="dumbbell-line" style="left: ${leftPos}%; width: ${rightPos - leftPos}%;"></div>
+                            <div class="dumbbell-dot eu" style="left: ${euPos}%;"></div>
+                            <div class="dumbbell-dot us" style="left: ${usPos}%;"></div>
+                        </div>
+                        <div class="dumbbell-values">
+                            <div class="dumbbell-value">
+                                <div class="rate us">${row.us}%</div>
+                                <div class="label">US</div>
+                            </div>
+                            <div class="dumbbell-value">
+                                <div class="rate eu">${row.eu}%</div>
+                                <div class="label">EU</div>
+                            </div>
+                        </div>
+                        <div class="dumbbell-savings">
+                            <div class="value ${savingsClass}">${savings > 0 ? '+' : ''}${savings.toFixed(1)}%</div>
+                            <div class="label">EU vs US</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectMaterial(el) {
+            document.querySelectorAll('.material-option').forEach(m => m.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // Keyboard shortcut for DutyGPT
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                showView('dutygpt');
+            }
+        });
+    </script>
+</body>
+</html>
