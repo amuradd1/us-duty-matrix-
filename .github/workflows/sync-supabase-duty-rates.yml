@@ -1,0 +1,27 @@
+name: Sync Supabase Duty Rates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 2 * * *"
+
+jobs:
+  sync-duty-rates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run duty rate sync
+        env:
+          WOVE_CLIENT_ID: ${{ secrets.WOVE_CLIENT_ID }}
+          WOVE_CLIENT_SECRET: ${{ secrets.WOVE_CLIENT_SECRET }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESET_EXISTING: "true"
+        run: node scripts/populate_us_rates.js

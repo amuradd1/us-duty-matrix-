@@ -1,0 +1,25 @@
+name: Sync Supabase EU Duty Rates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "45 2 * * *"
+
+jobs:
+  sync-eu-duty-rates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run EU duty rate sync
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESET_EXISTING: "true"
+        run: node scripts/populate_eu_rates.js

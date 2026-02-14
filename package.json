@@ -5,7 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "check-updates": "node scripts/check-tariff-updates.js"
+    "check-updates": "node scripts/check-tariff-updates.js",
+    "sync-duty-rates": "node scripts/populate_us_rates.js",
+    "sync-duty-rates:dry-run": "DRY_RUN=true node scripts/populate_us_rates.js",
+    "sync-duty-rates-eu": "node scripts/populate_eu_rates.js",
+    "sync-duty-rates-eu:dry-run": "DRY_RUN=true node scripts/populate_eu_rates.js"
   },
   "repository": {
     "type": "git",

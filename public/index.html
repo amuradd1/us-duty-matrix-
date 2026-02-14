@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>US Import Duty Matrix</title>
+    <title>Import Duty Matrix</title>
     <style>
         * {
             margin: 0;
@@ -35,6 +35,32 @@
         .header p {
             font-size: 14px;
             opacity: 0.9;
+        }
+
+        .dataset-menu {
+            margin-top: 14px;
+            display: inline-flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            padding: 4px;
+        }
+
+        .dataset-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .dataset-btn.active {
+            background: white;
+            color: #1a365d;
         }
 
         .container {
@@ -1326,8 +1352,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>US Import Duty Matrix</h1>
-        <p>Duty rates by material group, HTS code, and origin country</p>
+        <h1 id="pageTitle">US Import Duty Matrix</h1>
+        <p id="pageSubtitle">Duty rates by material group, HTS code, and origin country</p>
+        <div class="dataset-menu" role="tablist" aria-label="Dataset">
+            <button class="dataset-btn active" id="datasetUSBtn" onclick="switchDataset('US')">US Data</button>
+            <button class="dataset-btn" id="datasetEUBtn" onclick="switchDataset('EU')">EU Data</button>
+        </div>
         <div class="last-updated">
             <div class="date">Data Version: January 27, 2026 | Next Review: January 29, 2026</div>
             <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a>
@@ -1853,7 +1883,7 @@
         ];
 
         // Country duty data - all 13 materials
-        const dutyData = [
+        const staticDutyData = [
             // Section 301 + IEEPA (China) - MFN + 20% IEEPA + 25% Section 301
             {country: "China", iso: "CN", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "MFN + 10% Reciprocal + 10% Fentanyl + 25% Sec 301", source: "CBP CSMS #66749380"},
             {country: "Hong Kong", iso: "HK", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "Treated same as China"},
@@ -1954,6 +1984,23 @@
             {country: "Sri Lanka", iso: "LK", region: "Asia Pacific", program: "MFN + IEEPA", cigarettePaper: 10, tippingPaper: 10, plugwrap: 10, filterTow: 17.5, filterRods: 16.3, adhesive: 12.1, capsules: 15.3, plasticizer: 16.5, adsorbent: 10, boardPack: 10, paperPack: 10, innerBundling: 10, boardInnerFrame: 10, altRate: null, notes: "MFN + 10% IEEPA"}
         ];
 
+        const DATASET_CONFIG = {
+            US: {
+                destination: 'US',
+                source: 'WOVE',
+                title: 'US Import Duty Matrix',
+                subtitle: 'Duty rates by material group, HTS code, and origin country'
+            },
+            EU: {
+                destination: 'EU',
+                source: 'TARIC',
+                title: 'EU Import Duty Matrix',
+                subtitle: 'EU destination duty rates by material group, CN code, and origin country'
+            }
+        };
+
+        let activeDataset = 'US';
+        let dutyData = cloneDutyData(staticDutyData);
         let filteredData = [...dutyData];
         let currentSort = {column: 'country', ascending: true};
         let currentView = 'country';
@@ -1963,6 +2010,31 @@
         let currentOverrideCell = null;
         // Row-level adjustments storage: { 'ISO': { tier2: 'XX', conversion: 'XX', conversionRate: 12.5 } }
         let rowAdjustments = JSON.parse(localStorage.getItem('rowAdjustments') || '{}');
+        const dbMaterialToColumn = {
+            'Cigarette Paper': 'cigarettePaper',
+            'Tipping Paper': 'tippingPaper',
+            'Plugwrap': 'plugwrap',
+            'Filter Tow': 'filterTow',
+            'Filter Rods': 'filterRods',
+            'Adhesive': 'adhesive',
+            'Capsules': 'capsules',
+            'Plasticizer': 'plasticizer',
+            'Adsorbent': 'adsorbent',
+            'Board Packaging': 'boardPack',
+            'Paper Packaging': 'paperPack'
+        };
+
+        function cloneDutyData(rows) {
+            return rows.map((row) => ({ ...row }));
+        }
+
+        function updateDatasetHeader() {
+            const dataset = DATASET_CONFIG[activeDataset];
+            document.getElementById('pageTitle').textContent = dataset.title;
+            document.getElementById('pageSubtitle').textContent = dataset.subtitle;
+            document.getElementById('datasetUSBtn').classList.toggle('active', activeDataset === 'US');
+            document.getElementById('datasetEUBtn').classList.toggle('active', activeDataset === 'EU');
+        }
 
         // USMCA and FTA country codes for qualification logic
         const usmcaCountries = ['US', 'CA', 'MX'];
@@ -2333,17 +2405,123 @@
             }
         });
 
+        async function loadLiveRatesFromApi(datasetKey) {
+            const dataset = DATASET_CONFIG[datasetKey];
+            const url = `/api/duty-rates?destination=${dataset.destination}&source=${dataset.source}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.warn(`Live duty rates unavailable for ${datasetKey}:`, response.status);
+                    return;
+                }
+
+                const payload = await response.json();
+                const rows = Array.isArray(payload.rows) ? payload.rows : [];
+                const availableCountries = new Set(rows.map((row) => String(row.country_iso || '').toUpperCase()).filter(Boolean));
+
+                if (availableCountries.size > 0) {
+                    dutyData = dutyData.filter((row) => availableCountries.has(row.iso));
+                }
+
+                const merged = mergeLiveRates(rows);
+
+                if (merged.updatedCells > 0) {
+                    applyFilters();
+                } else {
+                    filteredData = [...dutyData];
+                    renderTable();
+                    updateStats();
+                }
+
+                console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries`);
+            } catch (error) {
+                console.warn(`Failed to load ${datasetKey} duty rates:`, error.message);
+            }
+        }
+
+        function mergeLiveRates(rows) {
+            const updatesByCountry = new Map();
+
+            rows.forEach((row) => {
+                const iso = String(row.country_iso || '').toUpperCase();
+                const column = dbMaterialToColumn[row.material];
+                const numericRate = Number(row.rate);
+
+                if (!iso || !column || !Number.isFinite(numericRate)) {
+                    return;
+                }
+
+                if (!updatesByCountry.has(iso)) {
+                    updatesByCountry.set(iso, {});
+                }
+                updatesByCountry.get(iso)[column] = numericRate;
+            });
+
+            let updatedCells = 0;
+            let updatedCountries = 0;
+
+            dutyData.forEach((row) => {
+                const updates = updatesByCountry.get(row.iso);
+                if (!updates) return;
+
+                updatedCountries += 1;
+                Object.entries(updates).forEach(([column, rate]) => {
+                    if (row[column] !== rate) {
+                        row[column] = rate;
+                        updatedCells += 1;
+                    }
+                });
+            });
+
+            return { updatedCells, updatedCountries };
+        }
+
+        async function switchDataset(datasetKey) {
+            if (!DATASET_CONFIG[datasetKey]) return;
+            activeDataset = datasetKey;
+            updateDatasetHeader();
+
+            dutyData = cloneDutyData(staticDutyData);
+            filteredData = [...dutyData];
+            selectedCountries = [];
+            selectedMaterials = [];
+
+            document.getElementById('countrySelectLabel').textContent = 'All Countries';
+            document.getElementById('materialSelectLabel').textContent = 'All Materials';
+            document.getElementById('countrySearch').value = '';
+
+            document.querySelectorAll('#materialDropdown input[type="checkbox"]').forEach((el) => {
+                el.checked = false;
+            });
+
+            document.getElementById('regionFilter').value = '';
+            document.getElementById('programFilter').value = '';
+            document.getElementById('rateFilter').value = '';
+            document.getElementById('searchBox').value = '';
+
+            populateCountryFilter();
+            updateColumnVisibility();
+            renderTable();
+            updateStats();
+
+            await loadLiveRatesFromApi(datasetKey);
+        }
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            updateDatasetHeader();
             populateCountryFilter();
             renderTable();
             renderMaterialTable();
             renderHTSTable();
             updateStats();
+            await loadLiveRatesFromApi(activeDataset);
         });
 
         function populateCountryFilter() {
             const countryOptions = document.getElementById('countryOptions');
+            countryOptions.innerHTML = '';
             const countries = dutyData.map(d => ({country: d.country, iso: d.iso})).sort((a, b) => a.country.localeCompare(b.country));
 
             countries.forEach(c => {

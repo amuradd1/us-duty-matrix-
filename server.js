@@ -6,6 +6,9 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
 // Initialize Anthropic client
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY
@@ -154,6 +157,61 @@ app.post('/api/chat', async (req, res) => {
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Supabase duty-rate proxy
+app.get('/api/duty-rates', async (req, res) => {
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+        return res.status(503).json({
+            error: 'Duty rate API is not configured',
+            details: 'Missing SUPABASE_URL or SUPABASE_KEY'
+        });
+    }
+
+    const source = req.query.source || 'WOVE';
+    const destination = req.query.destination || 'US';
+    const url = `${SUPABASE_URL}/rest/v1/duty_rates?destination=eq.${encodeURIComponent(destination)}&source=eq.${encodeURIComponent(source)}&select=country_iso,material,rate,rate_type`;
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                Accept: 'application/json'
+            }
+        });
+
+        const body = await response.text();
+        if (!response.ok) {
+            return res.status(502).json({
+                error: 'Failed to fetch duty rates from Supabase',
+                status: response.status,
+                details: body.slice(0, 500)
+            });
+        }
+
+        let rows = [];
+        try {
+            rows = JSON.parse(body);
+        } catch (parseError) {
+            return res.status(502).json({
+                error: 'Supabase response was not valid JSON',
+                details: parseError.message
+            });
+        }
+
+        return res.json({
+            source,
+            destination,
+            count: rows.length,
+            rows
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: 'Unexpected error while loading duty rates',
+            details: error.message
+        });
+    }
 });
 
 // EU TARIC API Proxy - bypasses CORS
