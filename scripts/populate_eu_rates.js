@@ -21,6 +21,12 @@ const COUNTRIES = [
   'LK', 'BR', 'AR', 'MX', 'CA', 'CL', 'CO', 'ZA', 'EG', 'AE'
 ];
 
+const EU_MEMBER_COUNTRIES = [
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+  'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+  'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'
+];
+
 const RESET_EXISTING = process.env.RESET_EXISTING !== 'false';
 const DRY_RUN = process.env.DRY_RUN === 'true';
 
@@ -82,6 +88,19 @@ async function insertRate(country, material, cnCode, rate, rateType) {
     const body = await response.text();
     throw new Error(`Supabase insert failed (${response.status}): ${body.slice(0, 400)}`);
   }
+}
+
+async function insertIntraEURates() {
+  let inserted = 0;
+  for (const country of EU_MEMBER_COUNTRIES) {
+    for (const [material, cnCode] of Object.entries(MATERIALS)) {
+      if (!DRY_RUN) {
+        await insertRate(country, material, cnCode, 0, 'INTRA_EU');
+      }
+      inserted += 1;
+    }
+  }
+  return inserted;
 }
 
 async function getTaricRate(cnCode, countryCode) {
@@ -179,6 +198,11 @@ async function main() {
       await sleep(120);
     }
   }
+
+  console.log('\n=== EU MEMBER ORIGINS (INTRA_EU) ===');
+  const intraEuRows = await insertIntraEURates();
+  success += intraEuRows;
+  console.log(`  OK: Inserted ${intraEuRows} INTRA_EU rows at 0%`);
 
   console.log('\n=== SUMMARY ===');
   console.log(`Inserted/Prepared: ${success}`);
