@@ -63,6 +63,16 @@
             color: #1a365d;
         }
 
+        .data-status {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #2d3748;
+        }
+
+        .data-status.error {
+            color: #c53030;
+        }
+
         .container {
             max-width: 1800px;
             margin: 0 auto;
@@ -1520,6 +1530,7 @@
                 <div class="stat-label">Showing</div>
             </div>
         </div>
+        <div id="dataStatus" class="data-status"></div>
 
         <!-- Country View -->
         <div id="countryView" class="view-container active">
@@ -2000,8 +2011,8 @@
         };
 
         let activeDataset = 'US';
-        let dutyData = cloneDutyData(staticDutyData);
-        let filteredData = [...dutyData];
+        let dutyData = [];
+        let filteredData = [];
         let currentSort = {column: 'country', ascending: true};
         let currentView = 'country';
         let selectedMaterials = []; // Changed to array for multi-select
@@ -2034,6 +2045,12 @@
             document.getElementById('pageSubtitle').textContent = dataset.subtitle;
             document.getElementById('datasetUSBtn').classList.toggle('active', activeDataset === 'US');
             document.getElementById('datasetEUBtn').classList.toggle('active', activeDataset === 'EU');
+        }
+
+        function setDataStatus(message, isError = false) {
+            const el = document.getElementById('dataStatus');
+            el.textContent = message;
+            el.classList.toggle('error', isError);
         }
 
         // USMCA and FTA country codes for qualification logic
@@ -2408,11 +2425,18 @@
         async function loadLiveRatesFromApi(datasetKey) {
             const dataset = DATASET_CONFIG[datasetKey];
             const url = `/api/duty-rates?destination=${dataset.destination}&source=${dataset.source}`;
+            setDataStatus(`Loading ${datasetKey} data from Supabase...`);
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
                     console.warn(`Live duty rates unavailable for ${datasetKey}:`, response.status);
+                    dutyData = [];
+                    filteredData = [];
+                    populateCountryFilter();
+                    renderTable();
+                    updateStats();
+                    setDataStatus(`Failed to load ${datasetKey} data from Supabase (HTTP ${response.status}).`, true);
                     return;
                 }
 
@@ -2420,11 +2444,19 @@
                 const rows = Array.isArray(payload.rows) ? payload.rows : [];
                 const availableCountries = new Set(rows.map((row) => String(row.country_iso || '').toUpperCase()).filter(Boolean));
 
-                if (availableCountries.size > 0) {
-                    dutyData = dutyData.filter((row) => availableCountries.has(row.iso));
+                if (availableCountries.size === 0) {
+                    dutyData = [];
+                    filteredData = [];
+                    populateCountryFilter();
+                    renderTable();
+                    updateStats();
+                    setDataStatus(`No ${datasetKey} rows found in Supabase.`, true);
+                    return;
                 }
 
+                dutyData = cloneDutyData(staticDutyData).filter((row) => availableCountries.has(row.iso));
                 const merged = mergeLiveRates(rows);
+                populateCountryFilter();
 
                 if (merged.updatedCells > 0) {
                     applyFilters();
@@ -2435,8 +2467,15 @@
                 }
 
                 console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries`);
+                setDataStatus(`Loaded ${datasetKey} dataset from Supabase: ${dutyData.length} countries.`);
             } catch (error) {
                 console.warn(`Failed to load ${datasetKey} duty rates:`, error.message);
+                dutyData = [];
+                filteredData = [];
+                populateCountryFilter();
+                renderTable();
+                updateStats();
+                setDataStatus(`Failed to load ${datasetKey} data from Supabase (${error.message}).`, true);
             }
         }
 
@@ -2482,8 +2521,8 @@
             activeDataset = datasetKey;
             updateDatasetHeader();
 
-            dutyData = cloneDutyData(staticDutyData);
-            filteredData = [...dutyData];
+            dutyData = [];
+            filteredData = [];
             selectedCountries = [];
             selectedMaterials = [];
 
