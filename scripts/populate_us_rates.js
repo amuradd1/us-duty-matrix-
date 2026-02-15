@@ -20,9 +20,14 @@ const MATERIALS = {
 };
 
 const COUNTRIES = [
+  // Non-EU countries
   'CN', 'MX', 'CA', 'AU', 'CL', 'CO', 'KR', 'SG', 'HN', 'JP',
   'CH', 'GB', 'IN', 'ID', 'VN', 'TH', 'MY', 'BR', 'AR', 'TR',
-  'ZA', 'EG', 'AE', 'NO', 'PK', 'BD', 'LK'
+  'ZA', 'EG', 'AE', 'NO', 'PK', 'BD', 'LK',
+  // EU countries
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+  'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+  'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'
 ];
 
 const RESET_EXISTING = process.env.RESET_EXISTING !== 'false';
