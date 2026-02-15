@@ -214,6 +214,27 @@ app.get('/api/duty-rates', async (req, res) => {
     }
 });
 
+// Supabase countries proxy
+app.get('/api/countries', async (req, res) => {
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+        return res.status(503).json({ error: 'Not configured' });
+    }
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/countries?select=iso_code,name&order=name`, {
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                Accept: 'application/json'
+            }
+        });
+        const body = await response.text();
+        if (!response.ok) return res.status(502).json({ error: body.slice(0, 300) });
+        return res.json(JSON.parse(body));
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
 // EU TARIC API Proxy - bypasses CORS
 app.get('/api/eu-rate/:cnCode/:countryCode', async (req, res) => {
     const { cnCode, countryCode } = req.params;

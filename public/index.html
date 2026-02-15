@@ -246,6 +246,177 @@
             }
         }
 
+        /* Compare View Styles */
+        .compare-controls {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .compare-controls label {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .compare-controls select {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.9rem;
+            min-width: 200px;
+            background: white;
+        }
+
+        .compare-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .compare-stat {
+            text-align: center;
+        }
+
+        .compare-stat .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .compare-stat .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .compare-table-wrap {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .compare-table th {
+            background: #f8fafc;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .compare-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .compare-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .compare-table .rank-cell {
+            font-weight: 700;
+            color: #64748b;
+            width: 50px;
+        }
+
+        .compare-table .rank-1 .rank-cell { color: #16a34a; }
+        .compare-table .rank-2 .rank-cell { color: #65a30d; }
+        .compare-table .rank-3 .rank-cell { color: #ca8a04; }
+
+        .rate-us { color: #1e40af; font-weight: 600; }
+        .rate-eu { color: #b45309; font-weight: 600; }
+
+        .optimal-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .optimal-us {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .optimal-eu {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .optimal-equal {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .savings-positive {
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .savings-negative {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .savings-neutral {
+            color: #64748b;
+        }
+
+        .compare-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 200px;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-us {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+
+        .bar-eu {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: #f59e0b;
+            border-radius: 4px;
+            opacity: 0.6;
+        }
+
         /* Matrix View Header (replaces old .header) */
         .header {
             background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
@@ -1866,8 +2037,8 @@
                                 <th class="sortable material-col" data-material="paperPack" onclick="sortTable('paperPack')">Paper Pack<br><span class="hts-code">4819.20</span></th>
                                 <th class="sortable material-col" data-material="innerBundling" onclick="sortTable('innerBundling')">Bundling<br><span class="hts-code">4811.90</span></th>
                                 <th class="sortable material-col" data-material="boardInnerFrame" onclick="sortTable('boardInnerFrame')">Bd Frame<br><span class="hts-code">4819.10</span></th>
-                                <th>Alt Rate</th>
-                                <th>Notes</th>
+                                <th>Source</th>
+                                <th>Tariff Basis</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -2147,14 +2318,68 @@
     <div id="view-compare" class="main-view">
         <div class="home-content">
             <div class="welcome-section">
-                <h1>⚖️ Compare US vs EU</h1>
-                <p>Side-by-side comparison of duty rates for the same origin country across both destinations.</p>
+                <h1>Route Optimiser</h1>
+                <p>Compare duty rates across US and EU destinations to find optimal sourcing routes per material.</p>
             </div>
-            <div style="background: white; border-radius: 16px; padding: 48px; text-align: center; border: 1px solid #e2e8f0;">
-                <p style="color: #64748b; font-size: 1.1rem;">Comparison tool coming soon!</p>
-                <p style="color: #94a3b8; margin-top: 8px;">This will show side-by-side rates with visual dumbbell charts.</p>
-                <button onclick="showMainView('us')" style="margin-top: 24px; background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">View US Data</button>
-                <button onclick="showMainView('eu')" style="margin-top: 24px; margin-left: 12px; background: #ca8a04; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">View EU Data</button>
+
+            <div class="compare-controls">
+                <label for="compareMaterial">Material:</label>
+                <select id="compareMaterial" onchange="updateCompareView()">
+                    <option value="cigarettePaper">Cigarette Paper</option>
+                    <option value="tippingPaper">Tipping Paper</option>
+                    <option value="plugwrap">Plugwrap</option>
+                    <option value="filterTow">Filter Tow</option>
+                    <option value="filterRods">Filter Rods</option>
+                    <option value="adhesive">Adhesive</option>
+                    <option value="capsules">Capsules</option>
+                    <option value="plasticizer">Plasticizer</option>
+                    <option value="adsorbent">Adsorbent</option>
+                    <option value="boardPack">Board Packaging</option>
+                    <option value="paperPack">Paper Packaging</option>
+                    <option value="innerBundling">Inner Bundling</option>
+                    <option value="boardInnerFrame">Board Inner Frame</option>
+                </select>
+                <span style="color:#94a3b8; font-size:0.85rem;" id="compareStatus">Select a material to compare routes</span>
+            </div>
+
+            <div class="compare-summary" id="compareSummary" style="display:none;">
+                <div class="compare-stat">
+                    <div class="stat-value" style="color:#3b82f6;" id="cmpUsOptimal">-</div>
+                    <div class="stat-label">US Optimal</div>
+                </div>
+                <div class="compare-stat">
+                    <div class="stat-value" style="color:#f59e0b;" id="cmpEuOptimal">-</div>
+                    <div class="stat-label">EU Optimal</div>
+                </div>
+                <div class="compare-stat">
+                    <div class="stat-value" style="color:#64748b;" id="cmpEqual">-</div>
+                    <div class="stat-label">Equal</div>
+                </div>
+                <div class="compare-stat">
+                    <div class="stat-value" id="cmpCountries">-</div>
+                    <div class="stat-label">Countries Compared</div>
+                </div>
+            </div>
+
+            <div class="compare-table-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Country</th>
+                            <th>US Rate</th>
+                            <th>EU Rate</th>
+                            <th>Visual</th>
+                            <th>Best Dest.</th>
+                            <th>Savings</th>
+                            <th>US Basis</th>
+                            <th>EU Basis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="compareTableBody">
+                        <tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">Select a material above to load comparison</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -2199,6 +2424,8 @@
             } else if (viewName === 'compare') {
                 document.getElementById('view-compare').classList.add('active');
                 document.getElementById('navCompare').classList.add('active');
+                // Load compare data and render
+                loadCompareData().then(() => updateCompareView());
             }
         }
 
@@ -2817,6 +3044,34 @@
                 }
 
                 dutyData = cloneDutyData(staticDutyData).filter((row) => availableCountries.has(row.iso));
+
+                // Add rows for countries in API but not in staticDutyData
+                const staticIsos = new Set(dutyData.map(r => r.iso));
+                const countryNameMap = {};
+                try {
+                    const cRes = await fetch('/api/countries');
+                    if (cRes.ok) {
+                        const cData = await cRes.json();
+                        (Array.isArray(cData) ? cData : []).forEach(c => { countryNameMap[c.iso_code] = c.name; });
+                    }
+                } catch(e) { /* ignore */ }
+
+                availableCountries.forEach(iso => {
+                    if (!staticIsos.has(iso)) {
+                        const newRow = {
+                            country: countryNameMap[iso] || iso,
+                            iso: iso,
+                            region: '-',
+                            program: '-',
+                            altRate: null,
+                            notes: '',
+                            source: ''
+                        };
+                        Object.keys(materialColumns).forEach(m => { newRow[m] = 0; });
+                        dutyData.push(newRow);
+                    }
+                });
+
                 const merged = mergeLiveRates(rows);
                 populateCountryFilter();
 
@@ -2843,11 +3098,13 @@
 
         function mergeLiveRates(rows) {
             const updatesByCountry = new Map();
+            const rateTypesByCountry = new Map();
 
             rows.forEach((row) => {
                 const iso = String(row.country_iso || '').toUpperCase();
                 const column = dbMaterialToColumn[row.material];
                 const numericRate = Number(row.rate);
+                const rateType = row.rate_type || '';
 
                 if (!iso || !column || !Number.isFinite(numericRate)) {
                     return;
@@ -2855,8 +3112,10 @@
 
                 if (!updatesByCountry.has(iso)) {
                     updatesByCountry.set(iso, {});
+                    rateTypesByCountry.set(iso, new Set());
                 }
                 updatesByCountry.get(iso)[column] = numericRate;
+                if (rateType) rateTypesByCountry.get(iso).add(rateType);
             });
 
             let updatedCells = 0;
@@ -2873,10 +3132,213 @@
                         updatedCells += 1;
                     }
                 });
+
+                // Update notes with API rate_type
+                const types = rateTypesByCountry.get(row.iso);
+                if (types && types.size > 0) {
+                    const typeArr = [...types];
+                    row.notes = typeArr.join(', ');
+                    row.rateTypes = typeArr;
+                }
             });
 
             return { updatedCells, updatedCountries };
         }
+
+        // ========== COMPARE VIEW LOGIC ==========
+        let compareDataCache = { US: null, EU: null };
+        let compareLoading = false;
+
+        async function loadCompareData() {
+            if (compareDataCache.US && compareDataCache.EU) return;
+            if (compareLoading) return;
+            compareLoading = true;
+
+            document.getElementById('compareStatus').textContent = 'Loading US and EU data...';
+
+            try {
+                const [usRes, euRes] = await Promise.all([
+                    fetch('/api/duty-rates?destination=US&source=WOVE'),
+                    fetch('/api/duty-rates?destination=EU&source=TARIC')
+                ]);
+
+                if (usRes.ok) {
+                    const usPayload = await usRes.json();
+                    compareDataCache.US = Array.isArray(usPayload.rows) ? usPayload.rows : [];
+                }
+                if (euRes.ok) {
+                    const euPayload = await euRes.json();
+                    compareDataCache.EU = Array.isArray(euPayload.rows) ? euPayload.rows : [];
+                }
+
+                document.getElementById('compareStatus').textContent = 'Data loaded. Select a material to compare.';
+            } catch (err) {
+                document.getElementById('compareStatus').textContent = 'Failed to load data: ' + err.message;
+            }
+            compareLoading = false;
+        }
+
+        function buildCompareRows(materialKey) {
+            const materialName = materialColumns[materialKey];
+            if (!materialName || !compareDataCache.US || !compareDataCache.EU) return [];
+
+            // Build rate maps: iso -> { rate, rateType }
+            const usRates = {};
+            const euRates = {};
+
+            compareDataCache.US.forEach(row => {
+                if (row.material === materialName) {
+                    usRates[row.country_iso] = { rate: Number(row.rate), rateType: row.rate_type || '' };
+                }
+            });
+
+            compareDataCache.EU.forEach(row => {
+                if (row.material === materialName) {
+                    euRates[row.country_iso] = { rate: Number(row.rate), rateType: row.rate_type || '' };
+                }
+            });
+
+            // Get all country ISOs that appear in BOTH datasets
+            const allIsos = new Set([...Object.keys(usRates), ...Object.keys(euRates)]);
+            const rows = [];
+
+            allIsos.forEach(iso => {
+                const us = usRates[iso];
+                const eu = euRates[iso];
+                if (!us && !eu) return;
+
+                const usRate = us ? us.rate : null;
+                const euRate = eu ? eu.rate : null;
+                const usType = us ? us.rateType : '-';
+                const euType = eu ? eu.rateType : '-';
+
+                let optimal, savings;
+                if (usRate === null) {
+                    optimal = 'EU';
+                    savings = null;
+                } else if (euRate === null) {
+                    optimal = 'US';
+                    savings = null;
+                } else if (usRate < euRate) {
+                    optimal = 'US';
+                    savings = euRate - usRate;
+                } else if (euRate < usRate) {
+                    optimal = 'EU';
+                    savings = usRate - euRate;
+                } else {
+                    optimal = 'Equal';
+                    savings = 0;
+                }
+
+                // Find country name from static data or countries table
+                const staticRow = staticDutyData.find(r => r.iso === iso);
+                const countryName = staticRow ? staticRow.country : iso;
+
+                rows.push({ iso, country: countryName, usRate, euRate, optimal, savings, usType, euType });
+            });
+
+            // Sort: best route first (lowest of min(us,eu))
+            rows.sort((a, b) => {
+                const aMin = Math.min(a.usRate ?? 999, a.euRate ?? 999);
+                const bMin = Math.min(b.usRate ?? 999, b.euRate ?? 999);
+                return aMin - bMin;
+            });
+
+            return rows;
+        }
+
+        function renderCompareTable(rows) {
+            const tbody = document.getElementById('compareTableBody');
+            const summary = document.getElementById('compareSummary');
+
+            if (!rows || rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">No data available for this material</td></tr>';
+                summary.style.display = 'none';
+                return;
+            }
+
+            // Calculate max rate for bar scaling
+            const maxRate = Math.max(...rows.map(r => Math.max(r.usRate || 0, r.euRate || 0)), 1);
+
+            let usOptimal = 0, euOptimal = 0, equal = 0;
+            rows.forEach(r => {
+                if (r.optimal === 'US') usOptimal++;
+                else if (r.optimal === 'EU') euOptimal++;
+                else equal++;
+            });
+
+            // Update summary
+            summary.style.display = 'flex';
+            document.getElementById('cmpUsOptimal').textContent = usOptimal;
+            document.getElementById('cmpEuOptimal').textContent = euOptimal;
+            document.getElementById('cmpEqual').textContent = equal;
+            document.getElementById('cmpCountries').textContent = rows.length;
+
+            // Render rows
+            let html = '';
+            rows.forEach((row, idx) => {
+                const rank = idx + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const usDisplay = row.usRate !== null ? row.usRate + '%' : 'N/A';
+                const euDisplay = row.euRate !== null ? row.euRate + '%' : 'N/A';
+
+                const usBarWidth = row.usRate !== null ? (row.usRate / maxRate * 100) : 0;
+                const euBarWidth = row.euRate !== null ? (row.euRate / maxRate * 100) : 0;
+
+                let optimalBadge, savingsHtml;
+                if (row.optimal === 'US') {
+                    optimalBadge = '<span class="optimal-badge optimal-us">US</span>';
+                    savingsHtml = row.savings !== null ? `<span class="savings-positive">-${row.savings.toFixed(1)}pp</span>` : '-';
+                } else if (row.optimal === 'EU') {
+                    optimalBadge = '<span class="optimal-badge optimal-eu">EU</span>';
+                    savingsHtml = row.savings !== null ? `<span class="savings-positive">-${row.savings.toFixed(1)}pp</span>` : '-';
+                } else {
+                    optimalBadge = '<span class="optimal-badge optimal-equal">Equal</span>';
+                    savingsHtml = '<span class="savings-neutral">0</span>';
+                }
+
+                html += `<tr class="${rankClass}">
+                    <td class="rank-cell">#${rank}</td>
+                    <td>
+                        <div class="country-cell">
+                            <img src="https://flagcdn.com/20x15/${row.iso.toLowerCase()}.png" style="border-radius:2px;" onerror="this.style.display='none'">
+                            <span>${row.country}</span>
+                            <span class="iso-tag">${row.iso}</span>
+                        </div>
+                    </td>
+                    <td class="rate-us">${usDisplay}</td>
+                    <td class="rate-eu">${euDisplay}</td>
+                    <td>
+                        <div class="compare-bar">
+                            <div class="bar-track">
+                                <div class="bar-us" style="width:${usBarWidth}%"></div>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-eu" style="width:${euBarWidth}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${optimalBadge}</td>
+                    <td>${savingsHtml}</td>
+                    <td style="font-size:0.75rem;color:#64748b;">${row.usType}</td>
+                    <td style="font-size:0.75rem;color:#64748b;">${row.euType}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        async function updateCompareView() {
+            const materialKey = document.getElementById('compareMaterial').value;
+            if (!compareDataCache.US || !compareDataCache.EU) {
+                await loadCompareData();
+            }
+            const rows = buildCompareRows(materialKey);
+            renderCompareTable(rows);
+            const matName = materialColumns[materialKey] || materialKey;
+            document.getElementById('compareStatus').textContent = `Showing ${rows.length} countries for ${matName}`;
+        }
+        // ========== END COMPARE VIEW LOGIC ==========
 
         async function switchDataset(datasetKey) {
             if (!DATASET_CONFIG[datasetKey]) return;
@@ -3079,8 +3541,8 @@
                 });
 
                 html += `
-                    <td class="alt-rate">${row.altRate || '-'}</td>
-                    <td class="notes-cell">${row.notes}</td>
+                    <td class="alt-rate">${row.source || (activeDataset === 'US' ? 'WOVE' : 'TARIC')}</td>
+                    <td class="notes-cell">${row.notes || '-'}</td>
                 `;
 
                 tr.innerHTML = html;
@@ -3246,7 +3708,7 @@
 
         function exportToCSV() {
             const materials = Object.keys(materialColumns);
-            const headers = ['Country', 'ISO', 'Region', 'Trade Program', 'Tier 2 Supplier', 'Conversion Country', 'Conversion Rate', ...materials.map(m => materialColumns[m]), 'Alt Rate', 'Notes'];
+            const headers = ['Country', 'ISO', 'Region', 'Trade Program', 'Tier 2 Supplier', 'Conversion Country', 'Conversion Rate', ...materials.map(m => materialColumns[m]), 'Source', 'Tariff Basis'];
             const rows = filteredData.map(row => {
                 const adj = rowAdjustments[row.iso] || {};
                 const rates = materials.map(m => {
@@ -3261,7 +3723,7 @@
                     adj.tier2 ? getCountryName(adj.tier2) : '',
                     adj.conversion ? getCountryName(adj.conversion) : '',
                     adj.conversionRate || '',
-                    ...rates, row.altRate || '', row.notes
+                    ...rates, row.source || (activeDataset === 'US' ? 'WOVE' : 'TARIC'), row.notes || ''
                 ];
             });
 
