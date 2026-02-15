@@ -315,6 +315,34 @@
             min-width: 210px;
         }
 
+        .route-v3 .rv3-group .rv3-country-filter {
+            min-width: 240px;
+            max-height: 120px;
+            padding: 4px;
+        }
+
+        .route-v3 .rv3-country-filter-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .route-v3 .rv3-country-filter-actions button {
+            border: 1px solid #dbe2ea;
+            background: #f8fafc;
+            color: #64748b;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            cursor: pointer;
+        }
+
+        .route-v3 .rv3-country-filter-actions button:hover {
+            background: #eef2f7;
+            color: #334155;
+        }
+
         .route-v3 .rv3-group select:focus,
         .route-v3 .rv3-search:focus {
             outline: none;
@@ -1059,6 +1087,11 @@
 
             .route-v3 .rv3-search {
                 width: 100%;
+            }
+
+            .route-v3 .rv3-group .rv3-country-filter {
+                width: 100%;
+                min-width: 0;
             }
         }
 
@@ -3008,6 +3041,15 @@
                     </select>
                 </div>
 
+                <div class="rv3-group">
+                    <label for="compareCountryFilter">Countries</label>
+                    <select id="compareCountryFilter" class="rv3-country-filter" multiple size="4" onchange="updateCompareView()"></select>
+                    <div class="rv3-country-filter-actions">
+                        <button type="button" onclick="selectAllCompareCountries()">Select all</button>
+                        <button type="button" onclick="clearCompareCountryFilter()">Clear</button>
+                    </div>
+                </div>
+
                 <div class="rv3-controls-right">
                     <div class="rv3-search-wrap">
                         <input type="text" id="compareSearchInput" class="rv3-search" placeholder="Search countries..." oninput="updateCompareView()">
@@ -3881,6 +3923,69 @@
             UAE: ['United Arab Emirates']
         };
 
+        function getAllCompareCountryOptions() {
+            const allIsos = new Set();
+            (compareDataCache.US || []).forEach((row) => {
+                const iso = String(row.country_iso || '').toUpperCase();
+                if (iso) allIsos.add(iso);
+            });
+            (compareDataCache.EU || []).forEach((row) => {
+                const iso = String(row.country_iso || '').toUpperCase();
+                if (iso) allIsos.add(iso);
+            });
+
+            return [...allIsos]
+                .map((iso) => ({
+                    iso,
+                    country: compareCountryNameLookup.get(iso) || iso
+                }))
+                .sort((a, b) => a.country.localeCompare(b.country));
+        }
+
+        function populateCompareCountryFilter() {
+            const filterEl = document.getElementById('compareCountryFilter');
+            if (!filterEl) return;
+
+            const previouslySelected = new Set(
+                [...filterEl.selectedOptions].map((option) => option.value)
+            );
+
+            const options = getAllCompareCountryOptions();
+            filterEl.innerHTML = '';
+
+            options.forEach((optionData) => {
+                const option = document.createElement('option');
+                option.value = optionData.iso;
+                option.textContent = `${optionData.country} (${optionData.iso})`;
+                option.selected = previouslySelected.has(optionData.iso);
+                filterEl.appendChild(option);
+            });
+        }
+
+        function getSelectedCompareCountryIsos() {
+            const filterEl = document.getElementById('compareCountryFilter');
+            if (!filterEl) return [];
+            return [...filterEl.selectedOptions].map((option) => option.value);
+        }
+
+        function clearCompareCountryFilter() {
+            const filterEl = document.getElementById('compareCountryFilter');
+            if (!filterEl) return;
+            [...filterEl.options].forEach((option) => {
+                option.selected = false;
+            });
+            updateCompareView();
+        }
+
+        function selectAllCompareCountries() {
+            const filterEl = document.getElementById('compareCountryFilter');
+            if (!filterEl) return;
+            [...filterEl.options].forEach((option) => {
+                option.selected = true;
+            });
+            updateCompareView();
+        }
+
         function setCompareStatus(message, isError = false) {
             const statusEl = document.getElementById('compareStatus');
             if (!statusEl) return;
@@ -4003,6 +4108,13 @@
             if (aRate === null) return 1;
             if (bRate === null) return -1;
             if (aRate !== bRate) return aRate - bRate;
+            const aSecondary = compareDestination === 'compare'
+                ? Math.max(a.usRate ?? 999, a.euRate ?? 999)
+                : (compareDestination === 'us' ? (a.euRate ?? 999) : (a.usRate ?? 999));
+            const bSecondary = compareDestination === 'compare'
+                ? Math.max(b.usRate ?? 999, b.euRate ?? 999)
+                : (compareDestination === 'us' ? (b.euRate ?? 999) : (b.usRate ?? 999));
+            if (aSecondary !== bSecondary) return aSecondary - bSecondary;
             return a.country.localeCompare(b.country);
         }
 
@@ -4044,6 +4156,7 @@
 
                 compareDataCache.US = usRows;
                 compareDataCache.EU = euRows;
+                populateCompareCountryFilter();
 
                 if (usErr && euErr) {
                     setCompareStatus(`Failed loading compare datasets (${usErr}; ${euErr})`, true);
@@ -4121,14 +4234,55 @@
         function processCompareRows(materialKey) {
             const baseRows = filterRowsByCompareDestination(buildCompareRows(materialKey));
             const search = document.getElementById('compareSearchInput').value.toLowerCase().trim();
+            const selectedCountrySet = new Set(getSelectedCompareCountryIsos());
 
-            const shownRows = baseRows.filter((row) => {
+            const countryFilteredRows = baseRows.filter((row) => {
+                if (selectedCountrySet.size > 0 && !selectedCountrySet.has(row.iso)) return false;
+                return true;
+            });
+
+            const shownRows = countryFilteredRows.filter((row) => {
                 if (!search) return true;
                 return row.country.toLowerCase().includes(search) || row.iso.toLowerCase().includes(search);
             });
 
             shownRows.sort(compareRowsSorter);
-            return { rows: shownRows, totalRows: baseRows.length };
+            return {
+                rows: shownRows,
+                totalRows: countryFilteredRows.length,
+                selectedCountryCount: selectedCountrySet.size
+            };
+        }
+
+        function getCompareTieKey(row) {
+            if (compareDestination === 'compare') {
+                const us = row.usRate === null ? 'na' : row.usRate.toFixed(4);
+                const eu = row.euRate === null ? 'na' : row.euRate.toFixed(4);
+                return `${us}|${eu}`;
+            }
+
+            const active = getCompareActiveRate(row);
+            if (active === null) return 'na';
+            return active.toFixed(4);
+        }
+
+        function buildCompareDisplayRanks(rows) {
+            const ranks = [];
+            let prevKey = null;
+            let prevRank = 0;
+
+            rows.forEach((row, idx) => {
+                const tieKey = getCompareTieKey(row);
+                let rank = idx + 1;
+                if (idx > 0 && tieKey === prevKey) {
+                    rank = prevRank;
+                }
+                ranks.push(rank);
+                prevKey = tieKey;
+                prevRank = rank;
+            });
+
+            return ranks;
         }
 
         function renderCompareSummary(rows) {
@@ -4480,10 +4634,11 @@
                 ...rows.map((row) => getCompareActiveRate(row) || 0),
                 1
             );
+            const displayRanks = buildCompareDisplayRanks(rows);
 
             let html = '';
             rows.forEach((row, idx) => {
-                const rank = idx + 1;
+                const rank = displayRanks[idx];
                 const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-default';
                 const flagImg = `<img class="rv3-country-flag" src="https://flagcdn.com/24x18/${row.iso.toLowerCase()}.png" onerror="this.style.display='none'" alt="">`;
                 const rowMapId = row.mapId || '';
@@ -4598,7 +4753,7 @@
 
             await ensureCompareMap();
 
-            const { rows, totalRows } = processCompareRows(materialKey);
+            const { rows, totalRows, selectedCountryCount } = processCompareRows(materialKey);
             compareRowsForView = rows;
             attachRowsToMap(compareRowsForView);
 
@@ -4613,7 +4768,10 @@
             selectCompareTableRow(compareSelectedIso, false);
 
             const matName = materialColumns[materialKey] || materialKey;
-            setCompareStatus(`Showing ${rows.length} of ${totalRows} countries for ${matName}.`);
+            const countryScope = selectedCountryCount > 0
+                ? ` within ${selectedCountryCount} selected countries`
+                : '';
+            setCompareStatus(`Showing ${rows.length} of ${totalRows} countries${countryScope} for ${matName}.`);
         }
         // ========== END COMPARE VIEW LOGIC ==========
 
