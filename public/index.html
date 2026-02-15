@@ -246,175 +246,830 @@
             }
         }
 
-        /* Compare View Styles */
-        .compare-controls {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid #e2e8f0;
+        /* Route Optimiser (V3) */
+        .route-v3 .welcome-section {
             margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .route-v3 .welcome-section h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .route-v3 .route-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        .route-v3 .welcome-section p {
+            max-width: none;
+            margin: 6px 0 0;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .route-v3 .rv3-controls {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
             gap: 16px;
             flex-wrap: wrap;
         }
 
-        .compare-controls label {
-            font-weight: 600;
-            color: #334155;
-            font-size: 0.95rem;
-        }
-
-        .compare-controls select {
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            font-size: 0.9rem;
-            min-width: 200px;
-            background: white;
-        }
-
-        .compare-summary {
-            background: white;
-            border-radius: 12px;
-            padding: 20px 24px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 24px;
+        .route-v3 .rv3-group {
             display: flex;
-            gap: 32px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .compare-stat {
-            text-align: center;
-        }
-
-        .compare-stat .stat-value {
-            font-size: 1.8rem;
+        .route-v3 .rv3-group label {
+            font-size: 0.68rem;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
         }
 
-        .compare-stat .stat-label {
-            font-size: 0.8rem;
+        .route-v3 .rv3-group select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.86rem;
+            background: #f8fafc;
+            color: #334155;
+            min-width: 210px;
+        }
+
+        .route-v3 .rv3-group select:focus,
+        .route-v3 .rv3-search:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .route-v3 .rv3-dest-selector {
+            display: flex;
+            gap: 3px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .route-v3 .rv3-dest-option {
+            border: none;
+            border-radius: 8px;
+            background: transparent;
             color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .route-v3 .rv3-dest-option:hover {
+            background: rgba(255, 255, 255, 0.6);
+            color: #334155;
+        }
+
+        .route-v3 .rv3-dest-option.active-us {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.32);
+        }
+
+        .route-v3 .rv3-dest-option.active-eu {
+            background: #d97706;
+            color: white;
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.32);
+        }
+
+        .route-v3 .rv3-dest-option.active-compare {
+            background: white;
+            color: #1e293b;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .route-v3 .rv3-divider {
+            width: 1px;
+            height: 34px;
+            background: #e2e8f0;
+        }
+
+        .route-v3 .rv3-controls-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .route-v3 .rv3-search-wrap {
+            position: relative;
+        }
+
+        .route-v3 .rv3-search-wrap::before {
+            content: '🔍';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        .route-v3 .rv3-search {
+            padding: 8px 12px 8px 32px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            width: 220px;
+            font-size: 0.85rem;
+            transition: width 0.2s;
+        }
+
+        .route-v3 .rv3-search:focus {
+            width: 260px;
+        }
+
+        .route-v3 .rv3-status {
+            font-size: 0.78rem;
+            color: #94a3b8;
             margin-top: 2px;
         }
 
-        .compare-table-wrap {
+        .route-v3 .rv3-map-section {
             background: white;
-            border-radius: 12px;
             border: 1px solid #e2e8f0;
-            overflow-x: auto;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        .compare-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
+        .route-v3 .rv3-map-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .compare-table th {
-            background: #f8fafc;
-            padding: 12px 16px;
-            text-align: left;
+        .route-v3 .rv3-map-header h2 {
+            font-size: 0.9rem;
             font-weight: 600;
             color: #334155;
-            border-bottom: 2px solid #e2e8f0;
-            white-space: nowrap;
         }
 
-        .compare-table td {
-            padding: 10px 16px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .compare-table tr:hover {
-            background: #f8fafc;
-        }
-
-        .compare-table .rank-cell {
+        .route-v3 .rv3-dest-label {
+            font-size: 0.74rem;
             font-weight: 700;
-            color: #64748b;
-            width: 50px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            margin-left: 6px;
         }
 
-        .compare-table .rank-1 .rank-cell { color: #16a34a; }
-        .compare-table .rank-2 .rank-cell { color: #65a30d; }
-        .compare-table .rank-3 .rank-cell { color: #ca8a04; }
-
-        .rate-us { color: #1e40af; font-weight: 600; }
-        .rate-eu { color: #b45309; font-weight: 600; }
-
-        .optimal-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .optimal-us {
+        .route-v3 .rv3-dest-label.us-label {
             background: #dbeafe;
-            color: #1e40af;
+            color: #1d4ed8;
         }
 
-        .optimal-eu {
+        .route-v3 .rv3-dest-label.eu-label {
             background: #fef3c7;
             color: #92400e;
         }
 
-        .optimal-equal {
-            background: #f1f5f9;
-            color: #64748b;
+        .route-v3 .rv3-dest-label.compare-label {
+            background: #ede9fe;
+            color: #6d28d9;
         }
 
-        .savings-positive {
-            color: #16a34a;
-            font-weight: 600;
-        }
-
-        .savings-negative {
-            color: #dc2626;
-            font-weight: 600;
-        }
-
-        .savings-neutral {
-            color: #64748b;
-        }
-
-        .compare-bar {
+        .route-v3 .rv3-map-legend {
             display: flex;
             align-items: center;
-            gap: 8px;
-            min-width: 200px;
+            gap: 14px;
+            flex-wrap: wrap;
+            font-size: 0.74rem;
+            color: #64748b;
         }
 
-        .bar-track {
-            flex: 1;
-            height: 8px;
-            background: #f1f5f9;
+        .route-v3 .rv3-legend-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .route-v3 .rv3-legend-gradient {
+            width: 130px;
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #059669, #34d399, #a3e635, #fbbf24, #f97316, #dc2626);
+        }
+
+        .route-v3 .rv3-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .route-v3 .rv3-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .route-v3 .rv3-map-container {
+            position: relative;
+            background: #f0f5fa;
+        }
+
+        .route-v3 #compareMapSvg {
+            width: 100%;
+            display: block;
+        }
+
+        .route-v3 #compareMapSvg .country-path {
+            stroke: #cbd5e1;
+            stroke-width: 0.4;
+            transition: fill 0.25s, stroke-width 0.12s;
+            cursor: default;
+        }
+
+        .route-v3 #compareMapSvg .country-path.has-data {
+            cursor: pointer;
+        }
+
+        .route-v3 #compareMapSvg .country-path.has-data:hover {
+            stroke: #1e293b;
+            stroke-width: 1.2;
+            filter: brightness(0.9);
+        }
+
+        .route-v3 #compareMapSvg .country-path.highlighted {
+            stroke: #1e293b;
+            stroke-width: 1.5;
+        }
+
+        .route-v3 #compareMapSvg .graticule {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 0.3;
+            stroke-dasharray: 2, 2;
+        }
+
+        .route-v3 #compareMapSvg .sphere {
+            fill: #f0f5fa;
+            stroke: #e2e8f0;
+            stroke-width: 0.5;
+        }
+
+        .route-v3 .rv3-map-tooltip {
+            position: absolute;
+            z-index: 100;
+            background: #1e293b;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+            padding: 11px 14px;
+            font-size: 0.82rem;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.15s, transform 0.15s;
+            min-width: 180px;
+            max-width: 260px;
+        }
+
+        .route-v3 .rv3-map-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-country {
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate-single {
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate-single.us-bg {
+            background: rgba(59, 130, 246, 0.22);
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate-single.eu-bg {
+            background: rgba(217, 119, 6, 0.22);
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate-single .tt-label {
+            font-size: 0.66rem;
+            opacity: 0.75;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate-single .tt-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate {
+            text-align: center;
+            padding: 6px 8px;
+            border-radius: 6px;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate.us {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate.eu {
+            background: rgba(217, 119, 6, 0.2);
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate .tt-label {
+            font-size: 0.65rem;
+            opacity: 0.74;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-rate .tt-value {
+            font-size: 0.98rem;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-basis {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #cbd5e1;
+        }
+
+        .route-v3 .rv3-map-tooltip .tt-optimal {
+            margin-top: 6px;
+            font-size: 0.74rem;
+            text-align: center;
+            padding: 4px 8px;
             border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .route-v3 .rv3-map-tooltip .best-us {
+            background: rgba(59, 130, 246, 0.22);
+            color: #bfdbfe;
+        }
+
+        .route-v3 .rv3-map-tooltip .best-eu {
+            background: rgba(217, 119, 6, 0.22);
+            color: #fcd34d;
+        }
+
+        .route-v3 .rv3-map-tooltip .best-equal {
+            background: rgba(148, 163, 184, 0.24);
+            color: #e2e8f0;
+        }
+
+        .route-v3 .rv3-map-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 400px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .route-v3 .rv3-map-loading .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: rv3spin 0.8s linear infinite;
+        }
+
+        @keyframes rv3spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .route-v3 .rv3-summary-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .route-v3 .rv3-summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
             position: relative;
             overflow: hidden;
         }
 
-        .bar-us {
+        .route-v3 .rv3-summary-card::before {
+            content: '';
             position: absolute;
             left: 0;
+            right: 0;
             top: 0;
-            height: 100%;
+            height: 3px;
+        }
+
+        .route-v3 .rv3-summary-card.card-total::before {
+            background: linear-gradient(90deg, #7c3aed, #a78bfa);
+        }
+
+        .route-v3 .rv3-summary-card.card-free::before {
+            background: linear-gradient(90deg, #059669, #34d399);
+        }
+
+        .route-v3 .rv3-summary-card.card-avg::before {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .route-v3 .rv3-summary-card.card-best::before {
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+        }
+
+        .route-v3 .rv3-summary-card .card-label {
+            font-size: 0.67rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .route-v3 .rv3-summary-card .card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-summary-card.card-total .card-value {
+            color: #7c3aed;
+        }
+
+        .route-v3 .rv3-summary-card.card-free .card-value {
+            color: #059669;
+        }
+
+        .route-v3 .rv3-summary-card.card-avg .card-value {
+            color: #d97706;
+        }
+
+        .route-v3 .rv3-summary-card.card-best .card-value {
+            color: #2563eb;
+        }
+
+        .route-v3 .rv3-summary-card .card-sub {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .route-v3 .rv3-table-container {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .route-v3 .rv3-table-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .route-v3 .rv3-table-header h2 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .route-v3 .rv3-showing {
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        .route-v3 .rv3-showing strong {
+            color: #334155;
+        }
+
+        .route-v3 .rv3-table-scroll {
+            overflow-x: auto;
+        }
+
+        .route-v3 .rv3-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .route-v3 .rv3-table thead th {
+            background: #f8fafc;
+            padding: 12px 14px;
+            text-align: left;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .route-v3 .rv3-table tbody td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.85rem;
+            color: #334155;
+        }
+
+        .route-v3 .rv3-table tbody tr {
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+
+        .route-v3 .rv3-table tbody tr:hover {
+            background: #f0f7ff;
+        }
+
+        .route-v3 .rv3-table tbody tr.row-selected {
+            background: #eff6ff;
+            box-shadow: inset 3px 0 0 #3b82f6;
+        }
+
+        .route-v3 .rv3-rank-badge {
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-rank-badge.rank-1 {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .route-v3 .rv3-rank-badge.rank-2 {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            color: #475569;
+        }
+
+        .route-v3 .rv3-rank-badge.rank-3 {
+            background: linear-gradient(135deg, #fed7aa, #fdba74);
+            color: #9a3412;
+        }
+
+        .route-v3 .rv3-rank-badge.rank-default {
+            background: #f8fafc;
+            color: #94a3b8;
+        }
+
+        .route-v3 .rv3-country-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .route-v3 .rv3-country-flag {
+            width: 24px;
+            height: 18px;
+            border-radius: 3px;
+            object-fit: cover;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+        }
+
+        .route-v3 .rv3-country-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .route-v3 .rv3-country-iso {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: #f1f5f9;
+            border-radius: 3px;
+            padding: 1px 5px;
+        }
+
+        .route-v3 .rv3-rate-cell {
+            font-variant-numeric: tabular-nums;
+            display: inline-block;
+            min-width: 56px;
+            text-align: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-rate-na {
+            color: #94a3b8;
+            font-style: italic;
+            background: transparent;
+            font-weight: 400;
+        }
+
+        .route-v3 .rv3-rate-us {
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-rate-eu {
+            color: #92400e;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-basis-tag {
+            font-size: 0.7rem;
+            color: #64748b;
+            background: #f1f5f9;
+            border-radius: 4px;
+            padding: 2px 7px;
+            white-space: nowrap;
+        }
+
+        .route-v3 .rv3-dumbbell {
+            min-width: 220px;
+            position: relative;
+            height: 26px;
+        }
+
+        .route-v3 .rv3-dumbbell-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+            transform: translateY(-50%);
+        }
+
+        .route-v3 .rv3-dumbbell-line {
+            position: absolute;
+            top: 50%;
+            height: 3px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #3b82f6, #d97706);
+            transform: translateY(-50%);
+            opacity: 0.55;
+        }
+
+        .route-v3 .rv3-dumbbell-dot {
+            position: absolute;
+            top: 50%;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+        .route-v3 .rv3-dumbbell-dot.us-dot {
             background: #3b82f6;
+        }
+
+        .route-v3 .rv3-dumbbell-dot.eu-dot {
+            background: #d97706;
+        }
+
+        .route-v3 .rv3-opt-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-opt-badge.opt-us {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1d4ed8;
+        }
+
+        .route-v3 .rv3-opt-badge.opt-eu {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .route-v3 .rv3-opt-badge.opt-equal {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .route-v3 .rv3-savings-pill {
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .route-v3 .rv3-savings-pill.positive {
+            color: #059669;
+        }
+
+        .route-v3 .rv3-savings-pill.neutral {
+            color: #94a3b8;
+        }
+
+        .route-v3 .rv3-single-bar {
+            width: 180px;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .route-v3 .rv3-single-bar > span {
+            display: block;
+            height: 100%;
             border-radius: 4px;
         }
 
-        .bar-eu {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            background: #f59e0b;
-            border-radius: 4px;
-            opacity: 0.6;
+        .route-v3 .rv3-empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #94a3b8;
+        }
+
+        .route-v3 .rv3-empty-state strong {
+            color: #64748b;
+            display: block;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 1100px) {
+            .route-v3 .rv3-summary-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .route-v3 .rv3-controls {
+                align-items: stretch;
+            }
+
+            .route-v3 .rv3-controls-right {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .route-v3 .rv3-search {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .route-v3 .rv3-divider {
+                display: none;
+            }
+
+            .route-v3 .rv3-summary-strip {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Matrix View Header (replaces old .header) */
@@ -2316,73 +2971,122 @@
 
     <!-- COMPARE VIEW -->
     <div id="view-compare" class="main-view">
-        <div class="home-content">
+        <div class="home-content route-v3">
             <div class="welcome-section">
-                <h1>Route Optimiser</h1>
-                <p>Compare duty rates across US and EU destinations to find optimal sourcing routes per material.</p>
+                <h1>⚖️ Route Optimiser <span class="route-hint">📍 Where to source from</span></h1>
+                <p>Select a destination market and material to find the lowest duty source countries.</p>
             </div>
 
-            <div class="compare-controls">
-                <label for="compareMaterial">Material:</label>
-                <select id="compareMaterial" onchange="updateCompareView()">
-                    <option value="cigarettePaper">Cigarette Paper</option>
-                    <option value="tippingPaper">Tipping Paper</option>
-                    <option value="plugwrap">Plugwrap</option>
-                    <option value="filterTow">Filter Tow</option>
-                    <option value="filterRods">Filter Rods</option>
-                    <option value="adhesive">Adhesive</option>
-                    <option value="capsules">Capsules</option>
-                    <option value="plasticizer">Plasticizer</option>
-                    <option value="adsorbent">Adsorbent</option>
-                    <option value="boardPack">Board Packaging</option>
-                    <option value="paperPack">Paper Packaging</option>
-                    <option value="innerBundling">Inner Bundling</option>
-                    <option value="boardInnerFrame">Board Inner Frame</option>
-                </select>
-                <span style="color:#94a3b8; font-size:0.85rem;" id="compareStatus">Select a material to compare routes</span>
+            <div class="rv3-controls">
+                <div class="rv3-group">
+                    <label>Importing Into</label>
+                    <div class="rv3-dest-selector">
+                        <button class="rv3-dest-option active-us" data-dest="us" onclick="setCompareDestination(this)">🇺🇸 US</button>
+                        <button class="rv3-dest-option" data-dest="eu" onclick="setCompareDestination(this)">🇪🇺 EU</button>
+                        <button class="rv3-dest-option" data-dest="compare" onclick="setCompareDestination(this)">⚖️ Compare</button>
+                    </div>
+                </div>
+
+                <div class="rv3-divider"></div>
+
+                <div class="rv3-group">
+                    <label for="compareMaterial">Material</label>
+                    <select id="compareMaterial" onchange="updateCompareView()">
+                        <option value="cigarettePaper">Cigarette Paper</option>
+                        <option value="tippingPaper">Tipping Paper</option>
+                        <option value="plugwrap">Plugwrap</option>
+                        <option value="filterTow">Filter Tow</option>
+                        <option value="filterRods">Filter Rods</option>
+                        <option value="adhesive">Adhesive</option>
+                        <option value="capsules">Capsules</option>
+                        <option value="plasticizer">Plasticizer</option>
+                        <option value="adsorbent">Adsorbent</option>
+                        <option value="boardPack">Board Packaging</option>
+                        <option value="paperPack">Paper Packaging</option>
+                        <option value="innerBundling">Inner Bundling</option>
+                        <option value="boardInnerFrame">Board Inner Frame</option>
+                    </select>
+                </div>
+
+                <div class="rv3-controls-right">
+                    <div class="rv3-search-wrap">
+                        <input type="text" id="compareSearchInput" class="rv3-search" placeholder="Search countries..." oninput="updateCompareView()">
+                    </div>
+                </div>
+            </div>
+            <div id="compareStatus" class="rv3-status">Loading data...</div>
+
+            <div class="rv3-map-section">
+                <div class="rv3-map-header">
+                    <h2 id="compareMapTitle">Best Source Countries for <span class="rv3-dest-label us-label" id="compareMapDestLabel">🇺🇸 US</span> — Filter Tow</h2>
+                    <div class="rv3-map-legend" id="compareMapLegend">
+                        <div class="rv3-legend-bar">
+                            <span>0%</span>
+                            <div class="rv3-legend-gradient"></div>
+                            <span>55%+</span>
+                        </div>
+                        <div class="rv3-legend-item">
+                            <span class="rv3-legend-dot" style="background:#e2e8f0;"></span>
+                            <span>No data</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="rv3-map-container" id="compareMapContainer">
+                    <div class="rv3-map-loading" id="compareMapLoading">
+                        <div class="spinner"></div>
+                        <span>Loading world map...</span>
+                    </div>
+                    <svg id="compareMapSvg" style="display:none;"></svg>
+                    <div class="rv3-map-tooltip" id="compareMapTooltip"></div>
+                </div>
             </div>
 
-            <div class="compare-summary" id="compareSummary" style="display:none;">
-                <div class="compare-stat">
-                    <div class="stat-value" style="color:#3b82f6;" id="cmpUsOptimal">-</div>
-                    <div class="stat-label">US Optimal</div>
+            <div class="rv3-summary-strip">
+                <div class="rv3-summary-card card-total">
+                    <div class="card-label">Source Countries</div>
+                    <div class="card-value" id="cmpSumTotal">-</div>
+                    <div class="card-sub">available suppliers</div>
                 </div>
-                <div class="compare-stat">
-                    <div class="stat-value" style="color:#f59e0b;" id="cmpEuOptimal">-</div>
-                    <div class="stat-label">EU Optimal</div>
+                <div class="rv3-summary-card card-free">
+                    <div class="card-label">Duty-Free Sources</div>
+                    <div class="card-value" id="cmpSumFree">-</div>
+                    <div class="card-sub">0% rate</div>
                 </div>
-                <div class="compare-stat">
-                    <div class="stat-value" style="color:#64748b;" id="cmpEqual">-</div>
-                    <div class="stat-label">Equal</div>
+                <div class="rv3-summary-card card-avg">
+                    <div class="card-label">Avg. Rate</div>
+                    <div class="card-value" id="cmpSumAvg">-</div>
+                    <div class="card-sub">across shown sources</div>
                 </div>
-                <div class="compare-stat">
-                    <div class="stat-value" id="cmpCountries">-</div>
-                    <div class="stat-label">Countries Compared</div>
+                <div class="rv3-summary-card card-best">
+                    <div class="card-label">Best Non-Free</div>
+                    <div class="card-value" id="cmpSumBest">-</div>
+                    <div class="card-sub">lowest non-zero rate</div>
                 </div>
             </div>
 
-            <div class="compare-table-wrap">
-                <table class="compare-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Country</th>
-                            <th>US Rate</th>
-                            <th>EU Rate</th>
-                            <th>Visual</th>
-                            <th>Best Dest.</th>
-                            <th>Savings</th>
-                            <th>US Basis</th>
-                            <th>EU Basis</th>
-                        </tr>
-                    </thead>
-                    <tbody id="compareTableBody">
-                        <tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">Select a material above to load comparison</td></tr>
-                    </tbody>
-                </table>
+            <div class="rv3-table-container">
+                <div class="rv3-table-header">
+                    <h2 id="compareTableTitle">Source Countries Ranked by Duty Rate</h2>
+                    <div class="rv3-showing">Showing <strong id="compareShowCount">0</strong> of <strong id="compareTotalCount">0</strong></div>
+                </div>
+                <div class="rv3-table-scroll">
+                    <table class="rv3-table">
+                        <thead id="compareTableHead"></thead>
+                        <tbody id="compareTableBody">
+                            <tr>
+                                <td colspan="7">
+                                    <div class="rv3-empty-state">Loading route optimiser data...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
 
     <script>
         // Main view switching (Home, US, EU, Compare)
@@ -3147,196 +3851,769 @@
 
         // ========== COMPARE VIEW LOGIC ==========
         let compareDataCache = { US: null, EU: null };
-        let compareLoading = false;
+        let compareDestination = 'us'; // us | eu | compare
+        let compareLoadingPromise = null;
+        let compareRowsForView = [];
+        let compareSelectedIso = null;
+        let compareHoveredMapId = null;
+        let compareMapReady = false;
+        let compareMapInitPromise = null;
+        let compareMapRowsById = {};
+        let compareMapNameIndex = null;
+        const COMPARE_MAX_RATE = 60;
+
+        const compareCountryNameLookup = new Map(staticDutyData.map((row) => [row.iso, row.country]));
+        const compareIsoNameAliases = {
+            AE: ['United Arab Emirates'],
+            CZ: ['Czech Republic', 'Czechia'],
+            DO: ['Dominican Republic'],
+            GB: ['United Kingdom', 'United Kingdom of Great Britain and Northern Ireland'],
+            HK: ['Hong Kong'],
+            KR: ['South Korea', 'Korea, Republic of'],
+            KP: ['North Korea', 'Korea, Democratic People\'s Republic of'],
+            RU: ['Russia', 'Russian Federation'],
+            SV: ['El Salvador'],
+            TR: ['Turkey', 'Turkiye'],
+            TW: ['Taiwan'],
+            US: ['United States of America', 'United States']
+        };
+        const compareCountryNameAliases = {
+            'Korea (South)': ['South Korea', 'Korea, Republic of'],
+            UAE: ['United Arab Emirates']
+        };
+
+        function setCompareStatus(message, isError = false) {
+            const statusEl = document.getElementById('compareStatus');
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.style.color = isError ? '#dc2626' : '#94a3b8';
+        }
+
+        function parseCompareRate(value) {
+            if (value === null || value === undefined || value === '') return null;
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : null;
+        }
+
+        function normalizeMapName(name) {
+            return String(name || '')
+                .toLowerCase()
+                .replace(/[().,]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function getMapNameCandidates(row) {
+            const candidates = [];
+            const iso = row.iso || '';
+            const fromIso = compareIsoNameAliases[iso] || [];
+            const fromCountry = compareCountryNameAliases[row.country] || [];
+            candidates.push(row.country, ...fromIso, ...fromCountry);
+
+            const unique = [];
+            const seen = new Set();
+            candidates.forEach((name) => {
+                const norm = normalizeMapName(name);
+                if (!norm || seen.has(norm)) return;
+                seen.add(norm);
+                unique.push(name);
+            });
+            return unique;
+        }
+
+        function resolveCompareMapId(row) {
+            if (!compareMapNameIndex) return null;
+            const candidates = getMapNameCandidates(row);
+            for (const candidate of candidates) {
+                const id = compareMapNameIndex.get(normalizeMapName(candidate));
+                if (id !== undefined) return String(id);
+            }
+            return null;
+        }
+
+        function getCompareMapRateScale() {
+            if (typeof d3 === 'undefined') return null;
+            return d3.scaleLinear()
+                .domain([0, 10, 25, 40, 55])
+                .range(['#059669', '#34d399', '#fbbf24', '#f97316', '#dc2626'])
+                .clamp(true);
+        }
+
+        function compareRateToMapColor(rate) {
+            if (rate === null) return '#e2e8f0';
+            const scale = getCompareMapRateScale();
+            if (!scale) return '#94a3b8';
+            return scale(rate);
+        }
+
+        function compareRateToText(rate) {
+            if (rate === null) return '#94a3b8';
+            if (rate === 0) return '#059669';
+            if (rate < 10) return '#16a34a';
+            if (rate < 20) return '#65a30d';
+            if (rate < 30) return '#ca8a04';
+            if (rate < 40) return '#ea580c';
+            return '#dc2626';
+        }
+
+        function compareRateToBg(rate) {
+            if (rate === null) return 'transparent';
+            if (rate === 0) return '#ecfdf5';
+            if (rate < 10) return '#f0fdf4';
+            if (rate < 20) return '#fefce8';
+            if (rate < 30) return '#fffbeb';
+            if (rate < 40) return '#fff7ed';
+            return '#fef2f2';
+        }
+
+        function formatCompareRate(rate) {
+            if (rate === null) return 'N/A';
+            return `${rate.toFixed(1)}%`;
+        }
+
+        function getCompareActiveRate(row) {
+            if (compareDestination === 'us') return row.usRate;
+            if (compareDestination === 'eu') return row.euRate;
+            if (row.usRate === null && row.euRate === null) return null;
+            return Math.min(row.usRate ?? 999, row.euRate ?? 999);
+        }
+
+        function getCompareBasis(row) {
+            return compareDestination === 'us' ? row.usType : row.euType;
+        }
+
+        function getCompareOptimal(row) {
+            if (row.usRate === null && row.euRate === null) return { optimal: 'Equal', savings: 0 };
+            if (row.usRate === null) return { optimal: 'EU', savings: null };
+            if (row.euRate === null) return { optimal: 'US', savings: null };
+            if (row.usRate < row.euRate) return { optimal: 'US', savings: row.euRate - row.usRate };
+            if (row.euRate < row.usRate) return { optimal: 'EU', savings: row.usRate - row.euRate };
+            return { optimal: 'Equal', savings: 0 };
+        }
+
+        function filterRowsByCompareDestination(rows) {
+            if (compareDestination === 'us') return rows.filter((row) => row.usRate !== null);
+            if (compareDestination === 'eu') return rows.filter((row) => row.euRate !== null);
+            return rows.filter((row) => row.usRate !== null || row.euRate !== null);
+        }
+
+        function compareRowsSorter(a, b) {
+            const aRate = getCompareActiveRate(a);
+            const bRate = getCompareActiveRate(b);
+            if (aRate === null && bRate === null) return a.country.localeCompare(b.country);
+            if (aRate === null) return 1;
+            if (bRate === null) return -1;
+            if (aRate !== bRate) return aRate - bRate;
+            return a.country.localeCompare(b.country);
+        }
 
         async function loadCompareData() {
             if (compareDataCache.US && compareDataCache.EU) return;
-            if (compareLoading) return;
-            compareLoading = true;
+            if (compareLoadingPromise) return compareLoadingPromise;
 
-            document.getElementById('compareStatus').textContent = 'Loading US and EU data...';
+            setCompareStatus('Loading US and EU data...');
+
+            compareLoadingPromise = (async () => {
+                let usRows = [];
+                let euRows = [];
+                let usErr = null;
+                let euErr = null;
+
+                try {
+                    const [usRes, euRes] = await Promise.all([
+                        fetch('/api/duty-rates?destination=US&source=WOVE'),
+                        fetch('/api/duty-rates?destination=EU&source=TARIC')
+                    ]);
+
+                    if (usRes.ok) {
+                        const usPayload = await usRes.json();
+                        usRows = Array.isArray(usPayload.rows) ? usPayload.rows : [];
+                    } else {
+                        usErr = `US HTTP ${usRes.status}`;
+                    }
+
+                    if (euRes.ok) {
+                        const euPayload = await euRes.json();
+                        euRows = Array.isArray(euPayload.rows) ? euPayload.rows : [];
+                    } else {
+                        euErr = `EU HTTP ${euRes.status}`;
+                    }
+                } catch (err) {
+                    usErr = usErr || err.message;
+                    euErr = euErr || err.message;
+                }
+
+                compareDataCache.US = usRows;
+                compareDataCache.EU = euRows;
+
+                if (usErr && euErr) {
+                    setCompareStatus(`Failed loading compare datasets (${usErr}; ${euErr})`, true);
+                } else if (usErr || euErr) {
+                    const partialErr = usErr ? `US: ${usErr}` : `EU: ${euErr}`;
+                    setCompareStatus(`Loaded partial data (${partialErr})`, true);
+                } else {
+                    setCompareStatus('Data loaded. Adjust destination, material, or search.');
+                }
+            })();
 
             try {
-                const [usRes, euRes] = await Promise.all([
-                    fetch('/api/duty-rates?destination=US&source=WOVE'),
-                    fetch('/api/duty-rates?destination=EU&source=TARIC')
-                ]);
-
-                if (usRes.ok) {
-                    const usPayload = await usRes.json();
-                    compareDataCache.US = Array.isArray(usPayload.rows) ? usPayload.rows : [];
-                }
-                if (euRes.ok) {
-                    const euPayload = await euRes.json();
-                    compareDataCache.EU = Array.isArray(euPayload.rows) ? euPayload.rows : [];
-                }
-
-                document.getElementById('compareStatus').textContent = 'Data loaded. Select a material to compare.';
-            } catch (err) {
-                document.getElementById('compareStatus').textContent = 'Failed to load data: ' + err.message;
+                await compareLoadingPromise;
+            } finally {
+                compareLoadingPromise = null;
             }
-            compareLoading = false;
         }
 
         function buildCompareRows(materialKey) {
             const materialName = materialColumns[materialKey];
             if (!materialName || !compareDataCache.US || !compareDataCache.EU) return [];
 
-            // Build rate maps: iso -> { rate, rateType }
-            const usRates = {};
-            const euRates = {};
+            const usRates = new Map();
+            const euRates = new Map();
 
-            compareDataCache.US.forEach(row => {
-                if (row.material === materialName) {
-                    usRates[row.country_iso] = { rate: Number(row.rate), rateType: row.rate_type || '' };
-                }
+            compareDataCache.US.forEach((row) => {
+                if (row.material !== materialName) return;
+                const iso = String(row.country_iso || '').toUpperCase();
+                if (!iso) return;
+                usRates.set(iso, {
+                    rate: parseCompareRate(row.rate),
+                    rateType: row.rate_type || '-'
+                });
             });
 
-            compareDataCache.EU.forEach(row => {
-                if (row.material === materialName) {
-                    euRates[row.country_iso] = { rate: Number(row.rate), rateType: row.rate_type || '' };
-                }
+            compareDataCache.EU.forEach((row) => {
+                if (row.material !== materialName) return;
+                const iso = String(row.country_iso || '').toUpperCase();
+                if (!iso) return;
+                euRates.set(iso, {
+                    rate: parseCompareRate(row.rate),
+                    rateType: row.rate_type || '-'
+                });
             });
 
-            // Get all country ISOs that appear in BOTH datasets
-            const allIsos = new Set([...Object.keys(usRates), ...Object.keys(euRates)]);
+            const allIsos = new Set([...usRates.keys(), ...euRates.keys()]);
             const rows = [];
 
-            allIsos.forEach(iso => {
-                const us = usRates[iso];
-                const eu = euRates[iso];
+            allIsos.forEach((iso) => {
+                const us = usRates.get(iso);
+                const eu = euRates.get(iso);
                 if (!us && !eu) return;
 
                 const usRate = us ? us.rate : null;
                 const euRate = eu ? eu.rate : null;
-                const usType = us ? us.rateType : '-';
-                const euType = eu ? eu.rateType : '-';
+                const country = compareCountryNameLookup.get(iso) || iso;
+                const { optimal, savings } = getCompareOptimal({ usRate, euRate });
 
-                let optimal, savings;
-                if (usRate === null) {
-                    optimal = 'EU';
-                    savings = null;
-                } else if (euRate === null) {
-                    optimal = 'US';
-                    savings = null;
-                } else if (usRate < euRate) {
-                    optimal = 'US';
-                    savings = euRate - usRate;
-                } else if (euRate < usRate) {
-                    optimal = 'EU';
-                    savings = usRate - euRate;
-                } else {
-                    optimal = 'Equal';
-                    savings = 0;
-                }
-
-                // Find country name from static data or countries table
-                const staticRow = staticDutyData.find(r => r.iso === iso);
-                const countryName = staticRow ? staticRow.country : iso;
-
-                rows.push({ iso, country: countryName, usRate, euRate, optimal, savings, usType, euType });
-            });
-
-            // Sort: best route first (lowest of min(us,eu))
-            rows.sort((a, b) => {
-                const aMin = Math.min(a.usRate ?? 999, a.euRate ?? 999);
-                const bMin = Math.min(b.usRate ?? 999, b.euRate ?? 999);
-                return aMin - bMin;
+                rows.push({
+                    iso,
+                    country,
+                    usRate,
+                    euRate,
+                    usType: us ? us.rateType : '-',
+                    euType: eu ? eu.rateType : '-',
+                    optimal,
+                    savings,
+                    mapId: null
+                });
             });
 
             return rows;
         }
 
-        function renderCompareTable(rows) {
-            const tbody = document.getElementById('compareTableBody');
-            const summary = document.getElementById('compareSummary');
+        function processCompareRows(materialKey) {
+            const baseRows = filterRowsByCompareDestination(buildCompareRows(materialKey));
+            const search = document.getElementById('compareSearchInput').value.toLowerCase().trim();
 
-            if (!rows || rows.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">No data available for this material</td></tr>';
-                summary.style.display = 'none';
+            const shownRows = baseRows.filter((row) => {
+                if (!search) return true;
+                return row.country.toLowerCase().includes(search) || row.iso.toLowerCase().includes(search);
+            });
+
+            shownRows.sort(compareRowsSorter);
+            return { rows: shownRows, totalRows: baseRows.length };
+        }
+
+        function renderCompareSummary(rows) {
+            const activeRates = rows
+                .map((row) => getCompareActiveRate(row))
+                .filter((rate) => rate !== null);
+
+            const total = rows.length;
+            const freeCount = activeRates.filter((rate) => rate === 0).length;
+            const avgRate = activeRates.length > 0
+                ? (activeRates.reduce((sum, rate) => sum + rate, 0) / activeRates.length)
+                : 0;
+            const nonZeroRates = activeRates.filter((rate) => rate > 0);
+            const bestNonZero = nonZeroRates.length > 0 ? Math.min(...nonZeroRates) : null;
+
+            document.getElementById('cmpSumTotal').textContent = String(total);
+            document.getElementById('cmpSumFree').textContent = String(freeCount);
+            document.getElementById('cmpSumAvg').textContent = activeRates.length > 0 ? `${avgRate.toFixed(1)}%` : '-';
+            document.getElementById('cmpSumBest').textContent = bestNonZero !== null ? `${bestNonZero.toFixed(1)}%` : '-';
+        }
+
+        function selectCompareTableRow(iso, shouldScroll = false) {
+            compareSelectedIso = iso || null;
+
+            document.querySelectorAll('#compareTableBody tr[data-iso]').forEach((rowEl) => {
+                const selected = rowEl.dataset.iso === compareSelectedIso;
+                rowEl.classList.toggle('row-selected', selected);
+                if (selected && shouldScroll) {
+                    rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            refreshCompareMapHighlights();
+        }
+
+        function refreshCompareMapHighlights() {
+            if (!compareMapReady || typeof d3 === 'undefined') return;
+
+            d3.selectAll('#compareMapSvg .country-path').classed('highlighted', false);
+
+            let activeMapId = compareHoveredMapId;
+            if (!activeMapId && compareSelectedIso) {
+                const selectedRow = compareRowsForView.find((row) => row.iso === compareSelectedIso);
+                activeMapId = selectedRow ? selectedRow.mapId : null;
+            }
+
+            if (activeMapId) {
+                d3.select(`#compareMapSvg .country-path[data-id="${activeMapId}"]`).classed('highlighted', true);
+            }
+        }
+
+        function attachRowsToMap(rows) {
+            compareMapRowsById = {};
+            rows.forEach((row) => {
+                row.mapId = resolveCompareMapId(row);
+                if (row.mapId) {
+                    compareMapRowsById[row.mapId] = row;
+                }
+            });
+        }
+
+        function updateCompareMapLegend() {
+            const legend = document.getElementById('compareMapLegend');
+            if (!legend) return;
+
+            if (compareDestination === 'compare') {
+                legend.innerHTML = `
+                    <div class="rv3-legend-item"><span class="rv3-legend-dot" style="background:#3b82f6;"></span><span>US lower tariff</span></div>
+                    <div class="rv3-legend-item"><span class="rv3-legend-dot" style="background:#d97706;"></span><span>EU lower tariff</span></div>
+                    <div class="rv3-legend-item"><span class="rv3-legend-dot" style="background:#94a3b8;"></span><span>Equal</span></div>
+                    <div class="rv3-legend-item"><span class="rv3-legend-dot" style="background:#e2e8f0;"></span><span>No data</span></div>
+                `;
                 return;
             }
 
-            // Calculate max rate for bar scaling
-            const maxRate = Math.max(...rows.map(r => Math.max(r.usRate || 0, r.euRate || 0)), 1);
+            legend.innerHTML = `
+                <div class="rv3-legend-bar"><span>0%</span><div class="rv3-legend-gradient"></div><span>55%+</span></div>
+                <div class="rv3-legend-item"><span class="rv3-legend-dot" style="background:#e2e8f0;"></span><span>No data</span></div>
+            `;
+        }
 
-            let usOptimal = 0, euOptimal = 0, equal = 0;
-            rows.forEach(r => {
-                if (r.optimal === 'US') usOptimal++;
-                else if (r.optimal === 'EU') euOptimal++;
-                else equal++;
+        function updateCompareMapColors() {
+            if (!compareMapReady || typeof d3 === 'undefined') return;
+
+            d3.selectAll('#compareMapSvg .country-path').each(function() {
+                const path = d3.select(this);
+                const id = path.attr('data-id');
+                const row = compareMapRowsById[id];
+
+                if (!row) {
+                    path.classed('has-data', false).style('fill', '#e8ecf0');
+                    return;
+                }
+
+                path.classed('has-data', true);
+
+                if (compareDestination === 'compare') {
+                    if (row.euRate === null) path.style('fill', '#3b82f6');
+                    else if (row.usRate === null) path.style('fill', '#d97706');
+                    else if (row.usRate < row.euRate) path.style('fill', '#3b82f6');
+                    else if (row.euRate < row.usRate) path.style('fill', '#d97706');
+                    else path.style('fill', '#94a3b8');
+                } else {
+                    const rate = compareDestination === 'us' ? row.usRate : row.euRate;
+                    path.style('fill', compareRateToMapColor(rate));
+                }
             });
 
-            // Update summary
-            summary.style.display = 'flex';
-            document.getElementById('cmpUsOptimal').textContent = usOptimal;
-            document.getElementById('cmpEuOptimal').textContent = euOptimal;
-            document.getElementById('cmpEqual').textContent = equal;
-            document.getElementById('cmpCountries').textContent = rows.length;
+            refreshCompareMapHighlights();
+            updateCompareMapLegend();
+        }
 
-            // Render rows
+        function showCompareMapTooltip(event, row) {
+            const tooltip = document.getElementById('compareMapTooltip');
+            if (!tooltip) return;
+
+            const flagImg = `<img src="https://flagcdn.com/20x15/${row.iso.toLowerCase()}.png" style="border-radius:2px;" onerror="this.style.display='none'" alt="">`;
+
+            let bodyHtml = '';
+            if (compareDestination === 'compare') {
+                const usDisplay = formatCompareRate(row.usRate);
+                const euDisplay = formatCompareRate(row.euRate);
+                let optimalClass = 'best-equal';
+                let optimalText = '= Same rate';
+
+                if (row.euRate === null || (row.usRate !== null && row.usRate < row.euRate)) {
+                    optimalClass = 'best-us';
+                    optimalText = '🇺🇸 US lower tariff';
+                } else if (row.usRate === null || (row.euRate !== null && row.euRate < row.usRate)) {
+                    optimalClass = 'best-eu';
+                    optimalText = '🇪🇺 EU lower tariff';
+                }
+
+                bodyHtml = `
+                    <div class="tt-rates">
+                        <div class="tt-rate us"><div class="tt-label">🇺🇸 US</div><div class="tt-value">${usDisplay}</div></div>
+                        <div class="tt-rate eu"><div class="tt-label">🇪🇺 EU</div><div class="tt-value">${euDisplay}</div></div>
+                    </div>
+                    <div class="tt-optimal ${optimalClass}">${optimalText}</div>
+                `;
+            } else {
+                const rate = getCompareActiveRate(row);
+                const display = formatCompareRate(rate);
+                const basis = getCompareBasis(row);
+                const isUS = compareDestination === 'us';
+
+                bodyHtml = `
+                    <div class="tt-rate-single ${isUS ? 'us-bg' : 'eu-bg'}">
+                        <div class="tt-label">${isUS ? '🇺🇸 US Rate' : '🇪🇺 EU Rate'}</div>
+                        <div class="tt-value">${display}</div>
+                    </div>
+                    <div class="tt-basis">${basis}</div>
+                `;
+            }
+
+            tooltip.innerHTML = `<div class="tt-country">${flagImg}<span>${row.country}</span></div>${bodyHtml}`;
+            tooltip.classList.add('visible');
+            moveCompareMapTooltip(event);
+        }
+
+        function moveCompareMapTooltip(event) {
+            const tooltip = document.getElementById('compareMapTooltip');
+            const container = document.getElementById('compareMapContainer');
+            if (!tooltip || !container) return;
+
+            const rect = container.getBoundingClientRect();
+            let x = event.clientX - rect.left + 16;
+            let y = event.clientY - rect.top - 12;
+
+            if (x + 260 > rect.width) x -= 280;
+            if (y + 160 > rect.height) y -= 150;
+
+            tooltip.style.left = `${x}px`;
+            tooltip.style.top = `${y}px`;
+        }
+
+        function hideCompareMapTooltip() {
+            const tooltip = document.getElementById('compareMapTooltip');
+            if (tooltip) tooltip.classList.remove('visible');
+        }
+
+        async function ensureCompareMap() {
+            if (compareMapReady) return;
+            if (compareMapInitPromise) return compareMapInitPromise;
+
+            compareMapInitPromise = (async () => {
+                const loadingEl = document.getElementById('compareMapLoading');
+                const svgEl = document.getElementById('compareMapSvg');
+
+                if (!loadingEl || !svgEl) return;
+
+                if (typeof d3 === 'undefined' || typeof topojson === 'undefined') {
+                    loadingEl.innerHTML = '<span>Map libraries unavailable</span>';
+                    return;
+                }
+
+                try {
+                    const [world, names] = await Promise.all([
+                        d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
+                        d3.tsv('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.tsv')
+                    ]);
+
+                    compareMapNameIndex = new Map();
+                    names.forEach((entry) => {
+                        if (!entry || !entry.name) return;
+                        compareMapNameIndex.set(normalizeMapName(entry.name), String(entry.id));
+                    });
+
+                    const container = document.getElementById('compareMapContainer');
+                    const width = Math.max(container.clientWidth, 680);
+                    const height = 400;
+                    const featureCollection = topojson.feature(world, world.objects.countries);
+
+                    const svg = d3.select('#compareMapSvg')
+                        .attr('viewBox', `0 0 ${width} ${height}`)
+                        .style('display', 'block');
+
+                    svg.selectAll('*').remove();
+
+                    const projection = d3.geoNaturalEarth1()
+                        .fitSize([width - 40, height - 40], featureCollection)
+                        .translate([width / 2, height / 2]);
+                    const path = d3.geoPath().projection(projection);
+
+                    svg.append('path')
+                        .datum({ type: 'Sphere' })
+                        .attr('class', 'sphere')
+                        .attr('d', path);
+
+                    svg.append('path')
+                        .datum(d3.geoGraticule()())
+                        .attr('class', 'graticule')
+                        .attr('d', path);
+
+                    svg.selectAll('.country-path')
+                        .data(featureCollection.features)
+                        .enter()
+                        .append('path')
+                        .attr('class', 'country-path')
+                        .attr('data-id', (d) => String(d.id))
+                        .attr('d', path)
+                        .on('mouseenter', function(event, d) {
+                            const row = compareMapRowsById[String(d.id)];
+                            if (!row) return;
+                            compareHoveredMapId = String(d.id);
+                            showCompareMapTooltip(event, row);
+                            refreshCompareMapHighlights();
+                        })
+                        .on('mousemove', function(event, d) {
+                            const row = compareMapRowsById[String(d.id)];
+                            if (!row) return;
+                            moveCompareMapTooltip(event);
+                        })
+                        .on('mouseleave', function() {
+                            compareHoveredMapId = null;
+                            hideCompareMapTooltip();
+                            refreshCompareMapHighlights();
+                        })
+                        .on('click', function(event, d) {
+                            const row = compareMapRowsById[String(d.id)];
+                            if (!row) return;
+                            selectCompareTableRow(row.iso, true);
+                        });
+
+                    loadingEl.style.display = 'none';
+                    compareMapReady = true;
+                } catch (err) {
+                    loadingEl.innerHTML = `<span>Map unavailable: ${err.message}</span>`;
+                }
+            })();
+
+            await compareMapInitPromise;
+            if (!compareMapReady) {
+                compareMapInitPromise = null;
+            }
+        }
+
+        function updateCompareTitles(materialKey) {
+            const matName = materialColumns[materialKey] || materialKey;
+            const mapTitle = document.getElementById('compareMapTitle');
+            const tableTitle = document.getElementById('compareTableTitle');
+
+            if (!mapTitle || !tableTitle) return;
+
+            if (compareDestination === 'us') {
+                mapTitle.innerHTML = `Best Source Countries for <span class="rv3-dest-label us-label">🇺🇸 US</span> — ${matName}`;
+                tableTitle.textContent = 'Source Countries Ranked by US Duty Rate';
+            } else if (compareDestination === 'eu') {
+                mapTitle.innerHTML = `Best Source Countries for <span class="rv3-dest-label eu-label">🇪🇺 EU</span> — ${matName}`;
+                tableTitle.textContent = 'Source Countries Ranked by EU Duty Rate';
+            } else {
+                mapTitle.innerHTML = `US vs EU Rate Comparison <span class="rv3-dest-label compare-label">⚖️ Compare</span> — ${matName}`;
+                tableTitle.textContent = 'Source Countries Ranked by Best Destination';
+            }
+        }
+
+        function renderCompareTable(rows, totalRows) {
+            const thead = document.getElementById('compareTableHead');
+            const tbody = document.getElementById('compareTableBody');
+            const showCount = document.getElementById('compareShowCount');
+            const totalCount = document.getElementById('compareTotalCount');
+
+            const isCompareMode = compareDestination === 'compare';
+            showCount.textContent = String(rows.length);
+            totalCount.textContent = String(totalRows);
+
+            if (isCompareMode) {
+                thead.innerHTML = `
+                    <tr>
+                        <th>Rank</th>
+                        <th>Source Country</th>
+                        <th>🇺🇸 US Rate</th>
+                        <th>🇪🇺 EU Rate</th>
+                        <th>Dumbbell</th>
+                        <th>Best Dest.</th>
+                        <th>Savings</th>
+                    </tr>
+                `;
+            } else {
+                const flag = compareDestination === 'us' ? '🇺🇸' : '🇪🇺';
+                thead.innerHTML = `
+                    <tr>
+                        <th>Rank</th>
+                        <th>Source Country</th>
+                        <th>${flag} Rate</th>
+                        <th>Rate Visual</th>
+                        <th>Basis / Programme</th>
+                    </tr>
+                `;
+            }
+
+            if (!rows.length) {
+                const colSpan = isCompareMode ? 7 : 5;
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="${colSpan}">
+                            <div class="rv3-empty-state">
+                                <div style="font-size:2rem;">🔍</div>
+                                <strong>No countries match this filter</strong>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const maxRateSingleMode = Math.max(
+                ...rows.map((row) => getCompareActiveRate(row) || 0),
+                1
+            );
+
             let html = '';
             rows.forEach((row, idx) => {
                 const rank = idx + 1;
-                const rankClass = rank <= 3 ? `rank-${rank}` : '';
-                const usDisplay = row.usRate !== null ? row.usRate + '%' : 'N/A';
-                const euDisplay = row.euRate !== null ? row.euRate + '%' : 'N/A';
+                const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-default';
+                const flagImg = `<img class="rv3-country-flag" src="https://flagcdn.com/24x18/${row.iso.toLowerCase()}.png" onerror="this.style.display='none'" alt="">`;
+                const rowMapId = row.mapId || '';
 
-                const usBarWidth = row.usRate !== null ? (row.usRate / maxRate * 100) : 0;
-                const euBarWidth = row.euRate !== null ? (row.euRate / maxRate * 100) : 0;
+                if (isCompareMode) {
+                    const usDisplay = formatCompareRate(row.usRate);
+                    const euDisplay = formatCompareRate(row.euRate);
+                    const usColor = compareRateToText(row.usRate);
+                    const euColor = compareRateToText(row.euRate);
+                    const usBg = compareRateToBg(row.usRate);
+                    const euBg = compareRateToBg(row.euRate);
 
-                let optimalBadge, savingsHtml;
-                if (row.optimal === 'US') {
-                    optimalBadge = '<span class="optimal-badge optimal-us">US</span>';
-                    savingsHtml = row.savings !== null ? `<span class="savings-positive">-${row.savings.toFixed(1)}pp</span>` : '-';
-                } else if (row.optimal === 'EU') {
-                    optimalBadge = '<span class="optimal-badge optimal-eu">EU</span>';
-                    savingsHtml = row.savings !== null ? `<span class="savings-positive">-${row.savings.toFixed(1)}pp</span>` : '-';
+                    const usPos = row.usRate !== null ? Math.min((row.usRate / COMPARE_MAX_RATE) * 100, 100) : null;
+                    const euPos = row.euRate !== null ? Math.min((row.euRate / COMPARE_MAX_RATE) * 100, 100) : null;
+
+                    let dumbbell = '<div class="rv3-dumbbell"><div class="rv3-dumbbell-track"></div>';
+                    if (usPos !== null && euPos !== null) {
+                        const left = Math.min(usPos, euPos);
+                        const right = Math.max(usPos, euPos);
+                        dumbbell += `<div class="rv3-dumbbell-line" style="left:${left}%;width:${right - left}%"></div>`;
+                    }
+                    if (usPos !== null) dumbbell += `<div class="rv3-dumbbell-dot us-dot" style="left:${usPos}%" title="US ${usDisplay}"></div>`;
+                    if (euPos !== null) dumbbell += `<div class="rv3-dumbbell-dot eu-dot" style="left:${euPos}%" title="EU ${euDisplay}"></div>`;
+                    dumbbell += '</div>';
+
+                    let optBadge = '<span class="rv3-opt-badge opt-equal">= Equal</span>';
+                    let savingsHtml = '<span class="rv3-savings-pill neutral">0pp</span>';
+                    if (row.optimal === 'US') {
+                        optBadge = '<span class="rv3-opt-badge opt-us">🇺🇸 US</span>';
+                        savingsHtml = row.savings !== null
+                            ? `<span class="rv3-savings-pill positive">▼ ${row.savings.toFixed(1)}pp</span>`
+                            : '<span class="rv3-savings-pill neutral">—</span>';
+                    } else if (row.optimal === 'EU') {
+                        optBadge = '<span class="rv3-opt-badge opt-eu">🇪🇺 EU</span>';
+                        savingsHtml = row.savings !== null
+                            ? `<span class="rv3-savings-pill positive">▼ ${row.savings.toFixed(1)}pp</span>`
+                            : '<span class="rv3-savings-pill neutral">—</span>';
+                    }
+
+                    html += `
+                        <tr data-iso="${row.iso}" data-map-id="${rowMapId}">
+                            <td><span class="rv3-rank-badge ${rankClass}">${rank}</span></td>
+                            <td><div class="rv3-country-cell">${flagImg}<span class="rv3-country-name">${row.country}</span><span class="rv3-country-iso">${row.iso}</span></div></td>
+                            <td><span class="rv3-rate-cell ${row.usRate === null ? 'rv3-rate-na' : ''}" style="color:${usColor};background:${usBg};">${usDisplay}</span></td>
+                            <td><span class="rv3-rate-cell ${row.euRate === null ? 'rv3-rate-na' : ''}" style="color:${euColor};background:${euBg};">${euDisplay}</span></td>
+                            <td>${dumbbell}</td>
+                            <td>${optBadge}</td>
+                            <td>${savingsHtml}</td>
+                        </tr>
+                    `;
                 } else {
-                    optimalBadge = '<span class="optimal-badge optimal-equal">Equal</span>';
-                    savingsHtml = '<span class="savings-neutral">0</span>';
-                }
+                    const rate = getCompareActiveRate(row);
+                    const display = formatCompareRate(rate);
+                    const rateColor = compareRateToText(rate);
+                    const rateBg = compareRateToBg(rate);
+                    const basis = getCompareBasis(row);
+                    const barColor = compareDestination === 'us' ? '#3b82f6' : '#d97706';
+                    const barWidth = rate !== null ? Math.min((rate / maxRateSingleMode) * 100, 100) : 0;
 
-                html += `<tr class="${rankClass}">
-                    <td class="rank-cell">#${rank}</td>
-                    <td>
-                        <div class="country-cell">
-                            <img src="https://flagcdn.com/20x15/${row.iso.toLowerCase()}.png" style="border-radius:2px;" onerror="this.style.display='none'">
-                            <span>${row.country}</span>
-                            <span class="iso-tag">${row.iso}</span>
-                        </div>
-                    </td>
-                    <td class="rate-us">${usDisplay}</td>
-                    <td class="rate-eu">${euDisplay}</td>
-                    <td>
-                        <div class="compare-bar">
-                            <div class="bar-track">
-                                <div class="bar-us" style="width:${usBarWidth}%"></div>
-                            </div>
-                            <div class="bar-track">
-                                <div class="bar-eu" style="width:${euBarWidth}%"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${optimalBadge}</td>
-                    <td>${savingsHtml}</td>
-                    <td style="font-size:0.75rem;color:#64748b;">${row.usType}</td>
-                    <td style="font-size:0.75rem;color:#64748b;">${row.euType}</td>
-                </tr>`;
+                    html += `
+                        <tr data-iso="${row.iso}" data-map-id="${rowMapId}">
+                            <td><span class="rv3-rank-badge ${rankClass}">${rank}</span></td>
+                            <td><div class="rv3-country-cell">${flagImg}<span class="rv3-country-name">${row.country}</span><span class="rv3-country-iso">${row.iso}</span></div></td>
+                            <td><span class="rv3-rate-cell ${rate === null ? 'rv3-rate-na' : ''}" style="color:${rateColor};background:${rateBg};">${display}</span></td>
+                            <td><div class="rv3-single-bar"><span style="width:${barWidth}%;background:${barColor};"></span></div></td>
+                            <td><span class="rv3-basis-tag">${basis || '-'}</span></td>
+                        </tr>
+                    `;
+                }
             });
 
             tbody.innerHTML = html;
+
+            tbody.querySelectorAll('tr[data-iso]').forEach((rowEl) => {
+                rowEl.addEventListener('mouseenter', () => {
+                    compareHoveredMapId = rowEl.dataset.mapId || null;
+                    refreshCompareMapHighlights();
+                });
+                rowEl.addEventListener('mouseleave', () => {
+                    compareHoveredMapId = null;
+                    refreshCompareMapHighlights();
+                });
+                rowEl.addEventListener('click', () => {
+                    selectCompareTableRow(rowEl.dataset.iso, false);
+                });
+            });
+        }
+
+        function setCompareDestination(buttonEl) {
+            const dest = buttonEl && buttonEl.dataset ? buttonEl.dataset.dest : 'us';
+            if (!['us', 'eu', 'compare'].includes(dest)) return;
+            compareDestination = dest;
+
+            document.querySelectorAll('.rv3-dest-option').forEach((option) => {
+                option.classList.remove('active-us', 'active-eu', 'active-compare');
+                if (option.dataset.dest === compareDestination) {
+                    if (compareDestination === 'us') option.classList.add('active-us');
+                    else if (compareDestination === 'eu') option.classList.add('active-eu');
+                    else option.classList.add('active-compare');
+                }
+            });
+
+            updateCompareView();
         }
 
         async function updateCompareView() {
             const materialKey = document.getElementById('compareMaterial').value;
+
             if (!compareDataCache.US || !compareDataCache.EU) {
                 await loadCompareData();
             }
-            const rows = buildCompareRows(materialKey);
-            renderCompareTable(rows);
+
+            await ensureCompareMap();
+
+            const { rows, totalRows } = processCompareRows(materialKey);
+            compareRowsForView = rows;
+            attachRowsToMap(compareRowsForView);
+
+            if (compareSelectedIso && !compareRowsForView.some((row) => row.iso === compareSelectedIso)) {
+                compareSelectedIso = null;
+            }
+
+            renderCompareSummary(compareRowsForView);
+            renderCompareTable(compareRowsForView, totalRows);
+            updateCompareTitles(materialKey);
+            updateCompareMapColors();
+            selectCompareTableRow(compareSelectedIso, false);
+
             const matName = materialColumns[materialKey] || materialKey;
-            document.getElementById('compareStatus').textContent = `Showing ${rows.length} countries for ${matName}`;
+            setCompareStatus(`Showing ${rows.length} of ${totalRows} countries for ${matName}.`);
         }
         // ========== END COMPARE VIEW LOGIC ==========
 
