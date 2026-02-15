@@ -3086,7 +3086,6 @@
     </div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://d3js.org/topojson.v3.min.js"></script>
 
     <script>
         // Main view switching (Home, US, EU, Compare)
@@ -4321,27 +4320,25 @@
 
                 if (!loadingEl || !svgEl) return;
 
-                if (typeof d3 === 'undefined' || typeof topojson === 'undefined') {
+                if (typeof d3 === 'undefined') {
                     loadingEl.innerHTML = '<span>Map libraries unavailable</span>';
                     return;
                 }
 
                 try {
-                    const [world, names] = await Promise.all([
-                        d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
-                        d3.tsv('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.tsv')
-                    ]);
-
+                    const worldGeoJson = await d3.json('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
                     compareMapNameIndex = new Map();
-                    names.forEach((entry) => {
-                        if (!entry || !entry.name) return;
-                        compareMapNameIndex.set(normalizeMapName(entry.name), String(entry.id));
+                    (worldGeoJson.features || []).forEach((feature) => {
+                        const name = feature && feature.properties ? feature.properties.name : '';
+                        const id = normalizeMapName(name);
+                        if (!id) return;
+                        compareMapNameIndex.set(id, id);
                     });
 
                     const container = document.getElementById('compareMapContainer');
                     const width = Math.max(container.clientWidth, 680);
                     const height = 400;
-                    const featureCollection = topojson.feature(world, world.objects.countries);
+                    const featureCollection = worldGeoJson;
 
                     const svg = d3.select('#compareMapSvg')
                         .attr('viewBox', `0 0 ${width} ${height}`)
@@ -4369,17 +4366,19 @@
                         .enter()
                         .append('path')
                         .attr('class', 'country-path')
-                        .attr('data-id', (d) => String(d.id))
+                        .attr('data-id', (d) => normalizeMapName(d && d.properties ? d.properties.name : ''))
                         .attr('d', path)
                         .on('mouseenter', function(event, d) {
-                            const row = compareMapRowsById[String(d.id)];
+                            const mapId = normalizeMapName(d && d.properties ? d.properties.name : '');
+                            const row = compareMapRowsById[mapId];
                             if (!row) return;
-                            compareHoveredMapId = String(d.id);
+                            compareHoveredMapId = mapId;
                             showCompareMapTooltip(event, row);
                             refreshCompareMapHighlights();
                         })
                         .on('mousemove', function(event, d) {
-                            const row = compareMapRowsById[String(d.id)];
+                            const mapId = normalizeMapName(d && d.properties ? d.properties.name : '');
+                            const row = compareMapRowsById[mapId];
                             if (!row) return;
                             moveCompareMapTooltip(event);
                         })
@@ -4389,7 +4388,8 @@
                             refreshCompareMapHighlights();
                         })
                         .on('click', function(event, d) {
-                            const row = compareMapRowsById[String(d.id)];
+                            const mapId = normalizeMapName(d && d.properties ? d.properties.name : '');
+                            const row = compareMapRowsById[mapId];
                             if (!row) return;
                             selectCompareTableRow(row.iso, true);
                         });
