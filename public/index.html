@@ -2521,8 +2521,7 @@
             activeDataset = datasetKey;
             updateDatasetHeader();
 
-            dutyData = [];
-            filteredData = [];
+            // Reset filter selections
             selectedCountries = [];
             selectedMaterials = [];
 
@@ -2539,22 +2538,26 @@
             document.getElementById('rateFilter').value = '';
             document.getElementById('searchBox').value = '';
 
-            populateCountryFilter();
-            updateColumnVisibility();
-            renderTable();
-            updateStats();
+            // Show loading state in table instead of empty flash
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="20" style="text-align:center;padding:40px;color:#718096;">Loading ' + datasetKey + ' data...</td></tr>';
 
+            // Fetch data first, then render once
             await loadLiveRatesFromApi(datasetKey);
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async function() {
             updateDatasetHeader();
-            populateCountryFilter();
-            renderTable();
+
+            // Show loading state immediately
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="20" style="text-align:center;padding:40px;color:#718096;">Loading US data...</td></tr>';
+
             renderMaterialTable();
             renderHTSTable();
-            updateStats();
+
+            // Fetch data then render
             await loadLiveRatesFromApi(activeDataset);
         });
 
