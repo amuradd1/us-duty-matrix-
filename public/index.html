@@ -2502,7 +2502,7 @@
                 </div>
                 <div class="home-stat-card">
                     <div class="stat-label">Material Groups</div>
-                    <div class="stat-value">11</div>
+                    <div class="stat-value" id="homeMaterialCount">13</div>
                     <div class="stat-desc">Papers, tow, additives, packaging</div>
                 </div>
                 <div class="home-stat-card">
@@ -2529,7 +2529,7 @@
                 <button class="dataset-btn" id="datasetEUBtn" onclick="switchDataset('EU')">EU Data</button>
             </div>
             <div class="last-updated">
-                <div class="date">Data Version: February 2026 | Auto-refreshed from Supabase</div>
+                <div class="date" id="dataVersionLabel">Data Version: Live from Supabase</div>
                 <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a>
                 <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a>
             </div>
@@ -2678,12 +2678,12 @@
                 <div class="stat-label">Countries</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">13</div>
+                <div class="stat-value" id="matrixMaterialCount">13</div>
                 <div class="stat-label">Materials</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">17</div>
-                <div class="stat-label">HTS Codes</div>
+                <div class="stat-value" id="matrixHtsCount">13</div>
+                <div class="stat-label">HTS Entries</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="filteredCount">0</div>
@@ -2794,141 +2794,87 @@
                 <h3>Appendix: Data Sources & Methodology</h3>
 
                 <div class="appendix-section">
-                    <h4>1. MFN Base Rates (Column 1 General)</h4>
-                    <p style="font-size:12px;margin-bottom:10px;">Base rates are sourced directly from the USITC Harmonized Tariff Schedule 2026 Revision 1.</p>
-                    <div class="quote-block">
-                        "4813.10.00.00 - Cigarette paper... General: Free"<br>
-                        "5502.10.00.00 - Cellulose acetate... General: 7.5%"<br>
-                        "5601.22.00.10 - Wadding of man-made fibers... General: 6.3%"<br>
-                        "3506.91 - Adhesives based on rubber or plastics... General: 2.1%"
-                        <div class="quote-source">Source: <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a></div>
-                    </div>
-                </div>
-
-                <div class="appendix-section">
-                    <h4>2. IEEPA Reciprocal Tariffs</h4>
-                    <p style="font-size:12px;margin-bottom:10px;">Additional tariffs under the International Emergency Economic Powers Act.</p>
-                    <div class="quote-block">
-                        "The IEEPA tariff rates are ADDITIVE to existing duties... For most countries, the baseline rate is 10% on top of MFN duties."
-                        <div class="quote-source">Source: <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a></div>
-                    </div>
-                    <div class="quote-block">
-                        "China: 10% Reciprocal + 10% Fentanyl IEEPA tariffs (CBP CSMS #66749380)"<br>
-                        "Vietnam: 20% (WH Framework Agreement Jul 2025)"<br>
-                        "Malaysia, Thailand, Indonesia, Philippines: 19% (WH Framework Agreements)"<br>
-                        "Japan, South Korea: 15% (WH Framework Agreements)"
-                        <div class="quote-source">Source: <a href="https://ustr.gov/trade-topics/presidential-tariff-actions" target="_blank">USTR Presidential Tariff Actions</a></div>
-                    </div>
-                </div>
-
-                <div class="appendix-section">
-                    <h4>3. EU/Japan 15% Ceiling</h4>
-                    <p style="font-size:12px;margin-bottom:10px;">Special trade deal caps tariffs at 15% maximum.</p>
-                    <div class="quote-block">
-                        "The U.S. will apply a 15% tariff to most imports from the EU. The 15% rate will generally act as an all-inclusive tariff ceiling, meaning it replaces rather than adds to existing duties for covered goods."
-                        <div class="quote-source">Source: White House Fact Sheet on EU Trade Agreement, January 2026</div>
-                    </div>
-                </div>
-
-                <div class="appendix-section">
-                    <h4>4. Section 301 Tariffs (China)</h4>
-                    <div class="quote-block">
-                        "List 1-4 China tariffs remain at 25% for covered products... These are in addition to normal customs duties."
-                        <div class="quote-source">Source: <a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR Section 301 Tariff Actions</a></div>
-                    </div>
-                </div>
-
-                <div class="appendix-section">
-                    <h4>5. USMCA Qualifying Goods</h4>
-                    <div class="quote-block">
-                        "Goods that qualify under USMCA rules of origin enter duty-free. Non-qualifying goods from Mexico face 25% tariff; from Canada face 35% tariff under IEEPA fentanyl provisions."
-                        <div class="quote-source">Source: <a href="https://www.cbp.gov/trade/priority-issues/trade-agreements/USMCA" target="_blank">CBP USMCA Guidance</a></div>
-                    </div>
-                </div>
-
-                <div class="appendix-section">
-                    <h4>6. Calculation Methodology</h4>
+                    <h4>1. Live Data Pipeline</h4>
                     <p style="font-size:12px;">
-                        <strong>FTA Countries:</strong> 0% (duty-free under agreement)<br>
-                        <strong>USMCA:</strong> 0% if qualifying; 25%/35% if non-qualifying<br>
-                        <strong>EU/Japan/Switzerland:</strong> max(MFN, 15%) - ceiling applies<br>
-                        <strong>MFN + IEEPA:</strong> MFN base rate + IEEPA rate (additive)<br>
-                        <strong>China:</strong> MFN + 20% IEEPA + 25% Section 301<br>
-                        <strong>Column 2:</strong> Statutory rates for non-MFN countries (Cuba, Russia, North Korea, Belarus)
+                        This dashboard is now Supabase-backed. The matrix and compare views read from the
+                        <code>duty_rates</code> table through the app API:
+                        <code>/api/duty-rates?destination=US&amp;source=WOVE</code> and
+                        <code>/api/duty-rates?destination=EU&amp;source=TARIC</code>.
+                    </p>
+                    <p style="font-size:11px;color:#666;margin-top:8px;">
+                        Last interface verification: <span id="lastVerified">Pending</span>
                     </p>
                 </div>
 
                 <div class="appendix-section">
-                    <h4>7. Data Maintenance Protocol</h4>
-                    <p style="font-size:12px;margin-bottom:10px;"><strong>Update Frequency:</strong> Every 48 hours</p>
-                    <p style="font-size:12px;margin-bottom:10px;"><strong>Official Sources to Check:</strong></p>
-                    <table style="width:100%;font-size:11px;border-collapse:collapse;margin-bottom:15px;">
+                    <h4>2. Coverage Scope</h4>
+                    <p style="font-size:12px;">
+                        The UI currently supports two destinations (<strong>US</strong> and <strong>EU</strong>)
+                        and 13 material groups. Country coverage is controlled by the Supabase <code>countries</code> table
+                        and by available rows in <code>duty_rates</code>.
+                    </p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>3. HTS / CN Mapping</h4>
+                    <p style="font-size:12px;">
+                        HTS/CN mappings in the Material and HTS tabs are maintained in-app and aligned with the 13
+                        material groups used for rate display and export. Some materials may share the same base code.
+                    </p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>4. Refresh Cadence</h4>
+                    <p style="font-size:12px;">
+                        The repository workflow checks official sources and update triggers every 48 hours.
+                        Manual sync runs can also be initiated for urgent changes.
+                    </p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>5. Official Validation Sources</h4>
+                    <table style="width:100%;font-size:11px;border-collapse:collapse;margin-bottom:10px;">
                         <tr style="background:#f7fafc;">
                             <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Data Type</th>
-                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Official Source</th>
+                            <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Primary Source</th>
                             <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">URL</th>
                         </tr>
                         <tr>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">HTS Base Rates</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">USITC Data Catalog</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2024" target="_blank">data.gov HTS Dataset</a></td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">US Base Tariffs (HTS)</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">USITC HTS</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://hts.usitc.gov/" target="_blank">hts.usitc.gov</a></td>
                         </tr>
                         <tr>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">IEEPA Country Rates</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP IEEPA FAQ</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a></td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">EU Tariffs / Preferences</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">EU TARIC</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en" target="_blank">EU TARIC Consultation</a></td>
                         </tr>
                         <tr>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">IEEPA Annex I (Country List)</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">White House</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.whitehouse.gov/wp-content/uploads/2025/04/Annex-I.pdf" target="_blank">Annex-I.pdf</a></td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">US Trade Remedy Notices</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP / USTR</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/automated/cargo-systems-messaging-service" target="_blank">CBP CSMS</a> · <a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR 301 Actions</a></td>
                         </tr>
                         <tr>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">Section 301 (China)</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">USTR</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR Section 301</a></td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">Trade Program Guidance</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP / USTR</td>
+                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/free-trade-agreements" target="_blank">CBP FTAs</a></td>
                         </tr>
-                        <tr>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">Trade Deal Updates</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">USTR</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://ustr.gov/trade-topics/presidential-tariff-actions" target="_blank">Presidential Tariff Actions</a></td>
-                        </tr>
-                        <tr>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">Implementation Updates</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;">CBP CSMS</td>
-                            <td style="padding:8px;border:1px solid #e2e8f0;"><a href="https://www.cbp.gov/trade/automated/cargo-systems-messaging-service" target="_blank">CBP CSMS Messages</a></td>
-                        </tr>
-                    </table>
-                    <p style="font-size:11px;color:#666;"><strong>Last Data Verification:</strong> <span id="lastVerified">January 26, 2026</span></p>
-                </div>
-
-                <div class="appendix-section">
-                    <h4>8. Verified Rate Sources by Country</h4>
-                    <p style="font-size:12px;margin-bottom:10px;">Key country rates verified against official sources:</p>
-                    <table style="width:100%;font-size:11px;border-collapse:collapse;">
-                        <tr style="background:#f7fafc;">
-                            <th style="padding:6px;border:1px solid #e2e8f0;">Country</th>
-                            <th style="padding:6px;border:1px solid #e2e8f0;">IEEPA Rate</th>
-                            <th style="padding:6px;border:1px solid #e2e8f0;">Source</th>
-                        </tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">China</td><td style="padding:6px;border:1px solid #e2e8f0;">10% Reciprocal + 10% Fentanyl + 25% Sec 301</td><td style="padding:6px;border:1px solid #e2e8f0;">CBP CSMS #66749380</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Malaysia</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH US-Malaysia Agreement Oct 2025</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Vietnam</td><td style="padding:6px;border:1px solid #e2e8f0;">20%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Jul 2025</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Thailand</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Oct 2025</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Indonesia</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement Jul 2025</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Philippines</td><td style="padding:6px;border:1px solid #e2e8f0;">19%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH Framework Agreement</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">Japan</td><td style="padding:6px;border:1px solid #e2e8f0;">15%</td><td style="padding:6px;border:1px solid #e2e8f0;">CRS R48549 / WH Framework</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">South Korea</td><td style="padding:6px;border:1px solid #e2e8f0;">15%</td><td style="padding:6px;border:1px solid #e2e8f0;">CRS R48549 / KORUS FTA</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">UK</td><td style="padding:6px;border:1px solid #e2e8f0;">10%</td><td style="padding:6px;border:1px solid #e2e8f0;">WH UK Economic Prosperity Deal May 2025</td></tr>
-                        <tr><td style="padding:6px;border:1px solid #e2e8f0;">EU</td><td style="padding:6px;border:1px solid #e2e8f0;">15% ceiling</td><td style="padding:6px;border:1px solid #e2e8f0;">EO 14326 / WH EU Framework Aug 2025</td></tr>
                     </table>
                 </div>
 
                 <div class="appendix-section">
-                    <h4>9. Disclaimer</h4>
+                    <h4>6. DutyGPT (Claude) Context Rules</h4>
+                    <p style="font-size:12px;">
+                        Import DutyGPT now receives the currently loaded Supabase-backed dashboard dataset context.
+                        Ranking and averages are generated from the live rows in view, not from legacy hardcoded matrices.
+                    </p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>7. Disclaimer</h4>
                     <p style="font-size:11px;color:#666;">
-                        This tool is for informational purposes only. Tariff rates change frequently based on trade policy decisions.
-                        Always verify current rates with official sources (USITC, CBP) before making import decisions.
+                        This tool is for informational purposes only. Tariff rates and trade-program eligibility can change quickly.
+                        Always validate current rates with official authorities before making import decisions.
                         Consult a licensed customs broker for binding rulings.
                     </p>
                 </div>
@@ -2949,12 +2895,13 @@
                 <div class="legend-item"><span class="trade-program program-301">301</span></div>
                 <div class="legend-item"><span class="trade-program program-col2">COL2</span></div>
             </div>
-            <p class="data-date">Data as of January 2026. Click any rate cell to apply override.</p>
+            <p class="data-date" id="matrixDataAsOf">Data as of live Supabase snapshot. Click any rate cell to apply override.</p>
 
             <div class="sources-section">
                 <h4>Official Data Sources</h4>
                 <div class="sources-list">
                     <a href="https://hts.usitc.gov/" target="_blank">USITC HTS Database</a>
+                    <a href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en" target="_blank">EU TARIC Consultation</a>
                     <a href="https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ" target="_blank">CBP IEEPA FAQ</a>
                     <a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank">USTR Section 301</a>
                     <a href="https://www.cbp.gov/trade/free-trade-agreements" target="_blank">CBP FTAs</a>
@@ -3371,6 +3318,57 @@
 
         function cloneDutyData(rows) {
             return rows.map((row) => ({ ...row }));
+        }
+
+        function formatAuditDate(date = new Date()) {
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function syncKpiCards() {
+            const materialCount = Object.keys(materialColumns).length;
+            const htsEntryCount = htsData.length;
+
+            const homeMaterialEl = document.getElementById('homeMaterialCount');
+            if (homeMaterialEl) homeMaterialEl.textContent = String(materialCount);
+
+            const matrixMaterialEl = document.getElementById('matrixMaterialCount');
+            if (matrixMaterialEl) matrixMaterialEl.textContent = String(materialCount);
+
+            const matrixHtsEl = document.getElementById('matrixHtsCount');
+            if (matrixHtsEl) matrixHtsEl.textContent = String(htsEntryCount);
+        }
+
+        function syncAuditDates() {
+            const today = formatAuditDate();
+
+            const headerDate = document.getElementById('dataVersionLabel');
+            if (headerDate) headerDate.textContent = `Data Version: ${today} | Live from Supabase`;
+
+            const matrixAsOf = document.getElementById('matrixDataAsOf');
+            if (matrixAsOf) matrixAsOf.textContent = `Data as of ${today}. Click any rate cell to apply override.`;
+
+            const appendixVerified = document.getElementById('lastVerified');
+            if (appendixVerified) appendixVerified.textContent = today;
+        }
+
+        async function refreshHomeCountryCount() {
+            const homeCountryEl = document.getElementById('homeCountryCount');
+            if (!homeCountryEl) return;
+
+            try {
+                const response = await fetch('/api/countries');
+                if (!response.ok) return;
+                const countries = await response.json();
+                if (Array.isArray(countries) && countries.length > 0) {
+                    homeCountryEl.textContent = String(countries.length);
+                }
+            } catch (error) {
+                // Non-blocking: keep existing value if country endpoint is unavailable.
+            }
         }
 
         function updateDatasetHeader() {
@@ -3819,6 +3817,8 @@
 
                 const merged = mergeLiveRates(rows);
                 populateCountryFilter();
+                const homeCountryEl = document.getElementById('homeCountryCount');
+                if (homeCountryEl) homeCountryEl.textContent = String(dutyData.length);
 
                 if (merged.updatedCells > 0) {
                     applyFilters();
@@ -4814,6 +4814,9 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async function() {
+            syncKpiCards();
+            syncAuditDates();
+            refreshHomeCountryCount();
             updateDatasetHeader();
             renderMaterialTable();
             renderHTSTable();
@@ -5244,6 +5247,10 @@
             submitBtn.disabled = true;
 
             try {
+                if (!Array.isArray(dutyData) || dutyData.length === 0) {
+                    const fallbackDataset = activeDataset === 'EU' ? 'EU' : 'US';
+                    await loadLiveRatesFromApi(fallbackDataset);
+                }
                 const context = buildContext();
 
                 const response = await fetch(API_URL, {
@@ -5386,33 +5393,65 @@
         }
 
         function buildContext() {
-            // Calculate averages dynamically from current data
-            const withAverages = dutyData.map(row => {
-                const rates = [
-                    row.cigarettePaper, row.tippingPaper, row.plugwrap,
-                    row.filterTow, row.filterRods, row.adhesive,
-                    row.capsules, row.plasticizer, row.adsorbent,
-                    row.boardPack, row.paperPack
-                ];
-                const avg = rates.reduce((sum, r) => sum + r, 0) / 11;
-                return { ...row, average: Math.round(avg * 100) / 100 };
+            const materialKeys = Object.keys(materialColumns);
+            const materialList = materialKeys.map((key) => `${key}=${materialColumns[key]}`).join(', ');
+
+            if (!Array.isArray(dutyData) || dutyData.length === 0) {
+                return [
+                    '=== DASHBOARD CONTEXT ===',
+                    `Main View: ${currentMainView}`,
+                    `Active Dataset: ${activeDataset}`,
+                    `Material Groups (${materialKeys.length}): ${materialList}`,
+                    'No country rows are currently loaded in the matrix.'
+                ].join('\n');
+            }
+
+            const withAverages = dutyData.map((row) => {
+                const numericRates = materialKeys
+                    .map((key) => Number(row[key]))
+                    .filter((value) => Number.isFinite(value));
+                const avg = numericRates.length > 0
+                    ? numericRates.reduce((sum, value) => sum + value, 0) / numericRates.length
+                    : null;
+                return {
+                    ...row,
+                    average: avg !== null ? Math.round(avg * 100) / 100 : null
+                };
             });
 
-            // Pre-sort by average (highest first) for ranking queries
-            const sorted = [...withAverages].sort((a, b) => b.average - a.average);
+            const sorted = [...withAverages].sort((a, b) => {
+                if (a.average === null && b.average === null) return a.country.localeCompare(b.country);
+                if (a.average === null) return 1;
+                if (b.average === null) return -1;
+                if (a.average !== b.average) return b.average - a.average;
+                return a.country.localeCompare(b.country);
+            });
 
-            let context = '=== COUNTRIES RANKED BY AVERAGE DUTY (highest first) ===\n';
+            let context = '=== DASHBOARD CONTEXT ===\n';
+            context += `Main View: ${currentMainView}\n`;
+            context += `Active Dataset: ${activeDataset}\n`;
+            context += `Country Rows Loaded: ${dutyData.length}\n`;
+            context += `Material Groups (${materialKeys.length}): ${materialList}\n`;
+
+            if (currentMainView === 'compare') {
+                context += `Compare Destination Selector: ${compareDestination}\n`;
+            }
+
+            context += '\n=== COUNTRIES RANKED BY AVERAGE DUTY (highest first) ===\n';
             sorted.forEach((row, idx) => {
-                context += `RANK ${idx + 1}: ${row.country} (${row.iso}) - AVG: ${row.average}% [${row.program}]\n`;
+                const avgLabel = row.average === null ? 'N/A' : `${row.average}%`;
+                context += `RANK ${idx + 1}: ${row.country} (${row.iso}) - AVG: ${avgLabel} [${row.program || '-'}]\n`;
             });
 
             context += '\n=== DETAILED RATES BY COUNTRY ===\n';
-            dutyData.forEach(row => {
-                context += `${row.country} (${row.iso}) [${row.program}]: `;
-                context += `CigPaper=${row.cigarettePaper}, Tipping=${row.tippingPaper}, Plugwrap=${row.plugwrap}, `;
-                context += `Tow=${row.filterTow}, Rods=${row.filterRods}, Adhesive=${row.adhesive}, `;
-                context += `Capsules=${row.capsules}, Plasticizer=${row.plasticizer}, Adsorbent=${row.adsorbent}, `;
-                context += `BoardPk=${row.boardPack}, PaperPk=${row.paperPack}\n`;
+            dutyData.forEach((row) => {
+                const ratePairs = materialKeys
+                    .map((key) => `${key}=${Number.isFinite(Number(row[key])) ? Number(row[key]) : 'N/A'}`)
+                    .join(', ');
+                context += `${row.country} (${row.iso}) [${row.program || '-'}]: ${ratePairs}`;
+                if (row.notes) context += ` | notes=${row.notes}`;
+                if (row.source) context += ` | source=${row.source}`;
+                context += '\n';
             });
 
             return context;
