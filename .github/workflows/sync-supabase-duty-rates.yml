@@ -24,4 +24,8 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           RESET_EXISTING: "true"
+          WOVE_REQUEST_DELAY_MS: "300"
+          WOVE_MAX_RETRIES: "6"
+          WOVE_RETRY_BASE_MS: "1500"
+          WOVE_RETRY_JITTER_MS: "400"
         run: node scripts/populate_us_rates.js

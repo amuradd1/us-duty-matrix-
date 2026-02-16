@@ -35,6 +35,10 @@ const COUNTRIES = [
 
 const RESET_EXISTING = process.env.RESET_EXISTING !== 'false';
 const DRY_RUN = process.env.DRY_RUN === 'true';
+const WOVE_REQUEST_DELAY_MS = Number(process.env.WOVE_REQUEST_DELAY_MS || '300');
+const WOVE_MAX_RETRIES = Number(process.env.WOVE_MAX_RETRIES || '6');
+const WOVE_RETRY_BASE_MS = Number(process.env.WOVE_RETRY_BASE_MS || '1500');
+const WOVE_RETRY_JITTER_MS = Number(process.env.WOVE_RETRY_JITTER_MS || '400');
 
 function assertEnv() {
   const missing = REQUIRED_ENVS.filter((name) => !process.env[name]);
@@ -49,7 +53,11 @@ async function requestJson(url, options = {}) {
   const data = text ? safeParseJson(text) : null;
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status} for ${url} -> ${text.slice(0, 400)}`);
+    const error = new Error(`HTTP ${response.status} for ${url} -> ${text.slice(0, 400)}`);
+    error.status = response.status;
+    error.url = url;
+    error.body = text;
+    throw error;
   }
 
   return data;
@@ -86,21 +94,45 @@ async function getWoveToken() {
 
 async function getWoveRate(token, hsCode, country) {
   const url = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${country}&destinationCountry=US&includeFtaOptions=true`;
-  const response = await requestJson(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  let attempt = 0;
+  let lastError = null;
 
-  if (!response || !response.success || !response.data) return null;
+  while (attempt <= WOVE_MAX_RETRIES) {
+    try {
+      const response = await requestJson(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-  const data = response.data;
-  if (data.ftaOptions?.[0]?.adValoremRate !== undefined) {
-    return { rate: data.ftaOptions[0].adValoremRate, rateType: 'FTA' };
+      if (!response || !response.success || !response.data) return null;
+
+      const data = response.data;
+      if (data.ftaOptions?.[0]?.adValoremRate !== undefined) {
+        return { rate: data.ftaOptions[0].adValoremRate, rateType: 'FTA' };
+      }
+      if (data.applicableRate?.adValoremRate !== undefined) {
+        const hasAdditional = Array.isArray(data.additionalDuties) && data.additionalDuties.length > 0;
+        return { rate: data.applicableRate.adValoremRate, rateType: hasAdditional ? 'MFN+Additional' : 'MFN' };
+      }
+      return null;
+    } catch (error) {
+      lastError = error;
+      const isRateLimit = error?.status === 429
+        || /RATE_LIMIT_ERROR/i.test(error?.message || '')
+        || /Too many requests/i.test(error?.message || '');
+      if (!isRateLimit || attempt === WOVE_MAX_RETRIES) {
+        throw error;
+      }
+
+      const backoff = Math.round(
+        (WOVE_RETRY_BASE_MS * (2 ** attempt)) + Math.random() * WOVE_RETRY_JITTER_MS
+      );
+      console.log(`  RETRY: ${country} ${hsCode} rate-limited, waiting ${backoff}ms (attempt ${attempt + 1}/${WOVE_MAX_RETRIES})`);
+      await sleep(backoff);
+      attempt += 1;
+    }
   }
-  if (data.applicableRate?.adValoremRate !== undefined) {
-    const hasAdditional = Array.isArray(data.additionalDuties) && data.additionalDuties.length > 0;
-    return { rate: data.applicableRate.adValoremRate, rateType: hasAdditional ? 'MFN+Additional' : 'MFN' };
-  }
-  return null;
+
+  throw lastError || new Error(`Rate lookup failed for ${country}/${hsCode}`);
 }
 
 function supabaseHeaders() {
@@ -192,7 +224,7 @@ async function main() {
         console.log(`  ERROR: ${material} - ${error.message}`);
       }
 
-      await sleep(75);
+      await sleep(WOVE_REQUEST_DELAY_MS);
     }
   }
 
