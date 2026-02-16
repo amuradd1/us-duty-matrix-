@@ -12,6 +12,7 @@ const MATERIALS = {
   Adsorbent: '3802100000',
   'Board Packaging': '4819100000',
   'Paper Packaging': '4819200000',
+  'MO Cans': '3923900000',
   'Inner Bundling': '4811900000',
   'Board Inner Frame': '4819100000'
 };

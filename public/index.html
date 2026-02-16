@@ -2502,7 +2502,7 @@
                 </div>
                 <div class="home-stat-card">
                     <div class="stat-label">Material Groups</div>
-                    <div class="stat-value" id="homeMaterialCount">13</div>
+                    <div class="stat-value" id="homeMaterialCount">14</div>
                     <div class="stat-desc">Papers, tow, additives, packaging</div>
                 </div>
                 <div class="home-stat-card">
@@ -2644,6 +2644,10 @@
                                 <label for="mat_paperPack">Paper Packaging</label>
                             </div>
                             <div class="multiselect-option">
+                                <input type="checkbox" id="mat_moCans" value="moCans" onchange="updateMaterialFilter()">
+                                <label for="mat_moCans">MO Cans</label>
+                            </div>
+                            <div class="multiselect-option">
                                 <input type="checkbox" id="mat_innerBundling" value="innerBundling" onchange="updateMaterialFilter()">
                                 <label for="mat_innerBundling">Inner Bundling</label>
                             </div>
@@ -2678,11 +2682,11 @@
                 <div class="stat-label">Countries</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="matrixMaterialCount">13</div>
+                <div class="stat-value" id="matrixMaterialCount">14</div>
                 <div class="stat-label">Materials</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="matrixHtsCount">13</div>
+                <div class="stat-value" id="matrixHtsCount">14</div>
                 <div class="stat-label">HTS Entries</div>
             </div>
             <div class="stat-card">
@@ -2723,6 +2727,7 @@
                                 <th class="sortable material-col" data-material="adsorbent" onclick="sortTable('adsorbent')">Adsorbent<br><span class="hts-code">3802.10</span></th>
                                 <th class="sortable material-col" data-material="boardPack" onclick="sortTable('boardPack')">Board Pack<br><span class="hts-code">4819.10</span></th>
                                 <th class="sortable material-col" data-material="paperPack" onclick="sortTable('paperPack')">Paper Pack<br><span class="hts-code">4819.20</span></th>
+                                <th class="sortable material-col" data-material="moCans" onclick="sortTable('moCans')">MO Cans<br><span class="hts-code">3923.90</span></th>
                                 <th class="sortable material-col" data-material="innerBundling" onclick="sortTable('innerBundling')">Bundling<br><span class="hts-code">4811.90</span></th>
                                 <th class="sortable material-col" data-material="boardInnerFrame" onclick="sortTable('boardInnerFrame')">Bd Frame<br><span class="hts-code">4819.10</span></th>
                                 <th>Source</th>
@@ -2810,7 +2815,7 @@
                     <h4>2. Coverage Scope</h4>
                     <p style="font-size:12px;">
                         The UI currently supports two destinations (<strong>US</strong> and <strong>EU</strong>)
-                        and 13 material groups. Country coverage is controlled by the Supabase <code>countries</code> table
+                        and 14 material groups. Country coverage is controlled by the Supabase <code>countries</code> table
                         and by available rows in <code>duty_rates</code>.
                     </p>
                 </div>
@@ -2818,7 +2823,7 @@
                 <div class="appendix-section">
                     <h4>3. HTS / CN Mapping</h4>
                     <p style="font-size:12px;">
-                        HTS/CN mappings in the Material and HTS tabs are maintained in-app and aligned with the 13
+                        HTS/CN mappings in the Material and HTS tabs are maintained in-app and aligned with the 14
                         material groups used for rate display and export. Some materials may share the same base code.
                     </p>
                 </div>
@@ -2983,6 +2988,7 @@
                         <option value="adsorbent">Adsorbent</option>
                         <option value="boardPack">Board Packaging</option>
                         <option value="paperPack">Paper Packaging</option>
+                        <option value="moCans">MO Cans</option>
                         <option value="innerBundling">Inner Bundling</option>
                         <option value="boardInnerFrame">Board Inner Frame</option>
                     </select>
@@ -3134,6 +3140,7 @@
             adsorbent: 'Adsorbent',
             boardPack: 'Board Packaging',
             paperPack: 'Paper Packaging',
+            moCans: 'MO Cans',
             innerBundling: 'Inner Bundling',
             boardInnerFrame: 'Board Inner Frame'
         };
@@ -3151,6 +3158,7 @@
             {hts: "3802.10.00.00", material: "Adsorbent", desc: "Activated carbon", mfn: "Free", special: "Free (FTA countries)", col2: "25%"},
             {hts: "4819.10.00.40", material: "Board Packaging", desc: "Cartons, boxes of corrugated paper", mfn: "Free", special: "Free (FTA countries)", col2: "35%"},
             {hts: "4819.20.00.40", material: "Paper Packaging", desc: "Folding cartons of non-corrugated paper", mfn: "Free", special: "Free (FTA countries)", col2: "35%"},
+            {hts: "3923.90.00.00", material: "MO Cans", desc: "Articles for the conveyance or packing of goods, of plastics – other (excluding boxes/cases/crates, sacks/bags, bottles, spools, and closures)", mfn: "TBD", special: "See live dataset", col2: "TBD"},
             {hts: "4811.90.90.00", material: "Inner Bundling", desc: "Other coated paper", mfn: "Free", special: "Free (FTA countries)", col2: "30%"},
             {hts: "4819.10.00.40", material: "Board Inner Frame", desc: "Cartons of corrugated paperboard", mfn: "Free", special: "Free (FTA countries)", col2: "35%"}
         ];
@@ -3168,11 +3176,12 @@
             {material: "Adsorbent", hts: "3802.10", desc: "Activated carbon for filters", mfnBase: 0, col2: 25},
             {material: "Board Packaging", hts: "4819.10", desc: "Cartons of corrugated paperboard", mfnBase: 0, col2: 35},
             {material: "Paper Packaging", hts: "4819.20", desc: "Folding cartons non-corrugated", mfnBase: 0, col2: 35},
+            {material: "MO Cans", hts: "3923.90", desc: "Articles for the conveyance or packing of goods, of plastics – other (excluding boxes/cases/crates, sacks/bags, bottles, spools, and closures)", mfnBase: null, col2: null},
             {material: "Inner Bundling", hts: "4811.90", desc: "Coated paper for inner bundling", mfnBase: 0, col2: 30},
             {material: "Board Inner Frame", hts: "4819.10", desc: "Corrugated paperboard inner frames", mfnBase: 0, col2: 35}
         ];
 
-        // Country duty data - all 13 materials
+        // Country duty data - all 14 materials
         const staticDutyData = [
             // Section 301 + IEEPA (China) - MFN + 20% IEEPA + 25% Section 301
             {country: "China", iso: "CN", region: "Asia Pacific", program: "Section 301", cigarettePaper: 45, tippingPaper: 45, plugwrap: 45, filterTow: 52.5, filterRods: 51.3, adhesive: 47.1, capsules: 50.3, plasticizer: 51.5, adsorbent: 45, boardPack: 45, paperPack: 45, innerBundling: 45, boardInnerFrame: 45, altRate: null, notes: "MFN + 10% Reciprocal + 10% Fentanyl + 25% Sec 301", source: "CBP CSMS #66749380"},
@@ -3312,12 +3321,19 @@
             'Adsorbent': 'adsorbent',
             'Board Packaging': 'boardPack',
             'Paper Packaging': 'paperPack',
+            'MO Cans': 'moCans',
             'Inner Bundling': 'innerBundling',
             'Board Inner Frame': 'boardInnerFrame'
         };
 
         function cloneDutyData(rows) {
-            return rows.map((row) => ({ ...row }));
+            return rows.map((row) => {
+                const cloned = { ...row };
+                Object.keys(materialColumns).forEach((materialKey) => {
+                    if (!(materialKey in cloned)) cloned[materialKey] = null;
+                });
+                return cloned;
+            });
         }
 
         function formatAuditDate(date = new Date()) {
@@ -4993,13 +5009,17 @@
             tbody.innerHTML = '';
 
             materialData.forEach(row => {
+                const mfnLabel = row.mfnBase === 0
+                    ? 'Free'
+                    : (Number.isFinite(row.mfnBase) ? `${row.mfnBase}%` : 'TBD');
+                const col2Label = Number.isFinite(row.col2) ? `${row.col2}%` : 'TBD';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${row.material}</strong></td>
                     <td class="hts-code">${row.hts}</td>
                     <td>${row.desc}</td>
-                    <td class="rate-cell ${getRateClass(row.mfnBase)}">${row.mfnBase === 0 ? 'Free' : row.mfnBase + '%'}</td>
-                    <td class="rate-cell ${getRateClass(row.col2)}">${row.col2}%</td>
+                    <td class="rate-cell ${getRateClass(row.mfnBase)}">${mfnLabel}</td>
+                    <td class="rate-cell ${getRateClass(row.col2)}">${col2Label}</td>
                     <td>Base rate before IEEPA/301</td>
                 `;
                 tbody.appendChild(tr);
@@ -5175,8 +5195,12 @@
 
         function exportMaterialCSV() {
             const headers = ['Material Group', 'HTS Code', 'Description', 'MFN Base Rate', 'Column 2 Rate'];
+            const formatMaterialRate = (value) => {
+                if (value === 0) return 'Free';
+                return Number.isFinite(value) ? `${value}%` : 'TBD';
+            };
             const rows = materialData.map(row => [
-                row.material, row.hts, row.desc, row.mfnBase + '%', row.col2 + '%'
+                row.material, row.hts, row.desc, formatMaterialRate(row.mfnBase), formatMaterialRate(row.col2)
             ]);
 
             let csv = headers.join(',') + '\n';
