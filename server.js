@@ -281,14 +281,58 @@ app.get('/api/eu-rate/:cnCode/:countryCode', async (req, res) => {
             }
         }
 
-        // Priority: Tariff preference (142) > Third country duty (103)
-        const preference = measures.find(m => m.type === 142);
+        // ── Measure-type priority (Series C – Applicable Duty) ──
+        // Preferential / agreement-based rates (origin-dependent)
+        //   142 = Tariff preference (FTA / GSP)
+        //   143 = Preferential tariff quota
+        //   144 = Preferential ceiling
+        //   141 = Preferential suspension
+        //   145 = Preference under authorised use (end-use)
+        //   146 = Preferential tariff quota under authorised use
+        // Customs Union rates
+        //   106 = Customs Union Duty  (Turkey, Andorra, San Marino)
+        //   147 = Customs Union Quota
+        // Autonomous / erga-omnes reductions
+        //   112 = Autonomous tariff suspension
+        //   122 = Non-preferential tariff quota
+        // MFN baseline
+        //   103 = Third country duty
+        //
+        // We pick the lowest-rate preferential measure first; fall back to MFN.
+        // Sector-specific suspensions (117 ships, 119 airworthiness) are excluded
+        // as they require special end-use authorisation not relevant to our materials.
+
+        const preferentialTypes = new Set([142, 143, 144, 141, 145, 146, 106, 147, 112, 122]);
+        const preferentialMeasures = measures.filter(m => preferentialTypes.has(m.type));
         const thirdCountry = measures.find(m => m.type === 103);
 
-        if (preference) {
-            res.json({ rate: preference.rate, type: 'FTA', cnCode, countryCode });
+        // Labels for response
+        const typeLabels = {
+            142: 'FTA', 143: 'FTA Quota', 144: 'FTA Ceiling', 141: 'FTA Suspension',
+            145: 'FTA End-Use', 146: 'FTA Quota End-Use',
+            106: 'Customs Union', 147: 'CU Quota',
+            112: 'Autonomous Suspension', 122: 'MFN Quota'
+        };
+
+        if (preferentialMeasures.length > 0) {
+            // Pick the lowest rate among all preferential measures
+            const best = preferentialMeasures.reduce((a, b) => a.rate <= b.rate ? a : b);
+            res.json({
+                rate: best.rate,
+                type: typeLabels[best.type] || 'Preferential',
+                cnCode,
+                countryCode,
+                mfnRate: thirdCountry ? thirdCountry.rate : null,
+                allMeasures: measures.map(m => ({ type: m.type, rate: m.rate, description: m.description }))
+            });
         } else if (thirdCountry) {
-            res.json({ rate: thirdCountry.rate, type: 'MFN', cnCode, countryCode });
+            res.json({
+                rate: thirdCountry.rate,
+                type: 'MFN',
+                cnCode,
+                countryCode,
+                allMeasures: measures.map(m => ({ type: m.type, rate: m.rate, description: m.description }))
+            });
         } else {
             res.json({ rate: null, type: 'N/A', cnCode, countryCode, measures });
         }
