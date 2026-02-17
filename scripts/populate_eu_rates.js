@@ -151,10 +151,24 @@ async function getTaricRate(cnCode, countryCode) {
     });
   }
 
-  const preference = measures.find((m) => m.type === 142);
+  // ── Measure-type priority (Series C – Applicable Duty) ──
+  // Preferential (142, 143, 144, 141, 145, 146), Customs Union (106, 147),
+  // Autonomous/erga-omnes (112, 122). Excludes sector-specific (117, 119).
+  const preferentialTypes = new Set([142, 143, 144, 141, 145, 146, 106, 147, 112, 122]);
+  const typeLabels = {
+    142: 'FTA', 143: 'FTA Quota', 144: 'FTA Ceiling', 141: 'FTA Suspension',
+    145: 'FTA End-Use', 146: 'FTA Quota End-Use',
+    106: 'Customs Union', 147: 'CU Quota',
+    112: 'Autonomous Suspension', 122: 'MFN Quota'
+  };
+
+  const preferentialMeasures = measures.filter((m) => preferentialTypes.has(m.type));
   const thirdCountry = measures.find((m) => m.type === 103);
 
-  if (preference) return { rate: preference.rate, rateType: 'FTA' };
+  if (preferentialMeasures.length > 0) {
+    const best = preferentialMeasures.reduce((a, b) => a.rate <= b.rate ? a : b);
+    return { rate: best.rate, rateType: typeLabels[best.type] || 'Preferential' };
+  }
   if (thirdCountry) return { rate: thirdCountry.rate, rateType: 'MFN' };
   return null;
 }
