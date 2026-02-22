@@ -33,6 +33,11 @@ const EU_MEMBER_COUNTRIES = [
 const RESET_EXISTING = process.env.RESET_EXISTING !== 'false';
 const DRY_RUN = process.env.DRY_RUN === 'true';
 
+// Blue-green source tags – new data is written to STAGING, then atomically
+// swapped to LIVE so users never see a half-empty table mid-sync.
+const SOURCE_LIVE    = 'TARIC';
+const SOURCE_STAGING = 'TARIC_STAGING';
+
 function assertEnv() {
   const missing = REQUIRED_ENVS.filter((name) => !process.env[name]);
   if (missing.length > 0) {
@@ -52,30 +57,25 @@ function supabaseHeaders() {
   };
 }
 
-async function clearExistingRows() {
-  const url = `${process.env.SUPABASE_URL}/rest/v1/duty_rates?destination=eq.EU&source=eq.TARIC`;
+// Clear any leftover staging rows from a previous failed run
+async function clearStagingRows() {
+  const url = `${process.env.SUPABASE_URL}/rest/v1/duty_rates?destination=eq.EU&source=eq.${SOURCE_STAGING}`;
   const response = await fetch(url, {
     method: 'DELETE',
-    headers: {
-      ...supabaseHeaders(),
-      Prefer: 'return=minimal'
-    }
+    headers: { ...supabaseHeaders(), Prefer: 'return=minimal' }
   });
-
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`Failed to clear EU TARIC rows (${response.status}): ${body.slice(0, 400)}`);
+    throw new Error(`Failed to clear staging rows (${response.status}): ${body.slice(0, 400)}`);
   }
 }
 
+// Write new row into staging (invisible to users – server only serves SOURCE_LIVE)
 async function insertRate(country, material, cnCode, rate, rateType) {
   const url = `${process.env.SUPABASE_URL}/rest/v1/duty_rates`;
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      ...supabaseHeaders(),
-      Prefer: 'return=minimal'
-    },
+    headers: { ...supabaseHeaders(), Prefer: 'return=minimal' },
     body: JSON.stringify({
       country_iso: country,
       destination: 'EU',
@@ -83,13 +83,38 @@ async function insertRate(country, material, cnCode, rate, rateType) {
       cn_code: cnCode,
       rate,
       rate_type: rateType,
-      source: 'TARIC'
+      source: SOURCE_STAGING   // ← staging, not live
     })
   });
-
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`Supabase insert failed (${response.status}): ${body.slice(0, 400)}`);
+  }
+}
+
+// Atomic swap: delete old live rows, rename staging → live in one go
+async function swapStagingToLive() {
+  const base = `${process.env.SUPABASE_URL}/rest/v1/duty_rates`;
+
+  // 1. Delete old live rows
+  const delResp = await fetch(`${base}?destination=eq.EU&source=eq.${SOURCE_LIVE}`, {
+    method: 'DELETE',
+    headers: { ...supabaseHeaders(), Prefer: 'return=minimal' }
+  });
+  if (!delResp.ok) {
+    const body = await delResp.text();
+    throw new Error(`Failed to delete old live rows (${delResp.status}): ${body.slice(0, 400)}`);
+  }
+
+  // 2. Rename staging → live (PATCH source field)
+  const patchResp = await fetch(`${base}?destination=eq.EU&source=eq.${SOURCE_STAGING}`, {
+    method: 'PATCH',
+    headers: { ...supabaseHeaders(), Prefer: 'return=minimal' },
+    body: JSON.stringify({ source: SOURCE_LIVE })
+  });
+  if (!patchResp.ok) {
+    const body = await patchResp.text();
+    throw new Error(`Failed to promote staging to live (${patchResp.status}): ${body.slice(0, 400)}`);
   }
 }
 
@@ -99,6 +124,7 @@ async function insertIntraEURates() {
     for (const [material, cnCode] of Object.entries(MATERIALS)) {
       if (!DRY_RUN) {
         await insertRate(country, material, cnCode, 0, 'INTRA_EU');
+        // insertRate already writes to SOURCE_STAGING; INTRA_EU is the rate_type
       }
       inserted += 1;
     }
@@ -193,17 +219,21 @@ async function main() {
 
   console.log('Starting EU duty rate sync to Supabase...');
   console.log(`Mode: ${DRY_RUN ? 'DRY_RUN' : 'WRITE'}`);
+  console.log('Strategy: blue-green staging swap (users see live data throughout)\n');
 
-  if (RESET_EXISTING) {
-    console.log('Clearing existing TARIC EU rows...');
-    if (!DRY_RUN) {
-      await clearExistingRows();
-    }
+  // Clear any leftover staging rows from a previous failed run
+  if (!DRY_RUN) {
+    console.log('Clearing any leftover staging rows...');
+    await clearStagingRows();
   }
 
   let success = 0;
   let skipped = 0;
   let errors = 0;
+
+  // Phase 1: Write all new data into staging (SOURCE_STAGING)
+  // Live rows (SOURCE_LIVE) remain untouched – users see current data throughout
+  console.log('Phase 1: Writing new rates to staging...');
 
   for (const country of COUNTRIES) {
     console.log(`\n=== ${country} ===`);
@@ -236,15 +266,27 @@ async function main() {
   console.log('\n=== EU MEMBER ORIGINS (INTRA_EU) ===');
   const intraEuRows = await insertIntraEURates();
   success += intraEuRows;
-  console.log(`  OK: Inserted ${intraEuRows} INTRA_EU rows at 0%`);
+  console.log(`  OK: Inserted ${intraEuRows} INTRA_EU rows into staging`);
 
   console.log('\n=== SUMMARY ===');
-  console.log(`Inserted/Prepared: ${success}`);
+  console.log(`Staged: ${success}`);
   console.log(`Skipped: ${skipped}`);
   console.log(`Errors: ${errors}`);
 
+  // Phase 2: Atomic swap – only promote if no errors
   if (errors > 0) {
+    console.log('\n⚠️  Errors detected – aborting swap. Live data unchanged. Cleaning up staging rows...');
+    if (!DRY_RUN) await clearStagingRows();
     process.exitCode = 1;
+    return;
+  }
+
+  if (!DRY_RUN) {
+    console.log('\nPhase 2: Atomically swapping staging → live...');
+    await swapStagingToLive();
+    console.log('✅ Swap complete. Live EU data updated with zero downtime.');
+  } else {
+    console.log('\n[DRY RUN] Would swap staging → live now.');
   }
 }
 
