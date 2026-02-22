@@ -156,6 +156,37 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Temporary debug endpoint – shows raw Wove API response for a single HTS + country
+app.get('/api/debug-wove', async (req, res) => {
+    const { hsCode = '3506915000', country = 'CN' } = req.query;
+    const WOVE_CLIENT_ID = process.env.WOVE_CLIENT_ID;
+    const WOVE_CLIENT_SECRET = process.env.WOVE_CLIENT_SECRET;
+
+    if (!WOVE_CLIENT_ID || !WOVE_CLIENT_SECRET) {
+        return res.status(503).json({ error: 'Missing WOVE_CLIENT_ID or WOVE_CLIENT_SECRET' });
+    }
+
+    try {
+        // Get token
+        const tokenRes = await fetch('https://api.wove.com/api/v1/external/auth/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ grant_type: 'client_credentials', client_id: WOVE_CLIENT_ID, client_secret: WOVE_CLIENT_SECRET })
+        });
+        const tokenData = await tokenRes.json();
+        if (!tokenData.access_token) return res.status(502).json({ error: 'Token fetch failed', tokenData });
+
+        // Lookup
+        const url = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${country}&destinationCountry=US&includeFtaOptions=true`;
+        const rateRes = await fetch(url, { headers: { Authorization: `Bearer ${tokenData.access_token}` } });
+        const rawJson = await rateRes.json();
+
+        return res.json({ hsCode, country, raw: rawJson });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
 // Supabase duty-rate proxy
 app.get('/api/duty-rates', async (req, res) => {
     if (!SUPABASE_URL || !SUPABASE_KEY) {
