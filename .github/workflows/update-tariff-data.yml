@@ -1,0 +1,77 @@
+name: Update Tariff Data
+
+on:
+  schedule:
+    # Run every 48 hours (at midnight UTC on odd days)
+    - cron: '0 0 */2 * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check-for-updates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install node-fetch cheerio
+
+      - name: Check official sources for updates
+        id: check-sources
+        run: node scripts/check-tariff-updates.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update data version date
+        if: steps.check-sources.outputs.updates_found == 'true'
+        run: |
+          TODAY=$(date +"%B %d, %Y")
+          NEXT_REVIEW=$(date -d "+2 days" +"%B %d, %Y")
+          sed -i "s/Data Version: .* | Next Review: .*/Data Version: $TODAY | Next Review: $NEXT_REVIEW/" us_duty_matrix_app.html
+
+      - name: Create Pull Request
+        if: steps.check-sources.outputs.updates_found == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: Update tariff data - ${{ steps.check-sources.outputs.update_summary }}"
+          title: "Tariff Data Update - Review Required"
+          body: |
+            ## Automated Tariff Data Check
+
+            **Sources Checked:**
+            - [ ] USITC HTS Database (data.gov catalog)
+            - [ ] CBP IEEPA FAQ
+            - [ ] USTR Presidential Tariff Actions
+            - [ ] CBP CSMS Messages
+
+            **Changes Detected:**
+            ${{ steps.check-sources.outputs.changes_detail }}
+
+            **Action Required:**
+            Please review the changes against official sources before merging.
+
+            **Official Source Links:**
+            - [USITC HTS Data Catalog](https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2024)
+            - [CBP IEEPA FAQ](https://www.cbp.gov/trade/programs-administration/trade-remedies/IEEPA-FAQ)
+            - [USTR Tariff Actions](https://ustr.gov/trade-topics/presidential-tariff-actions)
+            - [CBP CSMS](https://www.cbp.gov/trade/automated/cargo-systems-messaging-service)
+          branch: tariff-data-update
+          delete-branch: true
+
+      - name: Send notification if updates found
+        if: steps.check-sources.outputs.updates_found == 'true'
+        run: |
+          echo "::notice::Tariff data updates detected. PR created for review."
+
+      - name: Log no updates
+        if: steps.check-sources.outputs.updates_found != 'true'
+        run: |
+          echo "No tariff data updates detected. Sources checked at $(date)"

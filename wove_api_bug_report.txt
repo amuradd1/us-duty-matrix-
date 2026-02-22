@@ -1,0 +1,132 @@
+WOVE API BUG REPORT
+Date: 2026-02-22
+Endpoint: GET /api/v1/external/tariffs/lookup
+Issue: Section 301 tariff (US_301_9903_88_03, 25%) missing from additionalDuties for specific HTS codes
+
+================================================================================
+SUMMARY
+================================================================================
+
+For certain HTS codes originating from China (CN), the Wove API is not returning
+the Section 301 List 3 additional duty (programCode: US_301_9903_88_03, rate: 25%)
+in the additionalDuties array. As a result, the applicableRate returned is 20%
+(FENTANYL 10% + IEEPA 10%) instead of the correct 45%+ total.
+
+CRITICAL: This is not a question of tariff interpretation. Your own tariff simulator
+on wove.com returns the correct rate of 47.1% for HTS 3506.91 from China, which
+includes Section 301. This proves your backend database has the correct Section 301
+classification for these codes — the data exists, it is simply not being surfaced
+through the API response. The API and your own UI are inconsistent for the same
+HTS code and origin country combination.
+
+================================================================================
+AFFECTED HTS CODES (confirmed via API)
+================================================================================
+
+1. HTS: 3506.91 (Adhesives based on polymers / rubber)
+   Query:  hsCode=3506910000, originCountry=CN, destinationCountry=US
+   API returns:
+     applicableRate: 20%
+     baseRate: 0%                                   ← WRONG: MFN base should be 2.1%
+     additionalDuties: [FENTANYL 10%, IEEPA 10%]   ← Section 301 25% MISSING
+   Your simulator shows: 47.1%
+   Expected API total:   47.1%  (MFN 2.1% + Section 301 25% + FENTANYL 10% + IEEPA 10%)
+   This code has TWO errors: incorrect baseRate (0% vs 2.1%) AND missing Section 301 (25%).
+   Total undercount: 27.1%
+
+2. HTS: 4811.90 (Other coated/impregnated paper — inner bundling)
+   Query:  hsCode=4811900000, originCountry=CN, destinationCountry=US
+   API returns:
+     applicableRate: 20%
+     baseRate: 0%
+     additionalDuties: [FENTANYL 10%, IEEPA 10%]   ← Section 301 25% MISSING
+   Your simulator shows: 45%
+   Expected API total:   45%  (MFN 0% + Section 301 25% + FENTANYL 10% + IEEPA 10%)
+
+================================================================================
+FULL SCAN RESULTS — ALL MATERIALS (CN origin, US destination)
+================================================================================
+
+  HTS       Material          base    applicable  301 present?  Notes
+  --------  ----------------  ------  ----------  ------------  ----------------------
+  4813.10   Cigarette Paper    0.0%      45.0%       YES ✓
+  4813.20   Tipping Paper      0.0%      45.0%       YES ✓
+  4813.90   Plugwrap           0.0%      45.0%       YES ✓
+  5502.10   Filter Tow         7.5%      52.5%       YES ✓
+  5601.22   Filter Rods        6.3%      51.3%       YES ✓
+  3802.10   Adsorbent          4.8%      49.8%       YES ✓  (baseRate differs from USITC 0% — separate issue)
+  4819.10   Board Packaging    0.0%      45.0%       YES ✓
+  4819.20   Paper Packaging    0.0%      45.0%       YES ✓
+  3923.90   MO Cans            3.0%      48.0%       YES ✓
+  2917.12   Plasticizer        6.5%      51.5%       YES ✓  (baseRate differs from USITC 0% — separate issue)
+  3926.90   Capsules           5.3%      32.8%       N/A    Consistent with Wove simulator — not disputed
+  3506.91   Adhesive           0.0%      20.0%       NO  ✗  301 entirely absent; baseRate also wrong (should be 2.1%)
+  4811.90   Inner Bundling     0.0%      20.0%       NO  ✗  301 entirely absent
+
+================================================================================
+AFFECTED HTS CODES — DETAIL
+================================================================================
+
+1. HTS: 3506.91 (Adhesives based on polymers / rubber)
+   Query:  hsCode=3506910000, originCountry=CN, destinationCountry=US
+   API returns:
+     applicableRate: 20%
+     baseRate: 0%                                   ← WRONG: MFN base should be 2.1%
+     additionalDuties: [FENTANYL 10%, IEEPA 10%]   ← Section 301 25% MISSING entirely
+   Your simulator shows: 47.1%
+   Expected API total:   47.1%  (MFN 2.1% + Section 301 25% + FENTANYL 10% + IEEPA 10%)
+   This code has TWO errors: incorrect baseRate (0% vs 2.1%) AND missing Section 301 (25%).
+   Total undercount: 27.1%
+
+2. HTS: 4811.90 (Other coated/impregnated paper — inner bundling)
+   Query:  hsCode=4811900000, originCountry=CN, destinationCountry=US
+   API returns:
+     applicableRate: 20%
+     baseRate: 0%
+     additionalDuties: [FENTANYL 10%, IEEPA 10%]   ← Section 301 25% MISSING entirely
+   Your simulator shows: 45%
+   Expected API total:   45%  (MFN 0% + Section 301 25% + FENTANYL 10% + IEEPA 10%)
+   Total undercount: 25%
+
+3. HTS: 3926.90 (Capsules) — NOT DISPUTED
+   API applicableRate of 32.8% is consistent with your tariff simulator.
+   No action requested on this code.
+
+================================================================================
+WORKING HTS CODES (Section 301 correctly returned)
+================================================================================
+
+  HTS: 4813.10 / 4813.20 / 4813.90  (Cigarette / Tipping / Plugwrap paper)  45.0%  ✓
+  HTS: 5502.10  Filter Tow           52.5%  ✓
+  HTS: 5601.22  Filter Rods          51.3%  ✓
+  HTS: 4819.10  Board Packaging      45.0%  ✓
+  HTS: 4819.20  Paper Packaging      45.0%  ✓
+  HTS: 3923.90  MO Cans              48.0%  ✓
+
+================================================================================
+PATTERN
+================================================================================
+
+2 confirmed errors out of 13 HTS codes scanned.
+In both cases your own tariff simulator returns the correct higher rate, proving
+the data exists in your system but is not surfaced via the API. This is the sole
+basis for the dispute — we are not challenging any code where API and simulator agree.
+
+================================================================================
+REQUEST
+================================================================================
+
+Please investigate why US_301_9903_88_03 (25%) is absent from additionalDuties
+for HTS codes 3506.91 and 4811.90 when origin is CN or HK, and correct the
+API response to match what your tariff simulator already shows.
+
+Please also confirm if there are other HTS codes affected by the same gap so
+we can audit our full dataset.
+
+================================================================================
+CONTACT / CONTEXT
+================================================================================
+
+We are using the API to power an import duty matrix for tobacco manufacturing
+materials. The discrepancy causes our dashboard to display incorrect duty rates
+for Chinese suppliers, which has compliance implications for our users.
