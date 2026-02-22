@@ -106,7 +106,7 @@ async function insertIntraEURates() {
   return inserted;
 }
 
-async function getTaricRate(cnCode, countryCode) {
+async function getTaricRate(cnCode, countryCode, retries = 4, baseDelayMs = 2000) {
   const referenceDate = new Date().toISOString().split('T')[0];
   const soapRequest = `<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://goodsNomenclatureForWS.ws.taric.dds.s/">
@@ -120,57 +120,72 @@ async function getTaricRate(cnCode, countryCode) {
   </soap:Body>
 </soap:Envelope>`;
 
-  const response = await fetch('https://ec.europa.eu/taxation_customs/dds2/taric/services/goods', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/xml; charset=utf-8',
-      SOAPAction: '""'
-    },
-    body: soapRequest
-  });
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch('https://ec.europa.eu/taxation_customs/dds2/taric/services/goods', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/xml; charset=utf-8',
+          SOAPAction: '""'
+        },
+        body: soapRequest
+      });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`TARIC request failed (${response.status}): ${body.slice(0, 300)}`);
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(`TARIC request failed (${response.status}): ${body.slice(0, 300)}`);
+      }
+
+      const xml = await response.text();
+      const measures = [];
+      const measureRegex = /<measure>([\s\S]*?)<\/measure>/g;
+      let match;
+
+      while ((match = measureRegex.exec(xml)) !== null) {
+        const measureXml = match[1];
+        const typeMatch = measureXml.match(/<measure_type>(\d+)<\/measure_type>/);
+        const rateMatch = measureXml.match(/<duty_rate>([\d.]+)\s*%/);
+        if (!typeMatch || !rateMatch) continue;
+
+        measures.push({
+          type: Number(typeMatch[1]),
+          rate: Number(rateMatch[1])
+        });
+      }
+
+      // ── Measure-type priority (Series C – Applicable Duty) ──
+      // Preferential (142, 143, 144, 141, 145, 146), Customs Union (106, 147),
+      // Autonomous/erga-omnes (112, 122). Excludes sector-specific (117, 119).
+      const preferentialTypes = new Set([142, 143, 144, 141, 145, 146, 106, 147, 112, 122]);
+      const typeLabels = {
+        142: 'FTA', 143: 'FTA Quota', 144: 'FTA Ceiling', 141: 'FTA Suspension',
+        145: 'FTA End-Use', 146: 'FTA Quota End-Use',
+        106: 'Customs Union', 147: 'CU Quota',
+        112: 'Autonomous Suspension', 122: 'MFN Quota'
+      };
+
+      const preferentialMeasures = measures.filter((m) => preferentialTypes.has(m.type));
+      const thirdCountry = measures.find((m) => m.type === 103);
+
+      if (preferentialMeasures.length > 0) {
+        const best = preferentialMeasures.reduce((a, b) => a.rate <= b.rate ? a : b);
+        return { rate: best.rate, rateType: typeLabels[best.type] || 'Preferential' };
+      }
+      if (thirdCountry) return { rate: thirdCountry.rate, rateType: 'MFN' };
+      return null;
+
+    } catch (err) {
+      lastError = err;
+      if (attempt < retries) {
+        const delay = baseDelayMs * Math.pow(2, attempt); // 2s, 4s, 8s, 16s
+        console.log(`  RETRY ${attempt + 1}/${retries}: ${cnCode}/${countryCode} - ${err.message} (waiting ${delay}ms)`);
+        await sleep(delay);
+      }
+    }
   }
 
-  const xml = await response.text();
-  const measures = [];
-  const measureRegex = /<measure>([\s\S]*?)<\/measure>/g;
-  let match;
-
-  while ((match = measureRegex.exec(xml)) !== null) {
-    const measureXml = match[1];
-    const typeMatch = measureXml.match(/<measure_type>(\d+)<\/measure_type>/);
-    const rateMatch = measureXml.match(/<duty_rate>([\d.]+)\s*%/);
-    if (!typeMatch || !rateMatch) continue;
-
-    measures.push({
-      type: Number(typeMatch[1]),
-      rate: Number(rateMatch[1])
-    });
-  }
-
-  // ── Measure-type priority (Series C – Applicable Duty) ──
-  // Preferential (142, 143, 144, 141, 145, 146), Customs Union (106, 147),
-  // Autonomous/erga-omnes (112, 122). Excludes sector-specific (117, 119).
-  const preferentialTypes = new Set([142, 143, 144, 141, 145, 146, 106, 147, 112, 122]);
-  const typeLabels = {
-    142: 'FTA', 143: 'FTA Quota', 144: 'FTA Ceiling', 141: 'FTA Suspension',
-    145: 'FTA End-Use', 146: 'FTA Quota End-Use',
-    106: 'Customs Union', 147: 'CU Quota',
-    112: 'Autonomous Suspension', 122: 'MFN Quota'
-  };
-
-  const preferentialMeasures = measures.filter((m) => preferentialTypes.has(m.type));
-  const thirdCountry = measures.find((m) => m.type === 103);
-
-  if (preferentialMeasures.length > 0) {
-    const best = preferentialMeasures.reduce((a, b) => a.rate <= b.rate ? a : b);
-    return { rate: best.rate, rateType: typeLabels[best.type] || 'Preferential' };
-  }
-  if (thirdCountry) return { rate: thirdCountry.rate, rateType: 'MFN' };
-  return null;
+  throw lastError;
 }
 
 async function main() {
@@ -212,8 +227,10 @@ async function main() {
         console.log(`  ERROR: ${material} - ${error.message}`);
       }
 
-      await sleep(120);
+      await sleep(300);
     }
+    // Brief pause between countries to reduce TARIC API pressure
+    await sleep(500);
   }
 
   console.log('\n=== EU MEMBER ORIGINS (INTRA_EU) ===');
