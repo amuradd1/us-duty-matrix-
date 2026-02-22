@@ -3894,12 +3894,25 @@
                     }
                 });
 
-                // Update notes with API rate_type
+                // Update notes and program with API rate_type
                 const types = rateTypesByCountry.get(row.iso);
                 if (types && types.size > 0) {
                     const typeArr = [...types];
                     row.notes = typeArr.join(', ');
                     row.rateTypes = typeArr;
+                    // Override the US-centric program label with the TARIC type
+                    // Priority: Customs Union > FTA variants > INTRA_EU > MFN
+                    if (typeArr.some(t => t === 'Customs Union' || t === 'CU Quota')) {
+                        row.program = 'Customs Union';
+                    } else if (typeArr.some(t => t === 'INTRA_EU')) {
+                        row.program = 'INTRA_EU';
+                    } else if (typeArr.some(t => t.startsWith('FTA') || t === 'Preferential')) {
+                        row.program = 'FTA';
+                    } else if (typeArr.some(t => t === 'Autonomous Suspension' || t === 'MFN Quota')) {
+                        row.program = 'MFN';
+                    } else {
+                        row.program = typeArr[0];
+                    }
                 }
             });
 
@@ -5059,8 +5072,13 @@
         }
 
         function getProgramClass(program) {
+            if (!program) return 'program-mfn';
+            // EU TARIC types
+            if (program === 'Customs Union' || program === 'CU Quota') return 'program-usmca'; // blue – preferential bloc
+            if (program === 'INTRA_EU') return 'program-15cap'; // purple – internal
+            // US types
             if (program.includes('USMCA')) return 'program-usmca';
-            if (program.includes('FTA') || program.includes('CAFTA')) return 'program-fta';
+            if (program.includes('FTA') || program.includes('CAFTA') || program === 'Preferential') return 'program-fta';
             if (program.includes('15% Cap')) return 'program-15cap';
             if (program.includes('301')) return 'program-301';
             if (program.includes('Column 2')) return 'program-col2';
@@ -5068,13 +5086,19 @@
         }
 
         function getProgramLabel(program) {
+            if (!program) return 'MFN';
+            // EU TARIC types
+            if (program === 'Customs Union' || program === 'CU Quota') return 'CU';
+            if (program === 'INTRA_EU') return 'Intra-EU';
+            if (program === 'Autonomous Suspension' || program === 'MFN Quota') return 'MFN';
+            // US types
             if (program.includes('USMCA')) return 'USMCA';
             if (program.includes('CAFTA')) return 'CAFTA';
-            if (program.includes('FTA')) return 'FTA';
+            if (program.includes('FTA') || program === 'Preferential') return 'FTA';
             if (program.includes('15% Cap')) return '15%CAP';
             if (program.includes('301')) return '301';
             if (program.includes('Column 2')) return 'COL2';
-            return 'MFN+IEEPA';
+            return 'MFN';
         }
 
         function updateStats() {
