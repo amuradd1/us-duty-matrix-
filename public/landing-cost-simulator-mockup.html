@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Cost Simulator – Import Duty Matrix</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1e293b; }
+
+/* ── NAV ── */
+.top-nav { background: linear-gradient(135deg, #1e3a5f, #2c5282); padding: 0 32px; display: flex; align-items: center; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.logo { display: flex; align-items: center; gap: 10px; margin-right: 40px; }
+.logo-icon { width: 34px; height: 34px; background: rgba(255,255,255,.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+.logo-text { font-weight: 700; font-size: 1rem; color: #fff; }
+.main-nav { display: flex; gap: 2px; }
+.nav-tab { padding: 18px 18px; color: rgba(255,255,255,.7); font-size: .88rem; font-weight: 500; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; }
+.nav-tab:hover { color: #fff; background: rgba(255,255,255,.08); }
+.nav-tab.active { color: #fff; border-bottom-color: #fff; background: rgba(255,255,255,.1); }
+
+/* ── PAGE ── */
+.page { max-width: 1380px; margin: 0 auto; padding: 36px 28px 60px; display: flex; flex-direction: column; gap: 22px; }
+.page-header { }
+.title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.title-row h1 { font-size: 1.9rem; font-weight: 700; }
+.new-badge { background: linear-gradient(135deg,#7c3aed,#a78bfa); color: #fff; font-size: .68rem; font-weight: 800; letter-spacing: .07em; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+.subtitle { color: #64748b; font-size: .95rem; }
+
+/* ── CARDS ── */
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px 26px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+.card-purple::before { background: linear-gradient(90deg,#7c3aed,#a78bfa); }
+.card-blue::before   { background: linear-gradient(90deg,#2563eb,#60a5fa); }
+.card-orange::before { background: linear-gradient(90deg,#d97706,#fbbf24); }
+
+/* ── INPUTS ── */
+.input-row { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; padding-top: 6px; }
+.inp-group { display: flex; flex-direction: column; gap: 5px; }
+.inp-label { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; }
+.inp-select, .inp-number {
+  padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+  font-size: .85rem; background: #f8fafc; color: #334155;
+  transition: border-color .2s, box-shadow .2s;
+}
+.inp-select:focus, .inp-number:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+.inp-number { width: 110px; }
+.vdiv { width: 1px; height: 36px; background: #e2e8f0; align-self: flex-end; margin-bottom: 2px; }
+
+/* Pill toggles */
+.pill-group { display: flex; gap: 3px; background: #f1f5f9; border-radius: 10px; padding: 3px; }
+.pill-btn { border: none; border-radius: 7px; background: transparent; color: #64748b; font-size: .82rem; font-weight: 700; padding: 7px 16px; cursor: pointer; transition: all .18s; }
+.pill-btn.active-us  { background: #2563eb; color: #fff; box-shadow: 0 2px 6px rgba(37,99,235,.3); }
+.pill-btn.active-eu  { background: #d97706; color: #fff; box-shadow: 0 2px 6px rgba(217,119,6,.3); }
+.pill-btn.active-seg { background: #fff; color: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+
+/* Price wrap */
+.price-wrap { display: flex; align-items: center; gap: 6px; }
+.curr-sym { font-size: .95rem; font-weight: 600; color: #64748b; }
+
+/* ── SUMMARY STRIP ── */
+.summary-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.scard { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px 18px; position: relative; overflow: hidden; }
+.scard::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.scard-best::before    { background: linear-gradient(90deg,#2563eb,#60a5fa); }
+.scard-savings::before { background: linear-gradient(90deg,#059669,#34d399); }
+.scard-avg::before     { background: linear-gradient(90deg,#d97706,#fbbf24); }
+.scard-free::before    { background: linear-gradient(90deg,#7c3aed,#a78bfa); }
+.scard-icon { font-size: 1.3rem; margin-bottom: 5px; }
+.scard-label { font-size: .64rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; margin-bottom: 3px; }
+.scard-val { font-size: 1.4rem; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
+.scard-best    .scard-val { color: #2563eb; }
+.scard-savings .scard-val { color: #059669; }
+.scard-avg     .scard-val { color: #d97706; }
+.scard-free    .scard-val { color: #7c3aed; }
+.scard-sub { font-size: .7rem; color: #94a3b8; }
+
+/* ── TABLE CARD ── */
+.table-card { padding: 0; }
+.table-hdr { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 22px 14px; border-bottom: 1px solid #f1f5f9; gap: 12px; flex-wrap: wrap; }
+.table-title { font-size: .95rem; font-weight: 600; color: #334155; margin-bottom: 3px; }
+.table-sub { font-size: .75rem; color: #94a3b8; }
+.legend { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.leg { font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+.leg-free   { background: #c6f6d5; color: #22543d; }
+.leg-low    { background: #bee3f8; color: #2a4365; }
+.leg-med    { background: #feebc8; color: #744210; }
+.leg-high   { background: #fed7d7; color: #742a2a; }
+.tbl-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th { background: #f8fafc; padding: 10px 13px; text-align: left; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #64748b; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+tbody td { padding: 11px 13px; border-bottom: 1px solid #f1f5f9; font-size: .84rem; color: #334155; vertical-align: middle; }
+tbody tr:hover { background: #f0f7ff; }
+tbody tr.champion { background: #f0fdf4; box-shadow: inset 3px 0 0 #22c55e; }
+
+/* Rank badge */
+.rank { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font-size: .75rem; font-weight: 700; }
+.rank-1 { background: linear-gradient(135deg,#fef3c7,#fde68a); color: #92400e; }
+.rank-2 { background: linear-gradient(135deg,#f1f5f9,#e2e8f0); color: #475569; }
+.rank-3 { background: linear-gradient(135deg,#fed7aa,#fdba74); color: #9a3412; }
+.rank-n { background: #f8fafc; color: #94a3b8; }
+
+/* Country cell */
+.ctry { display: flex; align-items: center; gap: 8px; }
+.flag { width: 22px; height: 16px; border-radius: 2px; object-fit: cover; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.ctry-name { font-weight: 600; color: #1e293b; }
+.ctry-iso { font-size: .65rem; font-weight: 600; color: #94a3b8; background: #f1f5f9; border-radius: 3px; padding: 1px 4px; }
+.champ-badge { font-size: .65rem; font-weight: 800; background: linear-gradient(135deg,#fef3c7,#fde68a); color: #92400e; padding: 1px 6px; border-radius: 8px; margin-left: 5px; }
+
+/* Rate cells */
+.rate-pill { display: inline-block; min-width: 54px; text-align: center; padding: 3px 9px; border-radius: 6px; font-weight: 700; font-size: .8rem; }
+.rate-free { background: #c6f6d5; color: #22543d; }
+.rate-low  { background: #bee3f8; color: #2a4365; }
+.rate-med  { background: #feebc8; color: #744210; }
+.rate-high { background: #fed7d7; color: #742a2a; }
+
+.money { font-variant-numeric: tabular-nums; font-weight: 600; }
+.landed { font-weight: 700; font-size: .92rem; }
+
+/* Programme badge */
+.prog { display: inline-block; padding: 2px 9px; border-radius: 14px; font-size: .7rem; font-weight: 700; }
+.prog-fta   { background: #c6f6d5; color: #22543d; }
+.prog-usmca { background: #bee3f8; color: #2a4365; }
+.prog-mfn   { background: #feebc8; color: #744210; }
+.prog-cap   { background: #e9d8fd; color: #44337a; }
+.prog-301   { background: #fed7d7; color: #742a2a; }
+.prog-cu    { background: #c6f6d5; color: #22543d; }
+.prog-intra { background: #c6f6d5; color: #22543d; }
+.prog-deal  { background: #e9d8fd; color: #44337a; }
+
+/* Savings pill */
+.sav { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .75rem; font-weight: 700; }
+.sav-pos { background: #dcfce7; color: #15803d; }
+.sav-neu { background: #f1f5f9; color: #94a3b8; }
+.sav-neg { background: #fef2f2; color: #b91c1c; }
+
+/* ── CHART ── */
+.chart-card { padding: 0; }
+.chart-hdr { display: flex; align-items: baseline; justify-content: space-between; padding: 18px 22px 14px; border-bottom: 1px solid #f1f5f9; }
+.chart-hint { font-size: .75rem; color: #94a3b8; }
+.chart-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 10px; }
+.chart-row { display: grid; grid-template-columns: 148px 1fr 76px; align-items: center; gap: 10px; }
+.chart-ctry { display: flex; align-items: center; gap: 7px; font-size: .8rem; font-weight: 600; color: #334155; overflow: hidden; }
+.chart-ctry img { width: 18px; height: 13px; border-radius: 2px; object-fit: cover; flex-shrink: 0; }
+.chart-track { position: relative; height: 26px; background: #f1f5f9; border-radius: 6px; }
+.chart-bar { position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 7px; transition: width .35s ease; min-width: 3px; }
+.bar-free   { background: #c6f6d5; }
+.bar-low    { background: #bee3f8; }
+.bar-med    { background: #feebc8; }
+.bar-high   { background: #fed7d7; }
+.bar-champ  { background: linear-gradient(90deg,#bbf7d0,#86efac); outline: 2px solid #22c55e; outline-offset: -2px; border-radius: 6px; }
+.bar-lbl { font-size: .68rem; font-weight: 700; color: #1e293b; white-space: nowrap; }
+.base-line { position: absolute; top: -5px; bottom: -5px; width: 2px; background: #64748b; border-radius: 1px; z-index: 2; }
+.base-lbl { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: .62rem; font-weight: 700; color: #475569; background: #fff; padding: 1px 4px; border-radius: 3px; border: 1px solid #e2e8f0; white-space: nowrap; }
+.chart-val { font-size: .8rem; font-weight: 700; color: #334155; text-align: right; font-variant-numeric: tabular-nums; }
+.chart-foot { display: flex; align-items: center; gap: 14px; padding: 10px 22px; border-top: 1px solid #f1f5f9; flex-wrap: wrap; font-size: .73rem; color: #64748b; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 4px; vertical-align: middle; }
+.leg-line { width: 18px; height: 2px; background: #64748b; border-radius: 1px; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+/* ── CTA ── */
+.cta { display: flex; gap: 18px; background: linear-gradient(135deg,#eff6ff,#faf5ff); border: 1px solid #dbeafe; border-radius: 16px; padding: 22px 26px; }
+.cta-icon { font-size: 1.8rem; flex-shrink: 0; }
+.cta h3 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; }
+.cta p { font-size: .85rem; color: #475569; line-height: 1.6; margin-bottom: 12px; }
+.cta-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+.cta-tag { background: #fff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
+
+@media(max-width:1100px){ .summary-strip { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:860px){ .input-row { flex-direction: column; align-items: stretch; } .vdiv { display: none; } .chart-row { grid-template-columns: 110px 1fr 64px; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    <div class="logo-text">Import Duty Matrix</div>
+  </div>
+  <div class="main-nav">
+    <button class="nav-tab">Home</button>
+    <button class="nav-tab">🇺🇸 US Data</button>
+    <button class="nav-tab">🇪🇺 EU Data</button>
+    <button class="nav-tab">⚖️ Compare</button>
+    <button class="nav-tab active">💰 Landing Cost</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="title-row">
+      <h1>💰 Landing Cost Simulator</h1>
+      <span class="new-badge">NEW</span>
+    </div>
+    <p class="subtitle">Enter a SKU price and destination to instantly see your total landed cost across all source countries, ranked cheapest to most expensive.</p>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="card card-purple">
+    <div class="input-row">
+      <div class="inp-group">
+        <label class="inp-label">Material</label>
+        <select class="inp-select" id="material">
+          <option value="cigarettePaper">Cigarette Paper</option>
+          <option value="tippingPaper">Tipping Paper</option>
+          <option value="plugwrap">Plugwrap</option>
+          <option value="filterTow" selected>Filter Tow</option>
+          <option value="filterRods">Filter Rods</option>
+          <option value="adhesive">Adhesive</option>
+          <option value="capsules">Capsules</option>
+          <option value="plasticizer">Plasticizer</option>
+          <option value="adsorbent">Adsorbent</option>
+          <option value="boardPack">Board Packaging</option>
+          <option value="paperPack">Paper Packaging</option>
+          <option value="moCans">MO Cans</option>
+          <option value="innerBundling">Inner Bundling</option>
+          <option value="boardInnerFrame">Board Inner Frame</option>
+        </select>
+      </div>
+
+      <div class="vdiv"></div>
+
+      <div class="inp-group">
+        <label class="inp-label">Importing Into</label>
+        <div class="pill-group" id="destGroup">
+          <button class="pill-btn active-us" data-dest="US">🇺🇸 US</button>
+          <button class="pill-btn" data-dest="EU">🇪🇺 EU</button>
+        </div>
+      </div>
+
+      <div class="vdiv"></div>
+
+      <div class="inp-group">
+        <label class="inp-label">Unit Price</label>
+        <div class="price-wrap">
+          <span class="curr-sym" id="currSym">$</span>
+          <input class="inp-number" type="number" id="price" min="0" step="0.01" value="2.50">
+          <div class="pill-group" id="currGroup">
+            <button class="pill-btn active-seg" data-curr="USD">USD</button>
+            <button class="pill-btn" data-curr="EUR">EUR</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="vdiv"></div>
+
+      <div class="inp-group">
+        <label class="inp-label">Quantity</label>
+        <input class="inp-number" type="number" id="qty" min="1" step="1" value="1000">
+      </div>
+
+      <div class="vdiv"></div>
+
+      <div class="inp-group">
+        <label class="inp-label">Unit of Measure</label>
+        <div class="pill-group" id="uomGroup">
+          <button class="pill-btn active-seg" data-uom="kg">per kg</button>
+          <button class="pill-btn" data-uom="unit">per unit</button>
+          <button class="pill-btn" data-uom="k">per 1k</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-strip">
+    <div class="scard scard-best">
+      <div class="scard-icon">🏆</div>
+      <div class="scard-label">Best Route</div>
+      <div class="scard-val" id="sBestCtry">—</div>
+      <div class="scard-sub" id="sBestRate">—</div>
+    </div>
+    <div class="scard scard-savings">
+      <div class="scard-icon">💰</div>
+      <div class="scard-label">Max Savings vs Worst</div>
+      <div class="scard-val" id="sMaxSav">—</div>
+      <div class="scard-sub">vs highest-cost route</div>
+    </div>
+    <div class="scard scard-avg">
+      <div class="scard-icon">📊</div>
+      <div class="scard-label">Avg Landed Cost</div>
+      <div class="scard-val" id="sAvg">—</div>
+      <div class="scard-sub">across all shown routes</div>
+    </div>
+    <div class="scard scard-free">
+      <div class="scard-icon">🔢</div>
+      <div class="scard-label">Duty-Free Options</div>
+      <div class="scard-val" id="sFree">—</div>
+      <div class="scard-sub">routes with 0% duty</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card card-blue table-card">
+    <div class="table-hdr">
+      <div>
+        <div class="table-title" id="tableTitle">Route Comparison — Filter Tow → 🇺🇸 US</div>
+        <div class="table-sub">Sorted by total landed cost, lowest first</div>
+      </div>
+      <div class="legend">
+        <span class="leg leg-free">Free 0%</span>
+        <span class="leg leg-low">Low 1–15%</span>
+        <span class="leg leg-med">Med 15–30%</span>
+        <span class="leg leg-high">High 30%+</span>
+      </div>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Source Country</th>
+            <th>Base Price</th>
+            <th>Duty Rate</th>
+            <th>Duty Amount</th>
+            <th>Landed Cost / Unit</th>
+            <th>Total Order Cost</th>
+            <th>Programme</th>
+            <th>vs MFN Baseline</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="card card-orange chart-card">
+    <div class="chart-hdr">
+      <div class="table-title">Landed Cost by Source Country</div>
+      <span class="chart-hint">Bar width = total landed cost · dashed line = base price</span>
+    </div>
+    <div class="chart-body" id="chartBody"></div>
+    <div class="chart-foot">
+      <span><span class="leg-dot" style="background:#c6f6d5;"></span>Duty-free</span>
+      <span><span class="leg-dot" style="background:#bee3f8;"></span>Low 1–15%</span>
+      <span><span class="leg-dot" style="background:#feebc8;"></span>Med 15–30%</span>
+      <span><span class="leg-dot" style="background:#fed7d7;"></span>High 30%+</span>
+      <span style="margin-left:auto;"><span class="leg-line"></span>Base price</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <div class="cta-icon">💡</div>
+    <div>
+      <h3>Optimise Your Sourcing Strategy</h3>
+      <p>The Landing Cost Simulator combines your SKU unit price with import duty rates to reveal the true cost of importing from each source country. Use it to benchmark supplier quotes, evaluate trade programme eligibility, and identify duty-free routes that can significantly reduce your total landed cost.</p>
+      <div class="cta-tags">
+        <span class="cta-tag">FTA Routes Available</span>
+        <span class="cta-tag">USMCA Eligible</span>
+        <span class="cta-tag">Section 301 Impact</span>
+        <span class="cta-tag">Customs Union 0%</span>
+        <span class="cta-tag">Intra-EU Zero Duty</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+const state = { material:'filterTow', dest:'US', price:2.50, currency:'USD', qty:1000, uom:'kg' };
+
+// ── MATERIAL LABELS ──────────────────────────────────
+const MAT = {
+  cigarettePaper:'Cigarette Paper', tippingPaper:'Tipping Paper', plugwrap:'Plugwrap',
+  filterTow:'Filter Tow', filterRods:'Filter Rods', adhesive:'Adhesive',
+  capsules:'Capsules', plasticizer:'Plasticizer', adsorbent:'Adsorbent',
+  boardPack:'Board Packaging', paperPack:'Paper Packaging', moCans:'MO Cans',
+  innerBundling:'Inner Bundling', boardInnerFrame:'Board Inner Frame'
+};
+
+// MFN baseline rates for "vs MFN" savings column
+const MFN = {
+  US:{ cigarettePaper:0, tippingPaper:0, plugwrap:0, filterTow:7.5, filterRods:6.3,
+       adhesive:2.1, capsules:5.3, plasticizer:6.5, adsorbent:0, boardPack:0,
+       paperPack:0, moCans:5.3, innerBundling:0, boardInnerFrame:0 },
+  EU:{ cigarettePaper:0, tippingPaper:0, plugwrap:0, filterTow:7.5, filterRods:6.3,
+       adhesive:4.2, capsules:5.3, plasticizer:6.5, adsorbent:0, boardPack:0,
+       paperPack:0, moCans:6.5, innerBundling:0, boardInnerFrame:0 }
+};
+
+// ── SAMPLE DATA ──────────────────────────────────────
+// Each country: { name, iso, US:{material:{rate,prog}}, EU:{...} }
+// Most materials share a "default" rate per country; overrides only where material-specific
+function mkRates(usR, usP, euR, euP, ov={}){
+  const keys=['cigarettePaper','tippingPaper','plugwrap','filterTow','filterRods','adhesive',
+               'capsules','plasticizer','adsorbent','boardPack','paperPack','moCans',
+               'innerBundling','boardInnerFrame'];
+  const r={US:{},EU:{}};
+  keys.forEach(k=>{
+    r.US[k]=(ov.US&&ov.US[k])||{rate:usR,prog:usP};
+    r.EU[k]=(ov.EU&&ov.EU[k])||{rate:euR,prog:euP};
+  });
+  return r;
+}
+
+const COUNTRIES=[
+  { name:'Mexico',       iso:'MX', ...mkRates(0,  'USMCA',       0,   'MFN',
+      {EU:{ filterTow:{rate:6.5,prog:'MFN'}, filterRods:{rate:6.3,prog:'MFN'},
+            plasticizer:{rate:6.5,prog:'MFN'}, capsules:{rate:5.3,prog:'MFN'}, moCans:{rate:6.5,prog:'MFN'} }}) },
+  { name:'Korea (South)',iso:'KR', ...mkRates(0,  'KORUS FTA',   0,   'FTA') },
+  { name:'Japan',        iso:'JP', ...mkRates(15, '15% CAP',     0,   'FTA') },
+  { name:'Germany',      iso:'DE', ...mkRates(15, '15% CAP',     0,   'Intra-EU') },
+  { name:'Turkey',       iso:'TR', ...mkRates(10, 'MFN',         0,   'Customs Union',
+      {US:{ filterTow:{rate:17.5,prog:'MFN'}, filterRods:{rate:16.3,prog:'MFN'},
+            plasticizer:{rate:16.5,prog:'MFN'}, capsules:{rate:15.3,prog:'MFN'} }}) },
+  { name:'India',        iso:'IN', ...mkRates(10, 'MFN',         0,   'MFN',
+      {US:{ filterTow:{rate:17.5,prog:'MFN'}, filterRods:{rate:16.3,prog:'MFN'},
+            plasticizer:{rate:16.5,prog:'MFN'}, capsules:{rate:15.3,prog:'MFN'} },
+       EU:{ filterTow:{rate:7.5,prog:'MFN'}, filterRods:{rate:6.3,prog:'MFN'},
+            plasticizer:{rate:6.5,prog:'MFN'}, capsules:{rate:5.3,prog:'MFN'} }}) },
+  { name:'Vietnam',      iso:'VN', ...mkRates(20, 'Trade Deal',  0,   'FTA',
+      {EU:{ filterTow:{rate:7.5,prog:'MFN'}, filterRods:{rate:6.3,prog:'MFN'},
+            plasticizer:{rate:6.5,prog:'MFN'}, capsules:{rate:5.3,prog:'MFN'} }}) },
+  { name:'China',        iso:'CN',
+      US:{ cigarettePaper:{rate:25,prog:'Section 301'}, tippingPaper:{rate:25,prog:'Section 301'},
+           plugwrap:{rate:25,prog:'Section 301'}, filterTow:{rate:32.5,prog:'Section 301'},
+           filterRods:{rate:31.3,prog:'Section 301'}, adhesive:{rate:27.1,prog:'Section 301'},
+           capsules:{rate:30.3,prog:'Section 301'}, plasticizer:{rate:31.5,prog:'Section 301'},
+           adsorbent:{rate:25,prog:'Section 301'}, boardPack:{rate:25,prog:'Section 301'},
+           paperPack:{rate:25,prog:'Section 301'}, moCans:{rate:30.3,prog:'Section 301'},
+           innerBundling:{rate:25,prog:'Section 301'}, boardInnerFrame:{rate:25,prog:'Section 301'} },
+      EU:{ cigarettePaper:{rate:0,prog:'MFN'}, tippingPaper:{rate:0,prog:'MFN'},
+           plugwrap:{rate:0,prog:'MFN'}, filterTow:{rate:7.5,prog:'MFN'},
+           filterRods:{rate:6.3,prog:'MFN'}, adhesive:{rate:4.2,prog:'MFN'},
+           capsules:{rate:5.3,prog:'MFN'}, plasticizer:{rate:6.5,prog:'MFN'},
+           adsorbent:{rate:0,prog:'MFN'}, boardPack:{rate:0,prog:'MFN'},
+           paperPack:{rate:0,prog:'MFN'}, moCans:{rate:6.5,prog:'MFN'},
+           innerBundling:{rate:0,prog:'MFN'}, boardInnerFrame:{rate:0,prog:'MFN'} } },
+  { name:'Brazil',       iso:'BR', ...mkRates(50, 'MFN',         0,   'MFN',
+      {US:{ filterTow:{rate:57.5,prog:'MFN'}, filterRods:{rate:56.3,prog:'MFN'},
+            plasticizer:{rate:56.5,prog:'MFN'}, capsules:{rate:55.3,prog:'MFN'} },
+       EU:{ filterTow:{rate:7.5,prog:'MFN'}, filterRods:{rate:6.3,prog:'MFN'},
+            plasticizer:{rate:6.5,prog:'MFN'}, capsules:{rate:5.3,prog:'MFN'}, moCans:{rate:6.5,prog:'MFN'} }}) },
+];
+
+// ── HELPERS ──────────────────────────────────────────
+function sym(){ return state.currency==='USD'?'$':'€'; }
+function fmt(v){ return sym()+v.toFixed(2); }
+function fmtBig(v){ return sym()+Math.round(v).toLocaleString(); }
+function tier(r){ return r===0?'free':r<=15?'low':r<=30?'med':'high'; }
+function progClass(p){
+  const m={'FTA':'prog-fta','KORUS FTA':'prog-fta','USMCA':'prog-usmca','MFN':'prog-mfn',
+            '15% CAP':'prog-cap','Section 301':'prog-301','Customs Union':'prog-cu',
+            'Intra-EU':'prog-intra','Trade Deal':'prog-deal'};
+  return m[p]||'prog-mfn';
+}
+function rankClass(n){ return n<=3?`rank-${n}`:'rank-n'; }
+
+// ── CALC ──────────────────────────────────────────────
+function recalc(){
+  const {material,dest,price,qty}=state;
+  const mfnRate=MFN[dest][material]||0;
+  const mfnLanded=price+(price*mfnRate/100);
+
+  const rows=COUNTRIES.map(c=>{
+    const d=c[dest][material];
+    const dutyAmt=price*(d.rate/100);
+    const landed=price+dutyAmt;
+    const totalOrder=landed*qty;
+    const saving=mfnLanded-landed;
+    const savPct=mfnRate>0?(saving/mfnLanded*100):0;
+    return {name:c.name,iso:c.iso,rate:d.rate,prog:d.prog,dutyAmt,landed,totalOrder,saving,savPct,price};
+  }).sort((a,b)=>a.landed-b.landed||(a.name>b.name?1:-1));
+
+  rows.forEach((r,i)=>r.rank=i+1);
+  return rows;
+}
+
+// ── RENDER ────────────────────────────────────────────
+function renderSummary(rows){
+  if(!rows.length) return;
+  const best=rows[0], worst=rows[rows.length-1];
+  const maxSav=worst.landed-best.landed;
+  const avg=rows.reduce((s,r)=>s+r.landed,0)/rows.length;
+  const freeN=rows.filter(r=>r.rate===0).length;
+  const destFlag=state.dest==='US'?'🇺🇸':'🇪🇺';
+
+  document.getElementById('sBestCtry').textContent=best.name;
+  document.getElementById('sBestRate').textContent=
+    (best.rate===0?'Duty-Free — ':best.rate.toFixed(1)+'% — ')+fmt(best.landed)+'/unit';
+  document.getElementById('sMaxSav').textContent=fmt(maxSav);
+  document.getElementById('sAvg').textContent=fmt(avg);
+  document.getElementById('sFree').textContent=String(freeN);
+
+  document.getElementById('tableTitle').textContent=
+    `Route Comparison — ${MAT[state.material]} → ${destFlag} ${state.dest}`;
+}
+
+function renderTable(rows){
+  const tb=document.getElementById('tbody');
+  tb.innerHTML=rows.map(r=>{
+    const t=tier(r.rate);
+    const champ=r.rank===1?`<span class="champ-badge">🏆 Best</span>`:'';
+    let savHtml;
+    if(r.saving>0.001) savHtml=`<span class="sav sav-pos">▼ Save ${fmt(r.saving)} (${r.savPct.toFixed(1)}%)</span>`;
+    else if(r.saving<-0.001) savHtml=`<span class="sav sav-neg">▲ +${fmt(Math.abs(r.saving))}</span>`;
+    else savHtml=`<span class="sav sav-neu">MFN Baseline</span>`;
+    return `<tr class="${r.rank===1?'champion':''}">
+      <td><span class="rank ${rankClass(r.rank)}">${r.rank}</span></td>
+      <td><div class="ctry">
+        <img class="flag" src="https://flagcdn.com/24x18/${r.iso.toLowerCase()}.png" alt="${r.name}">
+        <span class="ctry-name">${r.name}${champ}</span>
+        <span class="ctry-iso">${r.iso}</span>
+      </div></td>
+      <td class="money">${fmt(r.price)}</td>
+      <td><span class="rate-pill rate-${t}">${r.rate===0?'Free':r.rate.toFixed(1)+'%'}</span></td>
+      <td class="money">${fmt(r.dutyAmt)}</td>
+      <td class="landed">${fmt(r.landed)}</td>
+      <td class="money">${fmtBig(r.totalOrder)}</td>
+      <td><span class="prog ${progClass(r.prog)}">${r.prog}</span></td>
+      <td>${savHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderChart(rows){
+  const body=document.getElementById('chartBody');
+  if(!rows.length){body.innerHTML='';return;}
+  const maxL=Math.max(...rows.map(r=>r.landed))*1.05;
+  const basePct=(state.price/maxL*100).toFixed(1);
+  body.innerHTML=rows.map((r,i)=>{
+    const t=tier(r.rate);
+    const barW=(r.landed/maxL*100).toFixed(1);
+    const barCls=r.rank===1?'bar-champ':`bar-${t}`;
+    const baseLblHtml=i===0?`<span class="base-lbl">Base ${fmt(state.price)}</span>`:'';
+    return `<div class="chart-row">
+      <div class="chart-ctry">
+        <img src="https://flagcdn.com/20x15/${r.iso.toLowerCase()}.png" alt="${r.name}">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.name}</span>
+      </div>
+      <div class="chart-track">
+        <div class="chart-bar ${barCls}" style="width:${barW}%">
+          <span class="bar-lbl">${fmt(r.landed)}</span>
+        </div>
+        <div class="base-line" style="left:${basePct}%">${baseLblHtml}</div>
+      </div>
+      <div class="chart-val">${fmt(r.landed)}</div>
+    </div>`;
+  }).join('');
+}
+
+function refresh(){
+  const rows=recalc();
+  renderSummary(rows);
+  renderTable(rows);
+  renderChart(rows);
+}
+
+// ── EVENTS ────────────────────────────────────────────
+document.getElementById('material').addEventListener('change',function(){state.material=this.value;refresh();});
+
+document.querySelectorAll('#destGroup .pill-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    state.dest=this.dataset.dest;
+    document.querySelectorAll('#destGroup .pill-btn').forEach(b=>b.className='pill-btn');
+    this.classList.add(state.dest==='US'?'active-us':'active-eu');
+    refresh();
+  });
+});
+
+document.querySelectorAll('#currGroup .pill-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    state.currency=this.dataset.curr;
+    document.querySelectorAll('#currGroup .pill-btn').forEach(b=>{b.classList.remove('active-seg');});
+    this.classList.add('active-seg');
+    document.getElementById('currSym').textContent=state.currency==='USD'?'$':'€';
+    refresh();
+  });
+});
+
+document.querySelectorAll('#uomGroup .pill-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    state.uom=this.dataset.uom;
+    document.querySelectorAll('#uomGroup .pill-btn').forEach(b=>b.classList.remove('active-seg'));
+    this.classList.add('active-seg');
+  });
+});
+
+let pt;
+document.getElementById('price').addEventListener('input',function(){
+  clearTimeout(pt);
+  pt=setTimeout(()=>{ const v=parseFloat(this.value); if(!isNaN(v)&&v>=0){state.price=v;refresh();} },150);
+});
+
+let qt;
+document.getElementById('qty').addEventListener('input',function(){
+  clearTimeout(qt);
+  qt=setTimeout(()=>{ const v=parseInt(this.value,10); if(!isNaN(v)&&v>0){state.qty=v;refresh();} },150);
+});
+
+// Init
+refresh();
+</script>
+</body>
+</html>
