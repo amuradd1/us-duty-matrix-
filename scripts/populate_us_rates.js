@@ -124,14 +124,16 @@ async function getWoveRate(token, hsCode, country) {
       const isRateLimit = error?.status === 429
         || /RATE_LIMIT_ERROR/i.test(error?.message || '')
         || /Too many requests/i.test(error?.message || '');
-      if (!isRateLimit || attempt === WOVE_MAX_RETRIES) {
+      const isTransient = [502, 503, 504].includes(error?.status);
+      if ((!isRateLimit && !isTransient) || attempt === WOVE_MAX_RETRIES) {
         throw error;
       }
 
       const backoff = Math.round(
         (WOVE_RETRY_BASE_MS * (2 ** attempt)) + Math.random() * WOVE_RETRY_JITTER_MS
       );
-      console.log(`  RETRY: ${country} ${hsCode} rate-limited, waiting ${backoff}ms (attempt ${attempt + 1}/${WOVE_MAX_RETRIES})`);
+      const reason = isRateLimit ? 'rate-limited' : `HTTP ${error.status}`;
+      console.log(`  RETRY: ${country} ${hsCode} ${reason}, waiting ${backoff}ms (attempt ${attempt + 1}/${WOVE_MAX_RETRIES})`);
       await sleep(backoff);
       attempt += 1;
     }
