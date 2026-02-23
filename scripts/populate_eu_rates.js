@@ -85,7 +85,7 @@ async function insertRate(country, material, cnCode, rate, rateType) {
   const url = `${process.env.SUPABASE_URL}/rest/v1/duty_rates`;
   const response = await fetch(url, {
     method: 'POST',
-    headers: { ...supabaseHeaders(), Prefer: 'return=minimal' },
+    headers: { ...supabaseHeaders(), Prefer: 'return=minimal,resolution=merge-duplicates' },
     body: JSON.stringify({
       country_iso: country,
       destination: 'EU',
