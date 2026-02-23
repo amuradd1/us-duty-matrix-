@@ -56,7 +56,7 @@
   .section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #94a3b8; margin-bottom: 14px; }
 
   /* ── MATERIAL GROUP CARDS ── */
-  .group-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
+  .group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 32px; }
   .group-card {
     background: white; border: 1px solid #e2e8f0; border-radius: 14px;
     padding: 18px 16px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
@@ -65,7 +65,6 @@
   .group-card.paper::before   { background: linear-gradient(90deg, #2563eb, #60a5fa); }
   .group-card.filter::before  { background: linear-gradient(90deg, #059669, #34d399); }
   .group-card.pack::before    { background: linear-gradient(90deg, #d97706, #fbbf24); }
-  .group-card.spec::before    { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
   .group-card.mo::before      { background: linear-gradient(90deg, #0e7490, #22d3ee); }
   .group-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); border-color: #cbd5e1; }
   .group-card.active { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
@@ -273,28 +272,22 @@
   <div class="section-label">Material Groups — US Destination</div>
   <div class="group-grid">
     <div class="group-card paper" onclick="openGroup('paper')">
-      <span class="group-count">4 materials</span>
+      <span class="group-count">5 materials</span>
       <div class="group-icon">📄</div>
-      <div class="group-name">Paper-Based</div>
-      <div class="group-sub">Cig Paper · Tipping · Plugwrap · Inner Bundling</div>
+      <div class="group-name">Flexible and Fine Papers</div>
+      <div class="group-sub">Cig Paper · Tipping · Plugwrap · Inner Bundling · Adhesive</div>
     </div>
     <div class="group-card filter" onclick="openGroup('filter')">
-      <span class="group-count">6 materials</span>
+      <span class="group-count">5 materials</span>
       <div class="group-icon">🔬</div>
       <div class="group-name">Filter Materials</div>
-      <div class="group-sub">Filter Tow · Filter Rods · Capsules · Adhesive · Plasticizer · Adsorbent</div>
+      <div class="group-sub">Filter Tow · Filter Rods · Capsules · Plasticizer · Adsorbent</div>
     </div>
     <div class="group-card pack" onclick="openGroup('pack')">
       <span class="group-count">3 materials</span>
       <div class="group-icon">📦</div>
       <div class="group-name">Packaging</div>
       <div class="group-sub">Board Pack · Paper Pack · Board Inner Frame</div>
-    </div>
-    <div class="group-card spec" onclick="openGroup('spec')">
-      <span class="group-count">1 material</span>
-      <div class="group-icon">💊</div>
-      <div class="group-name">Specialty</div>
-      <div class="group-sub">Capsules</div>
     </div>
     <div class="group-card mo" onclick="openGroup('mo')">
       <span class="group-count">1 material</span>
@@ -315,8 +308,8 @@
   <div class="detail-header">
     <button class="back-btn" onclick="showHome()">← Back</button>
     <div>
-      <div class="detail-title" id="groupTitle">📄 Paper-Based Materials</div>
-      <div class="detail-subtitle" id="groupSub">Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling — US destination</div>
+      <div class="detail-title" id="groupTitle">📄 Flexible and Fine Papers</div>
+      <div class="detail-subtitle" id="groupSub">Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling · Adhesive — US destination</div>
     </div>
   </div>
 
@@ -328,10 +321,11 @@
 
   <!-- Material sub-tabs -->
   <div class="mat-tabs" id="matTabs">
-    <button class="mat-tab active" onclick="selectMat(this, 'cig')">Cigarette Paper</button>
-    <button class="mat-tab" onclick="selectMat(this, 'tip')">Tipping Paper</button>
-    <button class="mat-tab" onclick="selectMat(this, 'plug')">Plugwrap</button>
-    <button class="mat-tab" onclick="selectMat(this, 'ib')">Inner Bundling</button>
+    <button class="mat-tab active" onclick="selectMat(this, 'Cigarette Paper')">Cigarette Paper</button>
+    <button class="mat-tab" onclick="selectMat(this, 'Tipping Paper')">Tipping Paper</button>
+    <button class="mat-tab" onclick="selectMat(this, 'Plugwrap')">Plugwrap</button>
+    <button class="mat-tab" onclick="selectMat(this, 'Inner Bundling')">Inner Bundling</button>
+    <button class="mat-tab" onclick="selectMat(this, 'Adhesive')">Adhesive</button>
   </div>
 
   <!-- Timeline controls -->
@@ -421,24 +415,24 @@ if (window.self !== window.top) {
 const GROUP_META = {
   paper: {
     icon: '📄',
-    title: 'Paper-Based Materials',
-    sub: 'Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling — US destination',
+    title: 'Flexible and Fine Papers',
+    sub: 'Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling · Adhesive — US destination',
     mats: [
       { id: 'Cigarette Paper', label: 'Cigarette Paper', hts: '4813.10.00.00' },
       { id: 'Tipping Paper', label: 'Tipping Paper', hts: '4813.20.00.00' },
       { id: 'Plugwrap', label: 'Plugwrap', hts: '4813.90.00.00' },
-      { id: 'Inner Bundling', label: 'Inner Bundling', hts: '4811.90.90.00' }
+      { id: 'Inner Bundling', label: 'Inner Bundling', hts: '4811.90.90.00' },
+      { id: 'Adhesive', label: 'Adhesive', hts: '3506.91.50.00' }
     ]
   },
   filter: {
     icon: '🔬',
     title: 'Filter Materials',
-    sub: 'Filter Tow · Filter Rods · Capsules · Adhesive · Plasticizer · Adsorbent — US destination',
+    sub: 'Filter Tow · Filter Rods · Capsules · Plasticizer · Adsorbent — US destination',
     mats: [
       { id: 'Filter Tow', label: 'Filter Tow', hts: '5502.10.00.00' },
       { id: 'Filter Rods', label: 'Filter Rods', hts: '5601.22.00.91' },
       { id: 'Capsules', label: 'Capsules', hts: '3926.90.99.90' },
-      { id: 'Adhesive', label: 'Adhesive', hts: '3506.91.50.00' },
       { id: 'Plasticizer', label: 'Plasticizer', hts: '2917.12.50.00' },
       { id: 'Adsorbent', label: 'Adsorbent', hts: '3802.10.00.00' }
     ]
@@ -452,12 +446,6 @@ const GROUP_META = {
       { id: 'Paper Packaging', label: 'Paper Packaging', hts: '4819.20.00.00' },
       { id: 'Board Inner Frame', label: 'Board Inner Frame', hts: '4819.10.00.00' }
     ]
-  },
-  spec: {
-    icon: '💊',
-    title: 'Specialty',
-    sub: 'Capsules — US destination',
-    mats: [{ id: 'Capsules', label: 'Capsules', hts: '3926.90.99.90' }]
   },
   mo: {
     icon: '🫙',
