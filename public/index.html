@@ -3772,12 +3772,21 @@
         function updateCompareScopeToggleUi() {
             const btn = document.getElementById('compareCountryScopeToggle');
             if (!btn) return;
+
+            if (compareDestination !== 'us') {
+                btn.textContent = 'All countries (US scope disabled)';
+                btn.disabled = true;
+                return;
+            }
+
+            btn.disabled = false;
             btn.textContent = showAdditionalCompareCountries
                 ? 'Show supplier countries only'
                 : 'Show additional countries';
         }
 
         function toggleCompareAdditionalCountries() {
+            if (compareDestination !== 'us') return;
             showAdditionalCompareCountries = !showAdditionalCompareCountries;
             updateCompareScopeToggleUi();
             populateCompareCountryFilter();
@@ -4362,7 +4371,7 @@
                 }))
                 .sort((a, b) => a.country.localeCompare(b.country));
 
-            if (showAdditionalCompareCountries) return options;
+            if (compareDestination !== 'us' || showAdditionalCompareCountries) return options;
             const materialKey = document.getElementById('compareMaterial')?.value;
             const materialLabel = materialColumns[materialKey] || null;
             const scopeSet = getUsBusinessScopeByMaterialLabels(materialLabel ? [materialLabel] : []);
@@ -4662,9 +4671,10 @@
             const baseRows = filterRowsByCompareDestination(buildCompareRows(materialKey));
             const materialLabel = materialColumns[materialKey] || null;
             const scopeSet = getUsBusinessScopeByMaterialLabels(materialLabel ? [materialLabel] : []);
-            const scopedRows = showAdditionalCompareCountries
-                ? baseRows
-                : baseRows.filter((row) => scopeSet.has(row.iso));
+            const shouldScope = compareDestination === 'us' && !showAdditionalCompareCountries;
+            const scopedRows = shouldScope
+                ? baseRows.filter((row) => scopeSet.has(row.iso))
+                : baseRows;
             const search = document.getElementById('compareSearchInput').value.toLowerCase().trim();
             const selectedCountrySet = new Set(getSelectedCompareCountryIsos());
 
@@ -5163,6 +5173,7 @@
             const dest = buttonEl && buttonEl.dataset ? buttonEl.dataset.dest : 'us';
             if (!['us', 'eu', 'compare'].includes(dest)) return;
             compareDestination = dest;
+            updateCompareScopeToggleUi();
 
             document.querySelectorAll('.rv3-dest-option').forEach((option) => {
                 option.classList.remove('active-us', 'active-eu', 'active-compare');
@@ -5205,7 +5216,9 @@
             const countryScope = selectedCountryCount > 0
                 ? ` within ${selectedCountryCount} selected countries`
                 : '';
-            const scopeLabel = showAdditionalCompareCountries ? 'all countries' : 'supplier countries';
+            const scopeLabel = (compareDestination === 'us' && !showAdditionalCompareCountries)
+                ? 'supplier countries'
+                : 'all countries';
             setCompareStatus(`Showing ${rows.length} of ${totalRows} countries (${scopeLabel})${countryScope} for ${matName}.`);
         }
         // ========== END COMPARE VIEW LOGIC ==========
