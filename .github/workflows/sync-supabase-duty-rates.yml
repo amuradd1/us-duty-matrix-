@@ -17,9 +17,29 @@ jobs:
         with:
           node-version: "20"
 
-      # ── Pass 1: Pre-Supreme Court Ruling snapshot (entryDate=2026-02-26)
-      # Writes to source=WOVE (live) / WOVE_STAGING (staging)
-      - name: Sync pre-SC ruling rates (WOVE — 26 Feb 2026 baseline)
+      # ── Pass 1: Pre-SC ruling snapshot — entryDate=2026-02-25 (day BEFORE ruling)
+      # IEEPA surcharges were still in force on 25 Feb 2026.
+      # Writes to source=WOVE / WOVE_STAGING
+      - name: Sync pre-SC ruling rates (WOVE — 25 Feb 2026, IEEPA in effect)
+        env:
+          WOVE_CLIENT_ID: ${{ secrets.WOVE_CLIENT_ID }}
+          WOVE_CLIENT_SECRET: ${{ secrets.WOVE_CLIENT_SECRET }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESET_EXISTING: "true"
+          WOVE_REQUEST_DELAY_MS: "300"
+          WOVE_MAX_RETRIES: "6"
+          WOVE_RETRY_BASE_MS: "1500"
+          WOVE_RETRY_JITTER_MS: "400"
+          WOVE_ENTRY_DATE: "2026-02-25"
+          WOVE_SOURCE_LIVE: "WOVE"
+          WOVE_SOURCE_STAGING: "WOVE_STAGING"
+        run: node scripts/populate_us_rates.js
+
+      # ── Pass 2: Post-SC ruling snapshot — entryDate=2026-02-26 (ruling date onward)
+      # IEEPA surcharges suspended from 26 Feb 2026.
+      # Writes to source=WOVE_TODAY / WOVE_TODAY_STAGING
+      - name: Sync post-SC ruling rates (WOVE_TODAY — 26 Feb 2026+, IEEPA suspended)
         env:
           WOVE_CLIENT_ID: ${{ secrets.WOVE_CLIENT_ID }}
           WOVE_CLIENT_SECRET: ${{ secrets.WOVE_CLIENT_SECRET }}
@@ -31,23 +51,6 @@ jobs:
           WOVE_RETRY_BASE_MS: "1500"
           WOVE_RETRY_JITTER_MS: "400"
           WOVE_ENTRY_DATE: "2026-02-26"
-          WOVE_SOURCE_LIVE: "WOVE"
-          WOVE_SOURCE_STAGING: "WOVE_STAGING"
-        run: node scripts/populate_us_rates.js
-
-      # ── Pass 2: Post-Supreme Court Ruling snapshot (today's rates, no entryDate)
-      # Writes to source=WOVE_TODAY (live) / WOVE_TODAY_STAGING (staging)
-      - name: Sync post-SC ruling rates (WOVE_TODAY — current rates)
-        env:
-          WOVE_CLIENT_ID: ${{ secrets.WOVE_CLIENT_ID }}
-          WOVE_CLIENT_SECRET: ${{ secrets.WOVE_CLIENT_SECRET }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          RESET_EXISTING: "true"
-          WOVE_REQUEST_DELAY_MS: "300"
-          WOVE_MAX_RETRIES: "6"
-          WOVE_RETRY_BASE_MS: "1500"
-          WOVE_RETRY_JITTER_MS: "400"
           WOVE_SOURCE_LIVE: "WOVE_TODAY"
           WOVE_SOURCE_STAGING: "WOVE_TODAY_STAGING"
         run: node scripts/populate_us_rates.js

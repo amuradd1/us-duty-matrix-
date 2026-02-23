@@ -3051,10 +3051,11 @@
                         </ul>
                     </div>
                     <p style="font-size:12px;margin-top:10px;">
-                        This tool uses <strong>26 Feb 2026</strong> as the <em>Pre-Supreme Court Ruling</em> baseline —
-                        reflecting rates before the CIT ruling and SC stay. The <em>Post-Supreme Court Ruling</em> rates
-                        reflect the current enforced position with IEEPA surcharges suspended. Status remains subject to
-                        change pending the Supreme Court's final ruling on IEEPA authority.
+                        This tool uses <strong>25 Feb 2026</strong> as the <em>Pre-Supreme Court Ruling</em> baseline —
+                        the last day IEEPA surcharges were in force before the CIT ruling and SC stay took effect.
+                        The <em>Post-Supreme Court Ruling</em> rates (from <strong>26 Feb 2026</strong>) reflect the
+                        position with IEEPA surcharges suspended. Status remains subject to change pending the
+                        Supreme Court's final ruling on IEEPA authority.
                     </p>
                     <p style="font-size:11px;color:#666;margin-top:8px;">
                         Sources: <a href="https://www.govinfo.gov/content/pkg/FR-2025-02-05/pdf/2025-02413.pdf" target="_blank" style="color:#3182ce;">Executive Order 14195</a> ·
@@ -5794,7 +5795,7 @@
                             </div>
                         </div>
                         <div class="mg-tl-date-label" id="mgDateLabel">
-                            Showing rates as of <span>26 Feb 2026</span> — Pre-Supreme Court Ruling (IEEPA surcharges in effect)
+                            Showing rates as of <span>25 Feb 2026</span> — Pre-Supreme Court Ruling (IEEPA surcharges in effect)
                         </div>
                     </div>
                 </div>
@@ -5805,7 +5806,7 @@
                 <!-- Note callout -->
                 <div class="mg-note-callout" id="mgNoteCallout">
                     <div class="note-icon">⚠️</div>
-                    <p id="mgNoteText"><strong>Pre-Supreme Court Ruling (26 Feb 2026):</strong> Rates when IEEPA executive tariff surcharges were in effect, before the Court of International Trade ruling that blocked enforcement.</p>
+                    <p id="mgNoteText"><strong>Pre-Supreme Court Ruling (25 Feb 2026):</strong> Rates when IEEPA executive tariff surcharges were in effect, before the Court of International Trade ruling that blocked enforcement.</p>
                 </div>
 
                 <!-- Bar chart (Compare Both mode) -->
@@ -5814,7 +5815,7 @@
                     <div class="mg-bar-list" id="mgBarList"></div>
                     <div style="display:flex;gap:16px;margin-top:12px;">
                         <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#94a3b8;">
-                            <div style="width:12px;height:8px;background:#fbbf24;opacity:0.7;border-radius:2px;"></div> Pre-IEEPA (26 Feb 2026)
+                            <div style="width:12px;height:8px;background:#fbbf24;opacity:0.7;border-radius:2px;"></div> Pre-IEEPA (25 Feb 2026)
                         </div>
                         <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#94a3b8;">
                             <div style="width:12px;height:8px;background:#dc2626;border-radius:2px;"></div> Post-IEEPA (current)
@@ -5827,7 +5828,7 @@
                     <div class="mg-table-header">
                         <h2 id="mgTableTitle">Duty Rates by Origin Country</h2>
                         <div class="mg-tl-legend" id="mgTableLegend">
-                            <div class="mg-tl-legend-item"><div class="mg-tl-dot pre"></div> Pre-SC Ruling (26 Feb 2026)</div>
+                            <div class="mg-tl-legend-item"><div class="mg-tl-dot pre"></div> Pre-SC Ruling (25 Feb 2026)</div>
                             <div class="mg-tl-legend-item"><div class="mg-tl-dot post"></div> Post-SC Ruling (current)</div>
                         </div>
                     </div>
@@ -5921,8 +5922,8 @@
         };
 
         // State
-        let mgDataPre  = [];   // rows from source=WOVE   (pre-SC ruling, entryDate 2026-02-26)
-        let mgDataPost = [];   // rows from source=WOVE_TODAY (post-SC ruling, today's rates)
+        let mgDataPre  = [];   // rows from source=WOVE       (pre-SC ruling,  entryDate 2026-02-25 — IEEPA in effect)
+        let mgDataPost = [];   // rows from source=WOVE_TODAY (post-SC ruling, entryDate 2026-02-26 — IEEPA suspended)
         let mgDataLoaded = false;
         let mgCurrentGroup = null;
         let mgCurrentMat   = null;
@@ -6014,16 +6015,16 @@
 
         function mgUpdateDateLabel(mode) {
             const el = document.getElementById('mgDateLabel');
-            if (mode === 'pre')  el.innerHTML = 'Showing rates as of <span>26 Feb 2026</span> — Pre-Supreme Court Ruling (IEEPA surcharges in effect)';
-            if (mode === 'post') el.innerHTML = 'Showing <span>current rates</span> — Post-Supreme Court Ruling (IEEPA surcharges suspended)';
-            if (mode === 'both') el.innerHTML = 'Comparing <span>Pre</span> vs <span>Post</span> Supreme Court Ruling (IEEPA) side by side';
+            if (mode === 'pre')  el.innerHTML = 'Showing rates as of <span>25 Feb 2026</span> — Pre-Supreme Court Ruling (IEEPA surcharges in effect)';
+            if (mode === 'post') el.innerHTML = 'Showing rates from <span>26 Feb 2026</span> — Post-Supreme Court Ruling (IEEPA surcharges suspended)';
+            if (mode === 'both') el.innerHTML = 'Comparing <span>Pre (25 Feb 2026)</span> vs <span>Post (26 Feb 2026+)</span> Supreme Court Ruling (IEEPA) side by side';
         }
 
         function mgUpdateNoteText(mode) {
             const el = document.getElementById('mgNoteText');
-            if (mode === 'pre')  el.innerHTML = '<strong>Pre-Supreme Court Ruling (26 Feb 2026):</strong> Rates when IEEPA executive tariff surcharges were in effect, before the Court of International Trade ruling that blocked enforcement.';
-            if (mode === 'post') el.innerHTML = '<strong>Post-Supreme Court Ruling (current):</strong> Rates with IEEPA surcharges suspended following the Supreme Court stay. MFN base rates and Section 301 China tariffs remain in effect. Subject to change pending final ruling.';
-            if (mode === 'both') el.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = Pre-SC Ruling (IEEPA in effect, 26 Feb 2026) · Red = Post-SC Ruling (IEEPA suspended, current) · Δ shows the duty change.';
+            if (mode === 'pre')  el.innerHTML = '<strong>Pre-Supreme Court Ruling (25 Feb 2026):</strong> Rates when IEEPA executive tariff surcharges were still in effect — the day before the Court of International Trade ruling blocked IEEPA enforcement.';
+            if (mode === 'post') el.innerHTML = '<strong>Post-Supreme Court Ruling (from 26 Feb 2026):</strong> Rates with IEEPA surcharges suspended following the Supreme Court stay. MFN base rates and Section 301 China tariffs remain in effect. Subject to change pending final ruling.';
+            if (mode === 'both') el.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = Pre-SC Ruling (IEEPA in effect, 25 Feb 2026) · Red = Post-SC Ruling (IEEPA suspended, 26 Feb 2026+) · Δ shows the duty reduction.';
         }
 
         // ── Data helpers ──────────────────────────────────────────────────────
@@ -6102,7 +6103,7 @@
 
             document.getElementById('mgSummaryStrip').innerHTML = `
                 <div class="mg-s-card c-purple"><div class="mg-s-label">Countries</div><div class="mg-s-value">${displayRows.length}</div><div class="mg-s-sub">sourced</div></div>
-                <div class="mg-s-card c-amber"><div class="mg-s-label">Pre-IEEPA Avg</div><div class="mg-s-value">${avgPre}${avgPre !== '—' ? '%' : ''}</div><div class="mg-s-sub">26 Feb 2026</div></div>
+                <div class="mg-s-card c-amber"><div class="mg-s-label">Pre-IEEPA Avg</div><div class="mg-s-value">${avgPre}${avgPre !== '—' ? '%' : ''}</div><div class="mg-s-sub">25 Feb 2026</div></div>
                 <div class="mg-s-card c-red"><div class="mg-s-label">Post-IEEPA Avg</div><div class="mg-s-value">${avgPost}${avgPost !== '—' ? '%' : ''}</div><div class="mg-s-sub">current</div></div>
                 <div class="mg-s-card c-blue"><div class="mg-s-label">Duty-Free Origins</div><div class="mg-s-value">${freeCount}</div><div class="mg-s-sub">${mgCurrentMode === 'post' ? 'post-IEEPA' : 'pre-IEEPA'}</div></div>
             `;
