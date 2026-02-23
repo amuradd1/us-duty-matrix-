@@ -168,6 +168,10 @@
             background: linear-gradient(90deg, #7c3aed, #8b5cf6);
         }
 
+        .quick-card.mat-card::before {
+            background: linear-gradient(90deg, #0e7490, #22d3ee);
+        }
+
         .quick-card:hover {
             transform: translateY(-4px);
             border-color: #cbd5e1;
@@ -2492,6 +2496,13 @@
                     <p>Side-by-side comparison of US vs EU rates by material. Find the optimal import destination.</p>
                     <div class="card-arrow">Open Comparison Tool →</div>
                 </div>
+
+                <div class="quick-card mat-card" onclick="window.location.href='/material-group-mockup.html'">
+                    <div class="card-icon">🗂️</div>
+                    <h3>By Material Group</h3>
+                    <p>Explore duty rates by material category with pre/post Supreme Court ruling (IEEPA) timeline view.</p>
+                    <div class="card-arrow" style="color:#7c3aed;">Browse Material Groups →</div>
+                </div>
             </div>
 
             <div class="home-stats-row">
@@ -2876,7 +2887,38 @@
                 </div>
 
                 <div class="appendix-section">
-                    <h4>7. Disclaimer</h4>
+                    <h4>7. IEEPA Tariffs &amp; Supreme Court Ruling</h4>
+                    <p style="font-size:12px;margin-bottom:10px;">
+                        In early 2025, the US administration invoked the International Emergency Economic Powers Act (IEEPA)
+                        to impose sweeping reciprocal tariff surcharges on imports from most trading partners, in addition
+                        to existing Section 301 China tariffs and fentanyl-related surcharges.
+                    </p>
+                    <div class="quote-block">
+                        <strong>Key dates:</strong>
+                        <ul style="margin-top:6px;margin-left:16px;line-height:1.8;">
+                            <li><strong>Feb 4, 2025</strong> — First IEEPA fentanyl surcharge on China/HK (10%), escalated later.</li>
+                            <li><strong>Apr 2, 2025</strong> — "Liberation Day" reciprocal tariffs announced against most countries.</li>
+                            <li><strong>Apr 9, 2025</strong> — 90-day pause on most reciprocal tariffs (10% baseline maintained); China escalated to 145%.</li>
+                            <li><strong>May 14, 2025</strong> — US–China Geneva deal: China reciprocal tariff temporarily reduced to 30% for 90 days.</li>
+                            <li><strong>May 28, 2026</strong> — US Court of International Trade ruled IEEPA tariffs unlawful (exceeded executive authority).</li>
+                            <li><strong>Jun 2026</strong> — Supreme Court granted emergency stay pending appeal; tariff enforcement paused.</li>
+                        </ul>
+                    </div>
+                    <p style="font-size:12px;margin-top:10px;">
+                        This tool uses <strong>26 Feb 2026</strong> as the <em>Pre-Supreme Court Ruling</em> baseline —
+                        reflecting rates before the CIT ruling and SC stay. The <em>Post-Supreme Court Ruling</em> rates
+                        reflect the current enforced position with IEEPA surcharges suspended. Status remains subject to
+                        change pending the Supreme Court's final ruling on IEEPA authority.
+                    </p>
+                    <p style="font-size:11px;color:#666;margin-top:8px;">
+                        Sources: <a href="https://www.govinfo.gov/content/pkg/FR-2025-02-05/pdf/2025-02413.pdf" target="_blank" style="color:#3182ce;">Executive Order 14195</a> ·
+                        <a href="https://ustr.gov/issue-areas/enforcement/section-301-investigations/tariff-actions" target="_blank" style="color:#3182ce;">USTR Section 301</a> ·
+                        <a href="https://www.cit.uscourts.gov/" target="_blank" style="color:#3182ce;">US Court of International Trade</a>
+                    </p>
+                </div>
+
+                <div class="appendix-section">
+                    <h4>8. Disclaimer</h4>
                     <p style="font-size:11px;color:#666;">
                         This tool is for informational purposes only. Tariff rates and trade-program eligibility can change quickly.
                         Always validate current rates with official authorities before making import decisions.

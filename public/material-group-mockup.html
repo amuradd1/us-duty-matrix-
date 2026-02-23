@@ -62,9 +62,9 @@
   .group-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
   .group-card.paper::before   { background: linear-gradient(90deg, #2563eb, #60a5fa); }
   .group-card.filter::before  { background: linear-gradient(90deg, #059669, #34d399); }
-  .group-card.chem::before    { background: linear-gradient(90deg, #dc2626, #f87171); }
   .group-card.pack::before    { background: linear-gradient(90deg, #d97706, #fbbf24); }
   .group-card.spec::before    { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+  .group-card.mo::before      { background: linear-gradient(90deg, #0e7490, #22d3ee); }
   .group-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); border-color: #cbd5e1; }
   .group-card.active { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
   .group-icon { font-size: 1.6rem; margin-bottom: 8px; }
@@ -265,16 +265,10 @@
       <div class="group-sub">Cig Paper · Tipping · Plugwrap · Inner Bundling</div>
     </div>
     <div class="group-card filter" onclick="openGroup('filter')">
-      <span class="group-count">2 materials</span>
+      <span class="group-count">5 materials</span>
       <div class="group-icon">🔬</div>
-      <div class="group-name">Filtration</div>
-      <div class="group-sub">Filter Tow · Filter Rods</div>
-    </div>
-    <div class="group-card chem" onclick="openGroup('chem')">
-      <span class="group-count">3 materials</span>
-      <div class="group-icon">⚗️</div>
-      <div class="group-name">Chemicals</div>
-      <div class="group-sub">Adhesive · Plasticizer · Adsorbent</div>
+      <div class="group-name">Filter Materials</div>
+      <div class="group-sub">Filter Tow · Filter Rods · Adhesive · Plasticizer · Adsorbent</div>
     </div>
     <div class="group-card pack" onclick="openGroup('pack')">
       <span class="group-count">3 materials</span>
@@ -283,10 +277,16 @@
       <div class="group-sub">Board Pack · Paper Pack · Board Inner Frame</div>
     </div>
     <div class="group-card spec" onclick="openGroup('spec')">
-      <span class="group-count">2 materials</span>
+      <span class="group-count">1 material</span>
       <div class="group-icon">💊</div>
       <div class="group-name">Specialty</div>
-      <div class="group-sub">Capsules · MO Cans</div>
+      <div class="group-sub">Capsules</div>
+    </div>
+    <div class="group-card mo" onclick="openGroup('mo')">
+      <span class="group-count">1 material</span>
+      <div class="group-icon">🫙</div>
+      <div class="group-name">Modern Oral</div>
+      <div class="group-sub">MO Cans</div>
     </div>
   </div>
 
@@ -326,8 +326,8 @@
       <div>
         <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:6px;">View Mode</div>
         <div class="timeline-toggle">
-          <button class="tl-btn active-pre" onclick="setMode('pre',this)">📅 Pre-IEEPA</button>
-          <button class="tl-btn" onclick="setMode('post',this)">⚡ Post-IEEPA</button>
+          <button class="tl-btn active-pre" onclick="setMode('pre',this)">📅 Pre-Supreme Court Ruling (IEEPA)</button>
+          <button class="tl-btn" onclick="setMode('post',this)">⚖️ Post-Supreme Court Ruling (IEEPA)</button>
           <button class="tl-btn" onclick="setMode('both',this)">↔ Compare Both</button>
         </div>
       </div>
@@ -382,8 +382,8 @@
     <div class="tl-table-header">
       <h2 id="tableTitle">Cigarette Paper — Duty Rates by Origin Country</h2>
       <div class="tl-legend" id="tableLegend">
-        <div class="tl-legend-item"><div class="tl-dot pre"></div> Pre-IEEPA (26 Feb 2026)</div>
-        <div class="tl-legend-item"><div class="tl-dot post"></div> Post-IEEPA (Today)</div>
+        <div class="tl-legend-item"><div class="tl-dot pre"></div> Pre-SC Ruling / IEEPA in effect (26 Feb 2026)</div>
+        <div class="tl-legend-item"><div class="tl-dot post"></div> Post-SC Ruling / IEEPA suspended (Today)</div>
       </div>
     </div>
     <table>
@@ -536,14 +536,14 @@ function setMode(mode, btn) {
   btn.classList.add('active-'+mode);
 
   const dl = document.getElementById('dateLabel');
-  if (mode==='pre')  dl.innerHTML = 'Showing rates as of <span>26 Feb 2026</span> (pre-Supreme Court ruling)';
-  if (mode==='post') dl.innerHTML = 'Showing <span>current rates</span> (post-IEEPA, today)';
-  if (mode==='both') dl.innerHTML = 'Comparing <span>pre</span> vs <span>post IEEPA</span> side by side';
+  if (mode==='pre')  dl.innerHTML = 'Showing rates as of <span>26 Feb 2026</span> — Pre-Supreme Court Ruling (IEEPA surcharges in effect)';
+  if (mode==='post') dl.innerHTML = 'Showing <span>current rates</span> — Post-Supreme Court Ruling (IEEPA surcharges suspended)';
+  if (mode==='both') dl.innerHTML = 'Comparing <span>Pre</span> vs <span>Post</span> Supreme Court Ruling (IEEPA) side by side';
 
   const note = document.getElementById('noteText');
-  if (mode==='pre')  note.innerHTML = '<strong>Pre-IEEPA baseline (26 Feb 2026):</strong> Rates before executive IEEPA surcharges. These apply if the Supreme Court stay is upheld.';
-  if (mode==='post') note.innerHTML = '<strong>Current rates (post-IEEPA):</strong> Rates including IEEPA executive tariff surcharges as of today. Subject to change pending Supreme Court ruling.';
-  if (mode==='both') note.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = pre-IEEPA baseline · Red = current post-IEEPA rate · Δ shows the duty increase.';
+  if (mode==='pre')  note.innerHTML = '<strong>Pre-Supreme Court Ruling (26 Feb 2026):</strong> Rates when IEEPA executive tariff surcharges were in effect. These reflect the duty burden before the Court of International Trade ruling that blocked IEEPA enforcement.';
+  if (mode==='post') note.innerHTML = '<strong>Post-Supreme Court Ruling (current):</strong> Rates with IEEPA surcharges suspended following the Supreme Court stay. MFN base rates and Section 301 China tariffs remain in effect. Subject to change pending final SC ruling.';
+  if (mode==='both') note.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = Pre-SC Ruling (IEEPA in effect, 26 Feb 2026) · Red = Post-SC Ruling (IEEPA suspended, current) · Δ shows the duty change.';
 
   renderAll();
 }

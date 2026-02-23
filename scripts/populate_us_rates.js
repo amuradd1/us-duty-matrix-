@@ -97,8 +97,12 @@ async function getWoveToken() {
   return response.access_token;
 }
 
+// PRE_SC_RULING_DATE: rates as of this date reflect the tariff position before the
+// Supreme Court stay that suspended IEEPA surcharges. Used as the baseline snapshot.
+const PRE_SC_RULING_DATE = process.env.WOVE_ENTRY_DATE || '2026-02-26';
+
 async function getWoveRate(token, hsCode, country) {
-  const url = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${country}&destinationCountry=US&includeFtaOptions=true`;
+  const url = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${country}&destinationCountry=US&includeFtaOptions=true&entryDate=${PRE_SC_RULING_DATE}`;
   let attempt = 0;
   let lastError = null;
 
