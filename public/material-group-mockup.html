@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Material Group View — Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1e293b; }
+
+  /* ── NAV ── */
+  .top-nav {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    height: 60px; display: flex; align-items: center;
+    padding: 0 32px; gap: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .logo-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+  .logo-text { font-weight: 700; font-size: 1.1rem; color: white; }
+  .main-nav { display: flex; height: 100%; }
+  .main-nav-tab { padding: 0 20px; color: rgba(255,255,255,0.75); border: none; border-bottom: 3px solid transparent; background: none; font-weight: 500; font-size: 0.9rem; cursor: pointer; height: 100%; }
+  .main-nav-tab:hover { color: white; background: rgba(255,255,255,0.1); }
+  .main-nav-tab.active { color: white; border-bottom-color: white; background: rgba(255,255,255,0.1); }
+
+  /* ── PAGE LAYOUT ── */
+  .page { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
+
+  /* ── HOME — QUICK CARDS ── */
+  .home-header { margin-bottom: 28px; }
+  .home-header h1 { font-size: 1.75rem; font-weight: 700; color: #1e293b; }
+  .home-header p { color: #64748b; margin-top: 4px; font-size: 0.95rem; }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+  .quick-card {
+    background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+    padding: 28px 28px 24px; cursor: pointer; transition: all 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .quick-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+  .quick-card.us-card::before  { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+  .quick-card.eu-card::before  { background: linear-gradient(90deg, #ca8a04, #eab308); }
+  .quick-card.mat-card::before { background: linear-gradient(90deg, #7c3aed, #8b5cf6); }
+  .quick-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+  .quick-card .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .quick-card h3 { font-size: 1.15rem; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
+  .quick-card p { color: #64748b; font-size: 0.9rem; line-height: 1.5; }
+  .card-arrow { display: flex; align-items: center; gap: 4px; margin-top: 16px; font-weight: 600; font-size: 0.9rem; }
+  .us-card .card-arrow { color: #2563eb; }
+  .eu-card .card-arrow { color: #ca8a04; }
+  .mat-card .card-arrow { color: #7c3aed; }
+
+  /* ── SECTION DIVIDER ── */
+  .section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #94a3b8; margin-bottom: 14px; }
+
+  /* ── MATERIAL GROUP CARDS ── */
+  .group-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
+  .group-card {
+    background: white; border: 1px solid #e2e8f0; border-radius: 14px;
+    padding: 18px 16px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .group-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .group-card.paper::before   { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+  .group-card.filter::before  { background: linear-gradient(90deg, #059669, #34d399); }
+  .group-card.chem::before    { background: linear-gradient(90deg, #dc2626, #f87171); }
+  .group-card.pack::before    { background: linear-gradient(90deg, #d97706, #fbbf24); }
+  .group-card.spec::before    { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+  .group-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+  .group-card.active { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+  .group-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .group-name { font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+  .group-sub  { font-size: 0.75rem; color: #94a3b8; }
+  .group-count { position: absolute; top: 14px; right: 14px; background: #f1f5f9; color: #64748b; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+
+  /* ── MATERIAL DETAIL VIEW ── */
+  #detailView { display: none; }
+  .detail-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .back-btn { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 600; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+  .back-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+  .detail-title { font-size: 1.4rem; font-weight: 700; color: #1e293b; }
+  .detail-subtitle { font-size: 0.875rem; color: #64748b; margin-top: 2px; }
+
+  /* material tabs within group */
+  .mat-tabs { display: flex; gap: 6px; margin-bottom: 22px; flex-wrap: wrap; }
+  .mat-tab { padding: 7px 14px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; font-size: 0.82rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
+  .mat-tab:hover { border-color: #3b82f6; color: #3b82f6; }
+  .mat-tab.active { background: #2563eb; border-color: #2563eb; color: white; }
+
+  /* timeline toggle */
+  .timeline-controls {
+    background: white; border: 1px solid #e2e8f0; border-radius: 14px;
+    padding: 16px 20px; margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .timeline-toggle { display: flex; gap: 3px; background: #f1f5f9; border-radius: 10px; padding: 3px; }
+  .tl-btn { border: none; border-radius: 8px; background: transparent; color: #64748b; font-size: 0.82rem; font-weight: 700; padding: 7px 16px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .tl-btn.active-pre  { background: #f59e0b; color: white; box-shadow: 0 2px 8px rgba(245,158,11,0.35); }
+  .tl-btn.active-post { background: #dc2626; color: white; box-shadow: 0 2px 8px rgba(220,38,38,0.35); }
+  .tl-btn.active-both { background: #7c3aed; color: white; box-shadow: 0 2px 8px rgba(124,58,237,0.35); }
+  .tl-date-label { font-size: 0.78rem; color: #94a3b8; font-weight: 500; }
+  .tl-date-label span { color: #1e293b; font-weight: 700; }
+
+  /* summary strip */
+  .summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  .s-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; position: relative; overflow: hidden; }
+  .s-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+  .s-card.c-purple::before { background: #7c3aed; }
+  .s-card.c-red::before    { background: #dc2626; }
+  .s-card.c-amber::before  { background: #f59e0b; }
+  .s-card.c-blue::before   { background: #2563eb; }
+  .s-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 4px; }
+  .s-value { font-size: 1.45rem; font-weight: 700; }
+  .s-card.c-purple .s-value { color: #7c3aed; }
+  .s-card.c-red    .s-value { color: #dc2626; }
+  .s-card.c-amber  .s-value { color: #d97706; }
+  .s-card.c-blue   .s-value { color: #2563eb; }
+  .s-sub { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+  /* ── TIMELINE TABLE ── */
+  .tl-table-wrap { background: white; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; }
+  .tl-table-header { padding: 14px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+  .tl-table-header h2 { font-size: 0.95rem; font-weight: 700; color: #1e293b; }
+  .tl-legend { display: flex; align-items: center; gap: 16px; }
+  .tl-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #64748b; font-weight: 500; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .tl-dot.pre  { background: #f59e0b; }
+  .tl-dot.post { background: #dc2626; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  thead th { background: #f8fafc; padding: 10px 12px; text-align: left; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f4f8; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f8fafc; }
+
+  .country-cell { display: flex; align-items: center; gap: 8px; min-width: 150px; }
+  .flag { width: 22px; height: 15px; border-radius: 2px; object-fit: cover; }
+  .country-name { font-weight: 600; color: #1e293b; }
+
+  /* rate pill */
+  .rate-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 10px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; min-width: 52px; }
+  .rate-free   { background: #dcfce7; color: #15803d; }
+  .rate-low    { background: #dbeafe; color: #1d4ed8; }
+  .rate-medium { background: #fef3c7; color: #92400e; }
+  .rate-high   { background: #fee2e2; color: #991b1b; }
+  .rate-vhigh  { background: #fce7f3; color: #9d174d; }
+
+  /* delta badge */
+  .delta { display: inline-flex; align-items: center; gap: 3px; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .delta.up   { background: #fee2e2; color: #dc2626; }
+  .delta.same { background: #f1f5f9; color: #94a3b8; }
+  .delta.down { background: #dcfce7; color: #16a34a; }
+
+  /* timeline bar inline */
+  .tl-bar-wrap { display: flex; align-items: center; gap: 8px; min-width: 180px; }
+  .tl-bar-track { flex: 1; height: 6px; background: #f1f5f9; border-radius: 3px; position: relative; overflow: visible; }
+  .tl-bar-pre  { position: absolute; top: 0; left: 0; height: 100%; border-radius: 3px; background: #f59e0b; opacity: 0.5; }
+  .tl-bar-post { position: absolute; top: 0; left: 0; height: 100%; border-radius: 3px; background: #dc2626; }
+  .tl-bar-pct  { font-size: 0.72rem; font-weight: 700; color: #dc2626; width: 36px; text-align: right; }
+
+  /* ruling badge */
+  .ruling-tag { display: inline-block; padding: 2px 7px; border-radius: 8px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+  .ruling-ieepa    { background: #fee2e2; color: #991b1b; }
+  .ruling-s301     { background: #fef3c7; color: #92400e; }
+  .ruling-fta      { background: #dcfce7; color: #15803d; }
+  .ruling-mfn      { background: #dbeafe; color: #1d4ed8; }
+  .ruling-usmca    { background: #ede9fe; color: #6d28d9; }
+  .ruling-reciprocal { background: #fce7f3; color: #9d174d; }
+
+  /* both-mode split cell */
+  .split-cell { display: flex; align-items: center; gap: 6px; }
+  .split-pre  { color: #d97706; font-weight: 700; font-size: 0.8rem; }
+  .split-sep  { color: #cbd5e0; font-size: 0.8rem; }
+  .split-post { color: #dc2626; font-weight: 700; font-size: 0.8rem; }
+
+  /* ── "BACK TO OVERVIEW" BANNER ── */
+  .overview-banner {
+    background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+    border: 1px solid #ddd6fe; border-radius: 12px;
+    padding: 16px 20px; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .overview-banner p { font-size: 0.88rem; color: #4c1d95; font-weight: 500; }
+  .overview-banner a { font-size: 0.85rem; color: #7c3aed; font-weight: 700; cursor: pointer; }
+
+  /* ── PAGINATION / COUNT ── */
+  .table-footer { padding: 12px 20px; border-top: 1px solid #f0f4f8; display: flex; align-items: center; justify-content: space-between; }
+  .table-footer span { font-size: 0.8rem; color: #94a3b8; }
+
+  /* ── CHART SECTION ── */
+  .chart-section { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 18px; }
+  .chart-title { font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
+  .bar-list { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { font-size: 0.78rem; font-weight: 600; color: #475569; width: 90px; text-align: right; }
+  .bar-track { flex: 1; height: 28px; background: #f1f5f9; border-radius: 6px; position: relative; overflow: hidden; }
+  .bar-pre-fill  { position: absolute; top: 6px; left: 0; height: 8px; border-radius: 4px; background: #fbbf24; opacity: 0.6; transition: width 0.4s; }
+  .bar-post-fill { position: absolute; top: 14px; left: 0; height: 8px; border-radius: 4px; background: #dc2626; transition: width 0.5s; }
+  .bar-val { font-size: 0.75rem; font-weight: 700; width: 44px; }
+  .bar-val.pre-val  { color: #d97706; }
+  .bar-val.post-val { color: #dc2626; }
+
+  /* ── NOTE CALLOUT ── */
+  .note-callout { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; display: flex; gap: 10px; align-items: flex-start; }
+  .note-callout .note-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .note-callout p { font-size: 0.82rem; color: #92400e; line-height: 1.5; }
+  .note-callout strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="top-nav">
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    <div class="logo-text">Import Duty Matrix</div>
+  </div>
+  <div class="main-nav">
+    <button class="main-nav-tab active" onclick="showHome()">Home</button>
+    <button class="main-nav-tab">🇺🇸 US Data</button>
+    <button class="main-nav-tab">🇪🇺 EU Data</button>
+    <button class="main-nav-tab">⚖️ Compare</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HOME VIEW
+════════════════════════════════════════ -->
+<div class="page" id="homeView">
+
+  <div class="home-header">
+    <h1>Import Duty Matrix</h1>
+    <p>Duty rates by material group, HTS code, and origin country — US &amp; EU destinations</p>
+  </div>
+
+  <!-- Quick access cards -->
+  <div class="section-label">Quick Access</div>
+  <div class="cards-grid">
+    <div class="quick-card us-card">
+      <div class="card-icon">🇺🇸</div>
+      <h3>US Duty Matrix</h3>
+      <p>Full matrix of import duty rates into the United States by material and origin country.</p>
+      <div class="card-arrow">Open US Matrix →</div>
+    </div>
+    <div class="quick-card eu-card">
+      <div class="card-icon">🇪🇺</div>
+      <h3>EU Duty Matrix</h3>
+      <p>TARIC-sourced duty rates for imports into the European Union by CN code and origin.</p>
+      <div class="card-arrow">Open EU Matrix →</div>
+    </div>
+    <div class="quick-card mat-card" onclick="showMaterialHome()">
+      <div class="card-icon">🗂️</div>
+      <h3>By Material Group</h3>
+      <p>Explore duty rates grouped by material category with pre/post IEEPA timeline view.</p>
+      <div class="card-arrow">Browse Material Groups →</div>
+    </div>
+  </div>
+
+  <!-- Material group cards -->
+  <div class="section-label">Material Groups — US Destination</div>
+  <div class="group-grid">
+    <div class="group-card paper" onclick="openGroup('paper')">
+      <span class="group-count">4 materials</span>
+      <div class="group-icon">📄</div>
+      <div class="group-name">Paper-Based</div>
+      <div class="group-sub">Cig Paper · Tipping · Plugwrap · Inner Bundling</div>
+    </div>
+    <div class="group-card filter" onclick="openGroup('filter')">
+      <span class="group-count">2 materials</span>
+      <div class="group-icon">🔬</div>
+      <div class="group-name">Filtration</div>
+      <div class="group-sub">Filter Tow · Filter Rods</div>
+    </div>
+    <div class="group-card chem" onclick="openGroup('chem')">
+      <span class="group-count">3 materials</span>
+      <div class="group-icon">⚗️</div>
+      <div class="group-name">Chemicals</div>
+      <div class="group-sub">Adhesive · Plasticizer · Adsorbent</div>
+    </div>
+    <div class="group-card pack" onclick="openGroup('pack')">
+      <span class="group-count">3 materials</span>
+      <div class="group-icon">📦</div>
+      <div class="group-name">Packaging</div>
+      <div class="group-sub">Board Pack · Paper Pack · Board Inner Frame</div>
+    </div>
+    <div class="group-card spec" onclick="openGroup('spec')">
+      <span class="group-count">2 materials</span>
+      <div class="group-icon">💊</div>
+      <div class="group-name">Specialty</div>
+      <div class="group-sub">Capsules · MO Cans</div>
+    </div>
+  </div>
+
+</div><!-- /homeView -->
+
+
+<!-- ══════════════════════════════════════
+     MATERIAL GROUP DETAIL VIEW
+════════════════════════════════════════ -->
+<div class="page" id="detailView" style="display:none">
+
+  <div class="detail-header">
+    <button class="back-btn" onclick="showHome()">← Back</button>
+    <div>
+      <div class="detail-title" id="groupTitle">📄 Paper-Based Materials</div>
+      <div class="detail-subtitle" id="groupSub">Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling — US destination</div>
+    </div>
+  </div>
+
+  <!-- Overview banner linking back to full matrix -->
+  <div class="overview-banner">
+    <p>💡 Viewing material-group detail. Want the full cross-material matrix?</p>
+    <a onclick="showHome()">Switch to Full Matrix View →</a>
+  </div>
+
+  <!-- Material sub-tabs -->
+  <div class="mat-tabs" id="matTabs">
+    <button class="mat-tab active" onclick="selectMat(this, 'cig')">Cigarette Paper</button>
+    <button class="mat-tab" onclick="selectMat(this, 'tip')">Tipping Paper</button>
+    <button class="mat-tab" onclick="selectMat(this, 'plug')">Plugwrap</button>
+    <button class="mat-tab" onclick="selectMat(this, 'ib')">Inner Bundling</button>
+  </div>
+
+  <!-- Timeline controls -->
+  <div class="timeline-controls">
+    <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:6px;">View Mode</div>
+        <div class="timeline-toggle">
+          <button class="tl-btn active-pre" onclick="setMode('pre',this)">📅 Pre-IEEPA</button>
+          <button class="tl-btn" onclick="setMode('post',this)">⚡ Post-IEEPA</button>
+          <button class="tl-btn" onclick="setMode('both',this)">↔ Compare Both</button>
+        </div>
+      </div>
+      <div class="tl-date-label" id="dateLabel">
+        Showing rates as of <span>26 Feb 2026</span> (pre-Supreme Court ruling)
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <select style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.83rem;background:white;">
+        <option>All regions</option>
+        <option>Asia</option>
+        <option>Americas</option>
+        <option>Europe</option>
+        <option>Middle East &amp; Africa</option>
+      </select>
+      <select style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.83rem;background:white;">
+        <option>All rate types</option>
+        <option>FTA / Preferential</option>
+        <option>MFN</option>
+        <option>IEEPA affected</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-strip" id="summaryStrip">
+    <!-- injected by JS -->
+  </div>
+
+  <!-- Note callout -->
+  <div class="note-callout" id="rateNote">
+    <div class="note-icon">⚠️</div>
+    <p id="noteText"><strong>Pre-IEEPA baseline (26 Feb 2026):</strong> Rates shown reflect duties before the executive IEEPA tariff surcharges. The Supreme Court ruling temporarily blocked IEEPA enforcement — these are the rates that would apply if the stay is upheld.</p>
+  </div>
+
+  <!-- Bar chart comparison (shown in "both" mode) -->
+  <div class="chart-section" id="chartSection" style="display:none;">
+    <div class="chart-title">Cigarette Paper — Pre vs Post IEEPA duty rate by origin country (top 10)</div>
+    <div class="bar-list" id="barList"></div>
+    <div style="display:flex;gap:16px;margin-top:14px;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#94a3b8;">
+        <div style="width:12px;height:8px;background:#fbbf24;opacity:0.6;border-radius:2px;"></div> Pre-IEEPA
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#94a3b8;">
+        <div style="width:12px;height:8px;background:#dc2626;border-radius:2px;"></div> Post-IEEPA
+      </div>
+    </div>
+  </div>
+
+  <!-- Main table -->
+  <div class="tl-table-wrap">
+    <div class="tl-table-header">
+      <h2 id="tableTitle">Cigarette Paper — Duty Rates by Origin Country</h2>
+      <div class="tl-legend" id="tableLegend">
+        <div class="tl-legend-item"><div class="tl-dot pre"></div> Pre-IEEPA (26 Feb 2026)</div>
+        <div class="tl-legend-item"><div class="tl-dot post"></div> Post-IEEPA (Today)</div>
+      </div>
+    </div>
+    <table>
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="table-footer">
+      <span id="rowCount">27 countries</span>
+      <span style="font-size:0.78rem;color:#94a3b8;">Source: Wove API · HTS 4813.10.00.00</span>
+    </div>
+  </div>
+
+</div><!-- /detailView -->
+
+<script>
+// ── HARDCODED SAMPLE DATA ──
+// Format: [iso, name, pre_rate, post_rate, pre_type, post_type]
+const DATA = {
+  cig: [
+    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
+    ['MY','Malaysia',        10,  19,  'MFN',     'Reciprocal'],
+    ['VN','Vietnam',         10,  46,  'MFN',     'Reciprocal'],
+    ['TH','Thailand',        10,  36,  'MFN',     'Reciprocal'],
+    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
+    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
+    ['PK','Pakistan',        10,  29,  'MFN',     'Reciprocal'],
+    ['BD','Bangladesh',      10,  37,  'MFN',     'Reciprocal'],
+    ['LK','Sri Lanka',       10,  44,  'MFN',     'Reciprocal'],
+    ['KR','South Korea',     10,  25,  'MFN',     'Reciprocal'],
+    ['JP','Japan',           10,  24,  'MFN',     'Reciprocal'],
+    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['AU','Australia',       10,  25,  'FTA',     'FTA+IEEPA'],
+    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
+    ['CH','Switzerland',     10,  31,  'MFN',     'Reciprocal'],
+    ['NO','Norway',          10,  15,  'MFN',     'Reciprocal'],
+    ['BR','Brazil',          10,  10,  'MFN',     'MFN'],
+    ['AR','Argentina',       10,  10,  'MFN',     'MFN'],
+    ['CL','Chile',           10,  10,  'FTA',     'FTA'],
+    ['CO','Colombia',        10,  10,  'FTA',     'FTA'],
+    ['HN','Honduras',        10,  10,  'CAFTA',   'CAFTA'],
+    ['TR','Turkey',          10,  10,  'MFN',     'MFN'],
+    ['ZA','South Africa',    10,  30,  'MFN',     'Reciprocal'],
+    ['EG','Egypt',           10,  10,  'MFN',     'MFN'],
+    ['AE','UAE',             10,  10,  'MFN',     'MFN'],
+    ['SG','Singapore',       10,  10,  'FTA',     'FTA'],
+  ],
+  tip: [
+    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
+    ['MY','Malaysia',         0,  19,  'FTA',     'Reciprocal'],
+    ['VN','Vietnam',          0,  46,  'FTA',     'Reciprocal'],
+    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
+    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
+    ['PK','Pakistan',        10,  29,  'MFN',     'Reciprocal'],
+    ['KR','South Korea',      0,  25,  'FTA',     'Reciprocal'],
+    ['JP','Japan',            0,  24,  'FTA',     'Reciprocal'],
+    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
+    ['AU','Australia',        0,  25,  'FTA',     'FTA+IEEPA'],
+    ['BR','Brazil',          10,  10,  'MFN',     'MFN'],
+    ['TR','Turkey',          10,  10,  'MFN',     'MFN'],
+    ['SG','Singapore',        0,  10,  'FTA',     'FTA'],
+  ],
+  plug: [
+    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
+    ['MY','Malaysia',        10,  19,  'MFN',     'Reciprocal'],
+    ['VN','Vietnam',         10,  46,  'MFN',     'Reciprocal'],
+    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
+    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
+    ['KR','South Korea',     10,  25,  'MFN',     'Reciprocal'],
+    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
+    ['JP','Japan',           10,  24,  'MFN',     'Reciprocal'],
+    ['AU','Australia',       10,  25,  'FTA',     'FTA+IEEPA'],
+  ],
+  ib: [
+    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
+    ['MY','Malaysia',        10,  19,  'MFN',     'Reciprocal'],
+    ['VN','Vietnam',         10,  46,  'MFN',     'Reciprocal'],
+    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
+    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
+    ['PK','Pakistan',        10,  29,  'MFN',     'Reciprocal'],
+    ['KR','South Korea',     10,  25,  'MFN',     'Reciprocal'],
+    ['JP','Japan',           10,  24,  'MFN',     'Reciprocal'],
+    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
+    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
+    ['AU','Australia',       10,  25,  'FTA',     'FTA+IEEPA'],
+    ['TR','Turkey',          10,  10,  'MFN',     'MFN'],
+  ]
+};
+
+const GROUP_META = {
+  paper: {
+    icon:'📄', title:'Paper-Based Materials',
+    sub:'Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling — US destination',
+    mats:[
+      {id:'cig',  label:'Cigarette Paper', hts:'4813.10.00.00'},
+      {id:'tip',  label:'Tipping Paper',   hts:'4813.20.00.00'},
+      {id:'plug', label:'Plugwrap',        hts:'4813.90.00.00'},
+      {id:'ib',   label:'Inner Bundling',  hts:'4811.90.90.00'},
+    ]
+  }
+};
+
+let currentMode = 'pre';
+let currentMat  = 'cig';
+let currentGroup = 'paper';
+
+function showHome() {
+  document.getElementById('homeView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+}
+
+function showMaterialHome() { showHome(); }
+
+function openGroup(grp) {
+  currentGroup = grp;
+  currentMat = 'cig';
+  currentMode = 'pre';
+  const meta = GROUP_META[grp] || GROUP_META.paper;
+  document.getElementById('groupTitle').textContent = meta.icon + ' ' + meta.title;
+  document.getElementById('groupSub').textContent   = meta.sub;
+
+  // rebuild mat tabs
+  const tabs = document.getElementById('matTabs');
+  tabs.innerHTML = meta.mats.map((m,i) =>
+    `<button class="mat-tab ${i===0?'active':''}" onclick="selectMat(this,'${m.id}')">${m.label}</button>`
+  ).join('');
+
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  renderAll();
+}
+
+function selectMat(el, mat) {
+  document.querySelectorAll('.mat-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  currentMat = mat;
+  renderAll();
+}
+
+function setMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.tl-btn').forEach(b=>{
+    b.classList.remove('active-pre','active-post','active-both');
+  });
+  btn.classList.add('active-'+mode);
+
+  const dl = document.getElementById('dateLabel');
+  if (mode==='pre')  dl.innerHTML = 'Showing rates as of <span>26 Feb 2026</span> (pre-Supreme Court ruling)';
+  if (mode==='post') dl.innerHTML = 'Showing <span>current rates</span> (post-IEEPA, today)';
+  if (mode==='both') dl.innerHTML = 'Comparing <span>pre</span> vs <span>post IEEPA</span> side by side';
+
+  const note = document.getElementById('noteText');
+  if (mode==='pre')  note.innerHTML = '<strong>Pre-IEEPA baseline (26 Feb 2026):</strong> Rates before executive IEEPA surcharges. These apply if the Supreme Court stay is upheld.';
+  if (mode==='post') note.innerHTML = '<strong>Current rates (post-IEEPA):</strong> Rates including IEEPA executive tariff surcharges as of today. Subject to change pending Supreme Court ruling.';
+  if (mode==='both') note.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = pre-IEEPA baseline · Red = current post-IEEPA rate · Δ shows the duty increase.';
+
+  renderAll();
+}
+
+function rateClass(r) {
+  if (r===0)    return 'rate-free';
+  if (r<=15)    return 'rate-low';
+  if (r<=30)    return 'rate-medium';
+  if (r<=60)    return 'rate-high';
+  return 'rate-vhigh';
+}
+
+function rulingClass(t) {
+  if (!t) return '';
+  const tl = t.toLowerCase();
+  if (tl.includes('ieepa'))      return 'ruling-ieepa';
+  if (tl.includes('301'))        return 'ruling-s301';
+  if (tl.includes('fta'))        return 'ruling-fta';
+  if (tl.includes('usmca')||tl.includes('cafta')) return 'ruling-usmca';
+  if (tl.includes('reciprocal')) return 'ruling-reciprocal';
+  return 'ruling-mfn';
+}
+
+function renderAll() {
+  const rows = DATA[currentMat] || DATA.cig;
+  const meta = (GROUP_META[currentGroup]||GROUP_META.paper).mats.find(m=>m.id===currentMat) || {label:'Material',hts:''};
+
+  // summary
+  const totalCountries = rows.length;
+  const avgPre  = (rows.reduce((s,r)=>s+r[2],0)/rows.length).toFixed(1);
+  const avgPost = (rows.reduce((s,r)=>s+r[3],0)/rows.length).toFixed(1);
+  const freeRows= rows.filter(r=>(currentMode==='post'?r[3]:r[2])===0).length;
+  const maxPost = Math.max(...rows.map(r=>r[3]));
+  const maxCountry = rows.find(r=>r[3]===maxPost);
+
+  document.getElementById('summaryStrip').innerHTML = `
+    <div class="s-card c-purple"><div class="s-label">Countries</div><div class="s-value">${totalCountries}</div><div class="s-sub">sourced</div></div>
+    <div class="s-card c-amber"><div class="s-label">Pre-IEEPA Avg</div><div class="s-value">${avgPre}%</div><div class="s-sub">26 Feb 2026</div></div>
+    <div class="s-card c-red"><div class="s-label">Post-IEEPA Avg</div><div class="s-value">${avgPost}%</div><div class="s-sub">current</div></div>
+    <div class="s-card c-blue"><div class="s-label">Duty-Free Origins</div><div class="s-value">${freeRows}</div><div class="s-sub">${currentMode==='post'?'post-IEEPA':'pre-IEEPA'}</div></div>
+  `;
+
+  // table title + legend
+  document.getElementById('tableTitle').textContent = `${meta.label} — Duty Rates by Origin Country`;
+  document.getElementById('rowCount').textContent = `${rows.length} countries`;
+  document.getElementById('tableLegend').style.display = currentMode==='both' ? 'flex' : 'none';
+
+  // chart (both mode only)
+  const chartSection = document.getElementById('chartSection');
+  if (currentMode==='both') {
+    chartSection.style.display = 'block';
+    const maxR = Math.max(...rows.map(r=>r[3]));
+    const top = [...rows].sort((a,b)=>b[3]-a[3]).slice(0,10);
+    document.getElementById('barList').innerHTML = top.map(r=>`
+      <div class="bar-row">
+        <div class="bar-label">${r[1].split(' ')[0]}</div>
+        <div class="bar-track">
+          <div class="bar-pre-fill"  style="width:${(r[2]/maxR*100).toFixed(1)}%"></div>
+          <div class="bar-post-fill" style="width:${(r[3]/maxR*100).toFixed(1)}%"></div>
+        </div>
+        <div class="bar-val pre-val">${r[2]}%</div>
+        <div class="bar-val post-val">${r[3]}%</div>
+      </div>`).join('');
+  } else {
+    chartSection.style.display = 'none';
+  }
+
+  // table head
+  let head = '';
+  if (currentMode==='pre') {
+    head = `<tr><th>Country</th><th>Pre-IEEPA Rate</th><th>Rate Type</th><th>HTS Code</th></tr>`;
+  } else if (currentMode==='post') {
+    head = `<tr><th>Country</th><th>Current Rate</th><th>Rate Type</th><th>HTS Code</th></tr>`;
+  } else {
+    head = `<tr><th>Country</th><th>Pre-IEEPA <span style="color:#f59e0b">(26 Feb)</span></th><th>Post-IEEPA <span style="color:#dc2626">(Today)</span></th><th>Δ Change</th><th>Rate Type</th></tr>`;
+  }
+  document.getElementById('tableHead').innerHTML = head;
+
+  // table body
+  const tbody = rows.map(r => {
+    const [iso, name, pre, post, preType, postType] = r;
+    const flag = `<img class="flag" src="https://flagcdn.com/w40/${iso.toLowerCase()}.png" onerror="this.style.display='none'">`;
+
+    if (currentMode==='pre') {
+      return `<tr>
+        <td><div class="country-cell">${flag}<span class="country-name">${name}</span></div></td>
+        <td><span class="rate-pill ${rateClass(pre)}">${pre}%</span></td>
+        <td><span class="ruling-tag ${rulingClass(preType)}">${preType}</span></td>
+        <td style="font-size:0.75rem;color:#94a3b8;font-family:monospace">${meta.hts}</td>
+      </tr>`;
+    } else if (currentMode==='post') {
+      return `<tr>
+        <td><div class="country-cell">${flag}<span class="country-name">${name}</span></div></td>
+        <td><span class="rate-pill ${rateClass(post)}">${post}%</span></td>
+        <td><span class="ruling-tag ${rulingClass(postType)}">${postType}</span></td>
+        <td style="font-size:0.75rem;color:#94a3b8;font-family:monospace">${meta.hts}</td>
+      </tr>`;
+    } else {
+      const delta = post - pre;
+      const dClass = delta>0 ? 'up' : delta<0 ? 'down' : 'same';
+      const dLabel = delta>0 ? `+${delta}%` : delta<0 ? `${delta}%` : '—';
+      return `<tr>
+        <td><div class="country-cell">${flag}<span class="country-name">${name}</span></div></td>
+        <td><span class="rate-pill ${rateClass(pre)}">${pre}%</span></td>
+        <td><span class="rate-pill ${rateClass(post)}">${post}%</span></td>
+        <td><span class="delta ${dClass}">${dLabel}</span></td>
+        <td>
+          <span class="ruling-tag ${rulingClass(preType)}" style="margin-right:3px">${preType}</span>
+          ${postType!==preType?`<span class="ruling-tag ${rulingClass(postType)}">${postType}</span>`:''}
+        </td>
+      </tr>`;
+    }
+  }).join('');
+  document.getElementById('tableBody').innerHTML = tbody;
+}
+
+// boot
+renderAll();
+</script>
+</body>
+</html>
