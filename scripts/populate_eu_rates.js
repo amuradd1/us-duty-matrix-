@@ -68,6 +68,16 @@ async function clearStagingRows() {
     const body = await response.text();
     throw new Error(`Failed to clear staging rows (${response.status}): ${body.slice(0, 400)}`);
   }
+
+  // Verify staging is actually empty before proceeding
+  const countUrl = `${process.env.SUPABASE_URL}/rest/v1/duty_rates?destination=eq.EU&source=eq.${SOURCE_STAGING}&select=count`;
+  const countRes = await fetch(countUrl, {
+    headers: { ...supabaseHeaders(), Prefer: 'count=exact', Accept: 'application/json' }
+  });
+  const remaining = parseInt(countRes.headers.get('content-range')?.split('/')[1] || '0', 10);
+  if (remaining > 0) {
+    throw new Error(`clearStagingRows: ${remaining} staging rows still present after DELETE – aborting to avoid duplicates`);
+  }
 }
 
 // Write new row into staging (invisible to users – server only serves SOURCE_LIVE)

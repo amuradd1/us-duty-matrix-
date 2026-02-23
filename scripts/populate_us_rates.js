@@ -151,10 +151,24 @@ function supabaseHeaders() {
 // Clear any leftover staging rows from a previous failed run
 async function clearStagingRows() {
   const url = `${process.env.SUPABASE_URL}/rest/v1/duty_rates?destination=eq.US&source=eq.${SOURCE_STAGING}`;
-  await fetch(url, {
+  const res = await fetch(url, {
     method: 'DELETE',
     headers: { ...supabaseHeaders(), Prefer: 'return=minimal' }
   });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`clearStagingRows DELETE failed (${res.status}): ${body.slice(0, 200)}`);
+  }
+
+  // Verify staging is actually empty before proceeding
+  const countUrl = `${process.env.SUPABASE_URL}/rest/v1/duty_rates?destination=eq.US&source=eq.${SOURCE_STAGING}&select=count`;
+  const countRes = await fetch(countUrl, {
+    headers: { ...supabaseHeaders(), Prefer: 'count=exact', Accept: 'application/json' }
+  });
+  const remaining = parseInt(countRes.headers.get('content-range')?.split('/')[1] || '0', 10);
+  if (remaining > 0) {
+    throw new Error(`clearStagingRows: ${remaining} staging rows still present after DELETE – aborting to avoid duplicates`);
+  }
 }
 
 // Write new row into staging (invisible to users – server only serves SOURCE_LIVE)
