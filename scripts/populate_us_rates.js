@@ -38,8 +38,9 @@ const DRY_RUN = process.env.DRY_RUN === 'true';
 
 // Blue-green source tags – new data is written to STAGING, then atomically
 // swapped to LIVE so users never see a half-empty table mid-sync.
-const SOURCE_LIVE    = 'WOVE';
-const SOURCE_STAGING = 'WOVE_STAGING';
+// Override via env to write a second snapshot (e.g. WOVE_TODAY / WOVE_TODAY_STAGING).
+const SOURCE_LIVE    = process.env.WOVE_SOURCE_LIVE    || 'WOVE';
+const SOURCE_STAGING = process.env.WOVE_SOURCE_STAGING || 'WOVE_STAGING';
 const WOVE_REQUEST_DELAY_MS = Number(process.env.WOVE_REQUEST_DELAY_MS || '300');
 const WOVE_MAX_RETRIES = Number(process.env.WOVE_MAX_RETRIES || '6');
 const WOVE_RETRY_BASE_MS = Number(process.env.WOVE_RETRY_BASE_MS || '1500');
