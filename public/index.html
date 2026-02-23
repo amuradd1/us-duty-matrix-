@@ -6118,7 +6118,10 @@
             const hasPost = mgDataPost.length > 0;
             if ((mgCurrentMode === 'post' || mgCurrentMode === 'both') && !hasPost) {
                 const noteEl = document.getElementById('mgNoteText');
-                noteEl.innerHTML += ' <strong style="color:#dc2626">⚠ Post-SC ruling data not yet synced — run WOVE_TODAY sync to populate.</strong>';
+                const warning = '⚠ Post-SC ruling data not yet synced — run WOVE_TODAY sync to populate.';
+                if (!noteEl.textContent.includes(warning)) {
+                    noteEl.innerHTML += ' <strong style="color:#dc2626">' + warning + '</strong>';
+                }
             }
 
             // Bar chart (both mode only)
@@ -6150,7 +6153,7 @@
             } else if (mgCurrentMode === 'post') {
                 head = `<tr><th>Country</th><th>Current Rate</th><th>Rate Type</th><th>HTS Code</th></tr>`;
             } else {
-                head = `<tr><th>Country</th><th>Pre-IEEPA <span style="color:#f59e0b">(26 Feb)</span></th><th>Post-IEEPA <span style="color:#dc2626">(Today)</span></th><th>Δ Change</th><th>Rate Type</th></tr>`;
+                head = `<tr><th>Country</th><th>Pre-SC <span style="color:#f59e0b">(before 26 Feb)</span></th><th>Post-SC <span style="color:#dc2626">(26 Feb onward)</span></th><th>Δ Change</th><th>Rate Type</th></tr>`;
             }
             document.getElementById('mgTableHead').innerHTML = head;
 
