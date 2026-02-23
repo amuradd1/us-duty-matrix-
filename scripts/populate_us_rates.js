@@ -11,14 +11,14 @@ const MATERIALS = {
   Plugwrap: '4813900000',
   'Filter Tow': '5502100000',
   'Filter Rods': '5601220000',
-  Adhesive: '3506910000',
+  Adhesive: '3506915000',
   Capsules: '3926909990',
   Plasticizer: '2917125000',
   Adsorbent: '3802100000',
   'Board Packaging': '4819100000',
   'Paper Packaging': '4819200000',
   'MO Cans': '3923900000',
-  'Inner Bundling': '4811900000',
+  'Inner Bundling': '4811909000',
   'Board Inner Frame': '4819100000'
 };
 
