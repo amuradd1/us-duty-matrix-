@@ -7,6 +7,8 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1e293b; }
+  body.embedded .top-nav { display: none; }
+  body.embedded .page { padding-top: 20px; }
 
   /* ── NAV ── */
   .top-nav {
@@ -215,10 +217,10 @@
     <div class="logo-text">Import Duty Matrix</div>
   </div>
   <div class="main-nav">
-    <button class="main-nav-tab active" onclick="showHome()">Home</button>
-    <button class="main-nav-tab">🇺🇸 US Data</button>
-    <button class="main-nav-tab">🇪🇺 EU Data</button>
-    <button class="main-nav-tab">⚖️ Compare</button>
+    <button class="main-nav-tab" onclick="window.location.href='/'">Home</button>
+    <button class="main-nav-tab" onclick="window.location.href='/'">🇺🇸 US Data</button>
+    <button class="main-nav-tab" onclick="window.location.href='/'">🇪🇺 EU Data</button>
+    <button class="main-nav-tab active">🗂️ By Material</button>
   </div>
 </nav>
 
@@ -332,7 +334,7 @@
         </div>
       </div>
       <div class="tl-date-label" id="dateLabel">
-        Showing rates as of <span>26 Feb 2026</span> (pre-Supreme Court ruling)
+        Showing rates for <span>before 26 Feb 2026</span> (Pre-Supreme Court ruling)
       </div>
     </div>
     <div style="display:flex;gap:10px;">
@@ -360,7 +362,7 @@
   <!-- Note callout -->
   <div class="note-callout" id="rateNote">
     <div class="note-icon">⚠️</div>
-    <p id="noteText"><strong>Pre-IEEPA baseline (26 Feb 2026):</strong> Rates shown reflect duties before the executive IEEPA tariff surcharges. The Supreme Court ruling temporarily blocked IEEPA enforcement — these are the rates that would apply if the stay is upheld.</p>
+    <p id="noteText"><strong>Pre-Supreme Court ruling (before 26 Feb 2026):</strong> Rates shown reflect duties when IEEPA surcharges were still in effect.</p>
   </div>
 
   <!-- Bar chart comparison (shown in "both" mode) -->
@@ -382,8 +384,8 @@
     <div class="tl-table-header">
       <h2 id="tableTitle">Cigarette Paper — Duty Rates by Origin Country</h2>
       <div class="tl-legend" id="tableLegend">
-        <div class="tl-legend-item"><div class="tl-dot pre"></div> Pre-SC Ruling / IEEPA in effect (26 Feb 2026)</div>
-        <div class="tl-legend-item"><div class="tl-dot post"></div> Post-SC Ruling / IEEPA suspended (Today)</div>
+        <div class="tl-legend-item"><div class="tl-dot pre"></div> Pre-SC Ruling (before 26 Feb 2026)</div>
+        <div class="tl-legend-item"><div class="tl-dot post"></div> Post-SC Ruling (26 Feb 2026 onward)</div>
       </div>
     </div>
     <table>
@@ -392,275 +394,352 @@
     </table>
     <div class="table-footer">
       <span id="rowCount">27 countries</span>
-      <span style="font-size:0.78rem;color:#94a3b8;">Source: Wove API · HTS 4813.10.00.00</span>
+      <span id="sourceInfo" style="font-size:0.78rem;color:#94a3b8;">Source: Wove API · HTS 4813.10.00.00</span>
     </div>
   </div>
 
 </div><!-- /detailView -->
 
 <script>
-// ── HARDCODED SAMPLE DATA ──
-// Format: [iso, name, pre_rate, post_rate, pre_type, post_type]
-const DATA = {
-  cig: [
-    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
-    ['MY','Malaysia',        10,  19,  'MFN',     'Reciprocal'],
-    ['VN','Vietnam',         10,  46,  'MFN',     'Reciprocal'],
-    ['TH','Thailand',        10,  36,  'MFN',     'Reciprocal'],
-    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
-    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
-    ['PK','Pakistan',        10,  29,  'MFN',     'Reciprocal'],
-    ['BD','Bangladesh',      10,  37,  'MFN',     'Reciprocal'],
-    ['LK','Sri Lanka',       10,  44,  'MFN',     'Reciprocal'],
-    ['KR','South Korea',     10,  25,  'MFN',     'Reciprocal'],
-    ['JP','Japan',           10,  24,  'MFN',     'Reciprocal'],
-    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['AU','Australia',       10,  25,  'FTA',     'FTA+IEEPA'],
-    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
-    ['CH','Switzerland',     10,  31,  'MFN',     'Reciprocal'],
-    ['NO','Norway',          10,  15,  'MFN',     'Reciprocal'],
-    ['BR','Brazil',          10,  10,  'MFN',     'MFN'],
-    ['AR','Argentina',       10,  10,  'MFN',     'MFN'],
-    ['CL','Chile',           10,  10,  'FTA',     'FTA'],
-    ['CO','Colombia',        10,  10,  'FTA',     'FTA'],
-    ['HN','Honduras',        10,  10,  'CAFTA',   'CAFTA'],
-    ['TR','Turkey',          10,  10,  'MFN',     'MFN'],
-    ['ZA','South Africa',    10,  30,  'MFN',     'Reciprocal'],
-    ['EG','Egypt',           10,  10,  'MFN',     'MFN'],
-    ['AE','UAE',             10,  10,  'MFN',     'MFN'],
-    ['SG','Singapore',       10,  10,  'FTA',     'FTA'],
-  ],
-  tip: [
-    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
-    ['MY','Malaysia',         0,  19,  'FTA',     'Reciprocal'],
-    ['VN','Vietnam',          0,  46,  'FTA',     'Reciprocal'],
-    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
-    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
-    ['PK','Pakistan',        10,  29,  'MFN',     'Reciprocal'],
-    ['KR','South Korea',      0,  25,  'FTA',     'Reciprocal'],
-    ['JP','Japan',            0,  24,  'FTA',     'Reciprocal'],
-    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
-    ['AU','Australia',        0,  25,  'FTA',     'FTA+IEEPA'],
-    ['BR','Brazil',          10,  10,  'MFN',     'MFN'],
-    ['TR','Turkey',          10,  10,  'MFN',     'MFN'],
-    ['SG','Singapore',        0,  10,  'FTA',     'FTA'],
-  ],
-  plug: [
-    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
-    ['MY','Malaysia',        10,  19,  'MFN',     'Reciprocal'],
-    ['VN','Vietnam',         10,  46,  'MFN',     'Reciprocal'],
-    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
-    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
-    ['KR','South Korea',     10,  25,  'MFN',     'Reciprocal'],
-    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
-    ['JP','Japan',           10,  24,  'MFN',     'Reciprocal'],
-    ['AU','Australia',       10,  25,  'FTA',     'FTA+IEEPA'],
-  ],
-  ib: [
-    ['CN','China',           45,  145, 'MFN+S301','IEEPA+S301'],
-    ['MY','Malaysia',        10,  19,  'MFN',     'Reciprocal'],
-    ['VN','Vietnam',         10,  46,  'MFN',     'Reciprocal'],
-    ['IN','India',           10,  26,  'MFN',     'Reciprocal'],
-    ['ID','Indonesia',       10,  32,  'MFN',     'Reciprocal'],
-    ['PK','Pakistan',        10,  29,  'MFN',     'Reciprocal'],
-    ['KR','South Korea',     10,  25,  'MFN',     'Reciprocal'],
-    ['JP','Japan',           10,  24,  'MFN',     'Reciprocal'],
-    ['MX','Mexico',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['CA','Canada',           0,  10,  'USMCA',   'USMCA+IEEPA'],
-    ['GB','Great Britain',   10,  10,  'MFN',     'MFN'],
-    ['AU','Australia',       10,  25,  'FTA',     'FTA+IEEPA'],
-    ['TR','Turkey',          10,  10,  'MFN',     'MFN'],
-  ]
-};
+if (window.self !== window.top) {
+  document.body.classList.add('embedded');
+}
 
 const GROUP_META = {
   paper: {
-    icon:'📄', title:'Paper-Based Materials',
-    sub:'Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling — US destination',
-    mats:[
-      {id:'cig',  label:'Cigarette Paper', hts:'4813.10.00.00'},
-      {id:'tip',  label:'Tipping Paper',   hts:'4813.20.00.00'},
-      {id:'plug', label:'Plugwrap',        hts:'4813.90.00.00'},
-      {id:'ib',   label:'Inner Bundling',  hts:'4811.90.90.00'},
+    icon: '📄',
+    title: 'Paper-Based Materials',
+    sub: 'Cigarette Paper · Tipping Paper · Plugwrap · Inner Bundling — US destination',
+    mats: [
+      { id: 'Cigarette Paper', label: 'Cigarette Paper', hts: '4813.10.00.00' },
+      { id: 'Tipping Paper', label: 'Tipping Paper', hts: '4813.20.00.00' },
+      { id: 'Plugwrap', label: 'Plugwrap', hts: '4813.90.00.00' },
+      { id: 'Inner Bundling', label: 'Inner Bundling', hts: '4811.90.90.00' }
     ]
+  },
+  filter: {
+    icon: '🔬',
+    title: 'Filter Materials',
+    sub: 'Filter Tow · Filter Rods · Adhesive · Plasticizer · Adsorbent — US destination',
+    mats: [
+      { id: 'Filter Tow', label: 'Filter Tow', hts: '5502.10.00.00' },
+      { id: 'Filter Rods', label: 'Filter Rods', hts: '5601.22.00.00' },
+      { id: 'Adhesive', label: 'Adhesive', hts: '3506.91.50.00' },
+      { id: 'Plasticizer', label: 'Plasticizer', hts: '2917.12.50.00' },
+      { id: 'Adsorbent', label: 'Adsorbent', hts: '3802.10.00.00' }
+    ]
+  },
+  pack: {
+    icon: '📦',
+    title: 'Packaging',
+    sub: 'Board Packaging · Paper Packaging · Board Inner Frame — US destination',
+    mats: [
+      { id: 'Board Packaging', label: 'Board Packaging', hts: '4819.10.00.00' },
+      { id: 'Paper Packaging', label: 'Paper Packaging', hts: '4819.20.00.00' },
+      { id: 'Board Inner Frame', label: 'Board Inner Frame', hts: '4819.10.00.00' }
+    ]
+  },
+  spec: {
+    icon: '💊',
+    title: 'Specialty',
+    sub: 'Capsules — US destination',
+    mats: [{ id: 'Capsules', label: 'Capsules', hts: '3926.90.99.90' }]
+  },
+  mo: {
+    icon: '🫙',
+    title: 'Modern Oral',
+    sub: 'MO Cans — US destination',
+    mats: [{ id: 'MO Cans', label: 'MO Cans', hts: '3923.90.00.00' }]
   }
 };
 
+const COUNTRY_NAMES = {
+  CN:'China', MX:'Mexico', CA:'Canada', AU:'Australia', CL:'Chile', CO:'Colombia', KR:'South Korea',
+  SG:'Singapore', HN:'Honduras', JP:'Japan', CH:'Switzerland', GB:'Great Britain', IN:'India',
+  ID:'Indonesia', VN:'Vietnam', TH:'Thailand', MY:'Malaysia', BR:'Brazil', AR:'Argentina', TR:'Turkey',
+  ZA:'South Africa', EG:'Egypt', AE:'UAE', NO:'Norway', PK:'Pakistan', BD:'Bangladesh', LK:'Sri Lanka',
+  AT:'Austria', BE:'Belgium', BG:'Bulgaria', HR:'Croatia', CY:'Cyprus', CZ:'Czech Republic', DK:'Denmark',
+  EE:'Estonia', FI:'Finland', FR:'France', DE:'Germany', GR:'Greece', HU:'Hungary', IE:'Ireland',
+  IT:'Italy', LV:'Latvia', LT:'Lithuania', LU:'Luxembourg', MT:'Malta', NL:'Netherlands', PL:'Poland',
+  PT:'Portugal', RO:'Romania', SK:'Slovakia', SI:'Slovenia', ES:'Spain', SE:'Sweden', HK:'Hong Kong',
+  TW:'Taiwan', PH:'Philippines', US:'United States'
+};
+
 let currentMode = 'pre';
-let currentMat  = 'cig';
 let currentGroup = 'paper';
+let currentMat = GROUP_META.paper.mats[0].id;
+
+let preRows = [];
+let postRows = [];
+let dataLoaded = false;
 
 function showHome() {
   document.getElementById('homeView').style.display = 'block';
   document.getElementById('detailView').style.display = 'none';
+  document.querySelectorAll('.group-card').forEach((c) => c.classList.remove('active'));
 }
 
-function showMaterialHome() { showHome(); }
-
-function openGroup(grp) {
-  currentGroup = grp;
-  currentMat = 'cig';
-  currentMode = 'pre';
-  const meta = GROUP_META[grp] || GROUP_META.paper;
-  document.getElementById('groupTitle').textContent = meta.icon + ' ' + meta.title;
-  document.getElementById('groupSub').textContent   = meta.sub;
-
-  // rebuild mat tabs
-  const tabs = document.getElementById('matTabs');
-  tabs.innerHTML = meta.mats.map((m,i) =>
-    `<button class="mat-tab ${i===0?'active':''}" onclick="selectMat(this,'${m.id}')">${m.label}</button>`
-  ).join('');
-
-  document.getElementById('homeView').style.display = 'none';
-  document.getElementById('detailView').style.display = 'block';
-  renderAll();
+function showMaterialHome() {
+  showHome();
 }
 
-function selectMat(el, mat) {
-  document.querySelectorAll('.mat-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  currentMat = mat;
-  renderAll();
+async function ensureDataLoaded() {
+  if (dataLoaded) return;
+  try {
+    const [preRes, postRes] = await Promise.all([
+      fetch('/api/duty-rates?destination=US&source=WOVE'),
+      fetch('/api/duty-rates?destination=US&source=WOVE_TODAY')
+    ]);
+
+    if (preRes.ok) {
+      const payload = await preRes.json();
+      preRows = Array.isArray(payload.rows) ? payload.rows : [];
+    }
+    if (postRes.ok) {
+      const payload = await postRes.json();
+      postRows = Array.isArray(payload.rows) ? payload.rows : [];
+    }
+  } catch (error) {
+    console.warn('Failed loading material timeline data:', error.message);
+  } finally {
+    dataLoaded = true;
+  }
+}
+
+function findMatMeta() {
+  const mats = GROUP_META[currentGroup].mats;
+  return mats.find((m) => m.id === currentMat) || mats[0];
+}
+
+function materialRows(rows, materialId) {
+  return rows
+    .filter((r) => r.material === materialId)
+    .map((r) => ({
+      iso: String(r.country_iso || '').toUpperCase(),
+      rate: Number(r.rate),
+      type: r.rate_type || ''
+    }))
+    .filter((r) => r.iso && Number.isFinite(r.rate));
+}
+
+function buildMergedRows(materialId) {
+  const preMap = new Map(materialRows(preRows, materialId).map((r) => [r.iso, { rate: r.rate, type: r.type }]));
+  const postMap = new Map(materialRows(postRows, materialId).map((r) => [r.iso, { rate: r.rate, type: r.type }]));
+  const all = new Set([...preMap.keys(), ...postMap.keys()]);
+  return Array.from(all).map((iso) => ({
+    iso,
+    name: COUNTRY_NAMES[iso] || iso,
+    pre: preMap.get(iso) || null,
+    post: postMap.get(iso) || null
+  })).sort((a, b) => {
+    const aRate = a.post ? a.post.rate : (a.pre ? a.pre.rate : 0);
+    const bRate = b.post ? b.post.rate : (b.pre ? b.pre.rate : 0);
+    return bRate - aRate;
+  });
+}
+
+function rateClass(rate) {
+  if (rate === 0) return 'rate-free';
+  if (rate <= 10) return 'rate-low';
+  if (rate <= 25) return 'rate-medium';
+  if (rate <= 50) return 'rate-high';
+  return 'rate-vhigh';
+}
+
+function rulingClass(type) {
+  if (!type) return 'ruling-mfn';
+  const text = String(type).toLowerCase();
+  if (text.includes('intra')) return 'ruling-fta';
+  if (text.includes('ieepa')) return 'ruling-ieepa';
+  if (text.includes('301')) return 'ruling-s301';
+  if (text.includes('usmca') || text.includes('cafta')) return 'ruling-usmca';
+  if (text.includes('fta') || text.includes('preferential')) return 'ruling-fta';
+  if (text.includes('reciprocal')) return 'ruling-reciprocal';
+  return 'ruling-mfn';
 }
 
 function setMode(mode, btn) {
   currentMode = mode;
-  document.querySelectorAll('.tl-btn').forEach(b=>{
-    b.classList.remove('active-pre','active-post','active-both');
-  });
-  btn.classList.add('active-'+mode);
-
-  const dl = document.getElementById('dateLabel');
-  if (mode==='pre')  dl.innerHTML = 'Showing rates as of <span>26 Feb 2026</span> — Pre-Supreme Court Ruling (IEEPA surcharges in effect)';
-  if (mode==='post') dl.innerHTML = 'Showing <span>current rates</span> — Post-Supreme Court Ruling (IEEPA surcharges suspended)';
-  if (mode==='both') dl.innerHTML = 'Comparing <span>Pre</span> vs <span>Post</span> Supreme Court Ruling (IEEPA) side by side';
-
-  const note = document.getElementById('noteText');
-  if (mode==='pre')  note.innerHTML = '<strong>Pre-Supreme Court Ruling (26 Feb 2026):</strong> Rates when IEEPA executive tariff surcharges were in effect. These reflect the duty burden before the Court of International Trade ruling that blocked IEEPA enforcement.';
-  if (mode==='post') note.innerHTML = '<strong>Post-Supreme Court Ruling (current):</strong> Rates with IEEPA surcharges suspended following the Supreme Court stay. MFN base rates and Section 301 China tariffs remain in effect. Subject to change pending final SC ruling.';
-  if (mode==='both') note.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = Pre-SC Ruling (IEEPA in effect, 26 Feb 2026) · Red = Post-SC Ruling (IEEPA suspended, current) · Δ shows the duty change.';
-
+  document.querySelectorAll('.tl-btn').forEach((b) => b.classList.remove('active-pre', 'active-post', 'active-both'));
+  btn.classList.add(`active-${mode}`);
+  updateDateLabel();
+  updateNote();
   renderAll();
 }
 
-function rateClass(r) {
-  if (r===0)    return 'rate-free';
-  if (r<=15)    return 'rate-low';
-  if (r<=30)    return 'rate-medium';
-  if (r<=60)    return 'rate-high';
-  return 'rate-vhigh';
+function updateDateLabel() {
+  const el = document.getElementById('dateLabel');
+  if (currentMode === 'pre') {
+    el.innerHTML = 'Showing rates for <span>before 26 Feb 2026</span> — Pre-Supreme Court ruling (IEEPA in effect)';
+  } else if (currentMode === 'post') {
+    el.innerHTML = 'Showing rates for <span>26 Feb 2026 onward</span> — Post-Supreme Court ruling (IEEPA suspended)';
+  } else {
+    el.innerHTML = 'Comparing <span>Pre (&lt; 26 Feb 2026)</span> vs <span>Post (>= 26 Feb 2026)</span> side by side';
+  }
 }
 
-function rulingClass(t) {
-  if (!t) return '';
-  const tl = t.toLowerCase();
-  if (tl.includes('ieepa'))      return 'ruling-ieepa';
-  if (tl.includes('301'))        return 'ruling-s301';
-  if (tl.includes('fta'))        return 'ruling-fta';
-  if (tl.includes('usmca')||tl.includes('cafta')) return 'ruling-usmca';
-  if (tl.includes('reciprocal')) return 'ruling-reciprocal';
-  return 'ruling-mfn';
+function updateNote() {
+  const el = document.getElementById('noteText');
+  if (currentMode === 'pre') {
+    el.innerHTML = '<strong>Pre-Supreme Court ruling (&lt; 26 Feb 2026):</strong> Rates when IEEPA surcharges were still in effect.';
+  } else if (currentMode === 'post') {
+    el.innerHTML = '<strong>Post-Supreme Court ruling (26 Feb 2026 onward):</strong> Rates after IEEPA suspension. MFN and Section 301 components still apply where relevant.';
+  } else {
+    el.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = Pre-SC (&lt; 26 Feb 2026), Red = Post-SC (>= 26 Feb 2026), Delta shows change.';
+  }
+}
+
+async function openGroup(groupId) {
+  const meta = GROUP_META[groupId];
+  if (!meta) return;
+  currentGroup = groupId;
+  currentMat = meta.mats[0].id;
+  currentMode = 'pre';
+
+  document.getElementById('groupTitle').textContent = `${meta.icon} ${meta.title}`;
+  document.getElementById('groupSub').textContent = meta.sub;
+
+  document.querySelectorAll('.group-card').forEach((c) => c.classList.remove('active'));
+  const card = document.querySelector(`.group-card.${groupId}`);
+  if (card) card.classList.add('active');
+
+  const tabs = document.getElementById('matTabs');
+  tabs.innerHTML = meta.mats.map((m, i) => {
+    const active = i === 0 ? 'active' : '';
+    return `<button class="mat-tab ${active}" onclick='selectMat(this, ${JSON.stringify(m.id)})'>${m.label}</button>`;
+  }).join('');
+
+  document.querySelectorAll('.tl-btn').forEach((b) => b.classList.remove('active-pre', 'active-post', 'active-both'));
+  document.querySelector('.tl-btn').classList.add('active-pre');
+  updateDateLabel();
+  updateNote();
+
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+
+  await ensureDataLoaded();
+  renderAll();
+}
+
+function selectMat(el, materialId) {
+  document.querySelectorAll('.mat-tab').forEach((t) => t.classList.remove('active'));
+  el.classList.add('active');
+  currentMat = materialId;
+  renderAll();
 }
 
 function renderAll() {
-  const rows = DATA[currentMat] || DATA.cig;
-  const meta = (GROUP_META[currentGroup]||GROUP_META.paper).mats.find(m=>m.id===currentMat) || {label:'Material',hts:''};
+  const meta = findMatMeta();
+  const allRows = buildMergedRows(currentMat);
+  const rows = allRows.filter((r) => {
+    if (currentMode === 'pre') return r.pre !== null;
+    if (currentMode === 'post') return r.post !== null;
+    return r.pre !== null || r.post !== null;
+  });
 
-  // summary
-  const totalCountries = rows.length;
-  const avgPre  = (rows.reduce((s,r)=>s+r[2],0)/rows.length).toFixed(1);
-  const avgPost = (rows.reduce((s,r)=>s+r[3],0)/rows.length).toFixed(1);
-  const freeRows= rows.filter(r=>(currentMode==='post'?r[3]:r[2])===0).length;
-  const maxPost = Math.max(...rows.map(r=>r[3]));
-  const maxCountry = rows.find(r=>r[3]===maxPost);
+  const preRates = rows.filter((r) => r.pre).map((r) => r.pre.rate);
+  const postRates = rows.filter((r) => r.post).map((r) => r.post.rate);
+  const avgPre = preRates.length ? (preRates.reduce((a, b) => a + b, 0) / preRates.length).toFixed(1) : '—';
+  const avgPost = postRates.length ? (postRates.reduce((a, b) => a + b, 0) / postRates.length).toFixed(1) : '—';
+  const freeCount = currentMode === 'post'
+    ? rows.filter((r) => r.post && r.post.rate === 0).length
+    : rows.filter((r) => r.pre && r.pre.rate === 0).length;
 
   document.getElementById('summaryStrip').innerHTML = `
-    <div class="s-card c-purple"><div class="s-label">Countries</div><div class="s-value">${totalCountries}</div><div class="s-sub">sourced</div></div>
-    <div class="s-card c-amber"><div class="s-label">Pre-IEEPA Avg</div><div class="s-value">${avgPre}%</div><div class="s-sub">26 Feb 2026</div></div>
-    <div class="s-card c-red"><div class="s-label">Post-IEEPA Avg</div><div class="s-value">${avgPost}%</div><div class="s-sub">current</div></div>
-    <div class="s-card c-blue"><div class="s-label">Duty-Free Origins</div><div class="s-value">${freeRows}</div><div class="s-sub">${currentMode==='post'?'post-IEEPA':'pre-IEEPA'}</div></div>
+    <div class="s-card c-purple"><div class="s-label">Countries</div><div class="s-value">${rows.length}</div><div class="s-sub">sourced</div></div>
+    <div class="s-card c-amber"><div class="s-label">Pre-SC Avg</div><div class="s-value">${avgPre}${avgPre !== '—' ? '%' : ''}</div><div class="s-sub">before 26 Feb 2026</div></div>
+    <div class="s-card c-red"><div class="s-label">Post-SC Avg</div><div class="s-value">${avgPost}${avgPost !== '—' ? '%' : ''}</div><div class="s-sub">26 Feb 2026 onward</div></div>
+    <div class="s-card c-blue"><div class="s-label">Duty-Free Origins</div><div class="s-value">${freeCount}</div><div class="s-sub">${currentMode === 'post' ? 'post-SC' : 'pre-SC'}</div></div>
   `;
 
-  // table title + legend
   document.getElementById('tableTitle').textContent = `${meta.label} — Duty Rates by Origin Country`;
   document.getElementById('rowCount').textContent = `${rows.length} countries`;
-  document.getElementById('tableLegend').style.display = currentMode==='both' ? 'flex' : 'none';
+  document.getElementById('sourceInfo').textContent = `Source: Wove API · HTS ${meta.hts}`;
+  document.getElementById('tableLegend').style.display = currentMode === 'both' ? 'flex' : 'none';
 
-  // chart (both mode only)
+  const noteEl = document.getElementById('noteText');
+  const missingPostWarning = '⚠ Post-SC data not synced yet (source=WOVE_TODAY).';
+  if ((currentMode === 'post' || currentMode === 'both') && postRows.length === 0) {
+    if (!noteEl.textContent.includes(missingPostWarning)) {
+      noteEl.innerHTML += ` <strong style="color:#dc2626">${missingPostWarning}</strong>`;
+    }
+  }
+
   const chartSection = document.getElementById('chartSection');
-  if (currentMode==='both') {
+  if (currentMode === 'both') {
+    const bothRows = rows.filter((r) => r.pre && r.post);
+    const top = [...bothRows].sort((a, b) => (b.post ? b.post.rate : 0) - (a.post ? a.post.rate : 0)).slice(0, 10);
+    const maxRate = Math.max(...top.map((r) => Math.max(r.pre.rate, r.post.rate)), 1);
     chartSection.style.display = 'block';
-    const maxR = Math.max(...rows.map(r=>r[3]));
-    const top = [...rows].sort((a,b)=>b[3]-a[3]).slice(0,10);
-    document.getElementById('barList').innerHTML = top.map(r=>`
+    document.querySelector('.chart-title').textContent = `${meta.label} — Pre vs Post duty rate by origin country (top 10)`;
+    document.getElementById('barList').innerHTML = top.map((r) => `
       <div class="bar-row">
-        <div class="bar-label">${r[1].split(' ')[0]}</div>
+        <div class="bar-label">${(COUNTRY_NAMES[r.iso] || r.iso).split(' ')[0]}</div>
         <div class="bar-track">
-          <div class="bar-pre-fill"  style="width:${(r[2]/maxR*100).toFixed(1)}%"></div>
-          <div class="bar-post-fill" style="width:${(r[3]/maxR*100).toFixed(1)}%"></div>
+          <div class="bar-pre-fill" style="width:${((r.pre.rate / maxRate) * 100).toFixed(1)}%"></div>
+          <div class="bar-post-fill" style="width:${((r.post.rate / maxRate) * 100).toFixed(1)}%"></div>
         </div>
-        <div class="bar-val pre-val">${r[2]}%</div>
-        <div class="bar-val post-val">${r[3]}%</div>
+        <div class="bar-val pre-val">${r.pre.rate}%</div>
+        <div class="bar-val post-val">${r.post.rate}%</div>
       </div>`).join('');
   } else {
     chartSection.style.display = 'none';
   }
 
-  // table head
   let head = '';
-  if (currentMode==='pre') {
-    head = `<tr><th>Country</th><th>Pre-IEEPA Rate</th><th>Rate Type</th><th>HTS Code</th></tr>`;
-  } else if (currentMode==='post') {
-    head = `<tr><th>Country</th><th>Current Rate</th><th>Rate Type</th><th>HTS Code</th></tr>`;
+  if (currentMode === 'pre') {
+    head = '<tr><th>Country</th><th>Pre-SC Rate</th><th>Rate Type</th><th>HTS Code</th></tr>';
+  } else if (currentMode === 'post') {
+    head = '<tr><th>Country</th><th>Post-SC Rate</th><th>Rate Type</th><th>HTS Code</th></tr>';
   } else {
-    head = `<tr><th>Country</th><th>Pre-IEEPA <span style="color:#f59e0b">(26 Feb)</span></th><th>Post-IEEPA <span style="color:#dc2626">(Today)</span></th><th>Δ Change</th><th>Rate Type</th></tr>`;
+    head = '<tr><th>Country</th><th>Pre-SC <span style="color:#f59e0b">(before 26 Feb)</span></th><th>Post-SC <span style="color:#dc2626">(26 Feb onward)</span></th><th>Δ Change</th><th>Rate Type</th></tr>';
   }
   document.getElementById('tableHead').innerHTML = head;
 
-  // table body
-  const tbody = rows.map(r => {
-    const [iso, name, pre, post, preType, postType] = r;
-    const flag = `<img class="flag" src="https://flagcdn.com/w40/${iso.toLowerCase()}.png" onerror="this.style.display='none'">`;
+  const bodyHtml = rows.map((r) => {
+    const flag = `<img class="flag" src="https://flagcdn.com/w40/${r.iso.toLowerCase()}.png" onerror="this.style.display='none'" alt="${r.iso}">`;
+    const country = `<div class="country-cell">${flag}<span class="country-name">${r.name}</span></div>`;
+    const hts = `<span style="font-size:0.75rem;color:#94a3b8;font-family:monospace">${meta.hts}</span>`;
 
-    if (currentMode==='pre') {
+    if (currentMode === 'pre') {
       return `<tr>
-        <td><div class="country-cell">${flag}<span class="country-name">${name}</span></div></td>
-        <td><span class="rate-pill ${rateClass(pre)}">${pre}%</span></td>
-        <td><span class="ruling-tag ${rulingClass(preType)}">${preType}</span></td>
-        <td style="font-size:0.75rem;color:#94a3b8;font-family:monospace">${meta.hts}</td>
-      </tr>`;
-    } else if (currentMode==='post') {
-      return `<tr>
-        <td><div class="country-cell">${flag}<span class="country-name">${name}</span></div></td>
-        <td><span class="rate-pill ${rateClass(post)}">${post}%</span></td>
-        <td><span class="ruling-tag ${rulingClass(postType)}">${postType}</span></td>
-        <td style="font-size:0.75rem;color:#94a3b8;font-family:monospace">${meta.hts}</td>
-      </tr>`;
-    } else {
-      const delta = post - pre;
-      const dClass = delta>0 ? 'up' : delta<0 ? 'down' : 'same';
-      const dLabel = delta>0 ? `+${delta}%` : delta<0 ? `${delta}%` : '—';
-      return `<tr>
-        <td><div class="country-cell">${flag}<span class="country-name">${name}</span></div></td>
-        <td><span class="rate-pill ${rateClass(pre)}">${pre}%</span></td>
-        <td><span class="rate-pill ${rateClass(post)}">${post}%</span></td>
-        <td><span class="delta ${dClass}">${dLabel}</span></td>
-        <td>
-          <span class="ruling-tag ${rulingClass(preType)}" style="margin-right:3px">${preType}</span>
-          ${postType!==preType?`<span class="ruling-tag ${rulingClass(postType)}">${postType}</span>`:''}
-        </td>
+        <td>${country}</td>
+        <td><span class="rate-pill ${rateClass(r.pre.rate)}">${r.pre.rate}%</span></td>
+        <td><span class="ruling-tag ${rulingClass(r.pre.type)}">${r.pre.type || 'MFN'}</span></td>
+        <td>${hts}</td>
       </tr>`;
     }
+
+    if (currentMode === 'post') {
+      return `<tr>
+        <td>${country}</td>
+        <td><span class="rate-pill ${rateClass(r.post.rate)}">${r.post.rate}%</span></td>
+        <td><span class="ruling-tag ${rulingClass(r.post.type)}">${r.post.type || 'MFN'}</span></td>
+        <td>${hts}</td>
+      </tr>`;
+    }
+
+    const preRate = r.pre ? r.pre.rate : null;
+    const postRate = r.post ? r.post.rate : null;
+    const delta = preRate !== null && postRate !== null ? postRate - preRate : null;
+    const deltaClass = delta === null ? 'same' : (delta > 0 ? 'up' : (delta < 0 ? 'down' : 'same'));
+    const deltaLabel = delta === null ? '—' : (delta > 0 ? `+${delta}%` : (delta < 0 ? `${delta}%` : '—'));
+
+    return `<tr>
+      <td>${country}</td>
+      <td>${preRate !== null ? `<span class="rate-pill ${rateClass(preRate)}">${preRate}%</span>` : '<span style="color:#94a3b8">—</span>'}</td>
+      <td>${postRate !== null ? `<span class="rate-pill ${rateClass(postRate)}">${postRate}%</span>` : '<span style="color:#94a3b8">—</span>'}</td>
+      <td><span class="delta ${deltaClass}">${deltaLabel}</span></td>
+      <td>
+        ${r.pre ? `<span class="ruling-tag ${rulingClass(r.pre.type)}" style="margin-right:3px">${r.pre.type || 'MFN'}</span>` : ''}
+        ${r.post && (!r.pre || r.post.type !== r.pre.type) ? `<span class="ruling-tag ${rulingClass(r.post.type)}">${r.post.type || 'MFN'}</span>` : ''}
+      </td>
+    </tr>`;
   }).join('');
-  document.getElementById('tableBody').innerHTML = tbody;
+
+  document.getElementById('tableBody').innerHTML = bodyHtml;
 }
 
-// boot
 renderAll();
 </script>
 </body>
