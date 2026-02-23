@@ -10,7 +10,7 @@ const MATERIALS = {
   'Tipping Paper': '4813200000',
   Plugwrap: '4813900000',
   'Filter Tow': '5502100000',
-  'Filter Rods': '5601220000',
+  'Filter Rods': '5601220091',
   Adhesive: '3506915000',
   Capsules: '3926909990',
   Plasticizer: '2917125000',
@@ -99,12 +99,11 @@ async function getWoveToken() {
 }
 
 // ENTRY_DATE: the entryDate passed to the Wove API lookup.
-// Pre-SC ruling snapshot → entryDate=2026-02-25 (day before the SC stay took effect;
-//   IEEPA surcharges were still in force on 25 Feb 2026).
+// Pre-SC ruling snapshot → entryDate=2026-02-15 (validated pre-ruling baseline date).
 // Post-SC ruling snapshot → entryDate=2026-02-26 (ruling date onward;
 //   IEEPA surcharges suspended from this date).
-// Default falls back to 2026-02-25 (pre-ruling baseline) when not overridden.
-const ENTRY_DATE = process.env.WOVE_ENTRY_DATE || '2026-02-25';
+// Default falls back to 2026-02-15 when not overridden.
+const ENTRY_DATE = process.env.WOVE_ENTRY_DATE || '2026-02-15';
 
 async function getWoveRate(token, hsCode, country) {
   const url = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${country}&destinationCountry=US&includeFtaOptions=true&entryDate=${ENTRY_DATE}`;

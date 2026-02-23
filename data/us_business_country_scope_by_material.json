@@ -1,0 +1,8 @@
+{
+  "Cigarette Paper": ["AT", "BR", "FR", "ID", "PL", "US"],
+  "Tipping Paper": ["AT", "BR", "CA", "DE", "MY", "PH", "ZA"],
+  "Plugwrap": ["AT", "BR", "CZ", "FR"],
+  "Filter Tow": ["DE"],
+  "Filter Rods": ["KR", "TH"],
+  "Plasticizer": ["CN"]
+}

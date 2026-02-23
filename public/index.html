@@ -347,6 +347,23 @@
             color: #334155;
         }
 
+        .route-v3 .rv3-scope-toggle {
+            border: 1px solid #dbe2ea;
+            background: #f8fafc;
+            color: #475569;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 7px 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .route-v3 .rv3-scope-toggle:hover {
+            background: #eef2f7;
+            color: #1e293b;
+        }
+
         .route-v3 .rv3-group select:focus,
         .route-v3 .rv3-search:focus {
             outline: none;
@@ -1366,6 +1383,36 @@
             outline: none;
             border-color: #3182ce;
             box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .scope-toggle-btn {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            background: #f8fafc;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+        }
+
+        .scope-toggle-btn:hover {
+            border-color: #cbd5e0;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .scope-toggle-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .scope-toggle-note {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
         }
 
         /* Multi-select dropdown */
@@ -2750,6 +2797,13 @@
                     </div>
                 </div>
                 <div class="filter-group">
+                    <label>Country Scope</label>
+                    <button type="button" id="matrixCountryScopeToggle" class="scope-toggle-btn" onclick="toggleAdditionalCountries()">
+                        Show additional countries
+                    </button>
+                    <div class="scope-toggle-note" id="matrixCountryScopeNote">Default: supplier countries only</div>
+                </div>
+                <div class="filter-group">
                     <label>Trade Program</label>
                     <select id="programFilter" onchange="applyFilters()">
                         <option value="">All Programs</option>
@@ -2890,7 +2944,7 @@
                                 <th class="sortable material-col" data-material="tippingPaper" onclick="sortTable('tippingPaper')">Tipping<br><span class="hts-code">4813.20</span></th>
                                 <th class="sortable material-col" data-material="plugwrap" onclick="sortTable('plugwrap')">Plugwrap<br><span class="hts-code">4813.90</span></th>
                                 <th class="sortable material-col" data-material="filterTow" onclick="sortTable('filterTow')">Filter Tow<br><span class="hts-code">5502</span></th>
-                                <th class="sortable material-col" data-material="filterRods" onclick="sortTable('filterRods')">Filter Rods<br><span class="hts-code">5601.22</span></th>
+                                <th class="sortable material-col" data-material="filterRods" onclick="sortTable('filterRods')">Filter Rods<br><span class="hts-code">5601.22.00.91</span></th>
                                 <th class="sortable material-col" data-material="adhesive" onclick="sortTable('adhesive')">Adhesive<br><span class="hts-code">3506</span></th>
                                 <th class="sortable material-col" data-material="capsules" onclick="sortTable('capsules')">Capsules<br><span class="hts-code">3926.90</span></th>
                                 <th class="sortable material-col" data-material="plasticizer" onclick="sortTable('plasticizer')">Plasticizer<br><span class="hts-code">2917.12</span></th>
@@ -3064,10 +3118,9 @@
                         </ul>
                     </div>
                     <p style="font-size:12px;margin-top:10px;">
-                        This tool uses <strong>25 Feb 2026</strong> as the <em>Pre-Supreme Court Ruling</em> baseline —
-                        the last day IEEPA surcharges were in force before the CIT ruling and SC stay took effect.
-                        The <em>Post-Supreme Court Ruling</em> rates (from <strong>26 Feb 2026</strong>) reflect the
-                        position with IEEPA surcharges suspended. Status remains subject to change pending the
+                        This tool uses <strong>15 Feb 2026</strong> as the <em>Pre-Supreme Court Ruling</em> baseline snapshot.
+                        The <em>Post-Supreme Court Ruling</em> rates use a <strong>26 Feb 2026</strong> snapshot.
+                        Status remains subject to change pending the
                         Supreme Court's final ruling on IEEPA authority.
                     </p>
                     <p style="font-size:11px;color:#666;margin-top:8px;">
@@ -3203,6 +3256,13 @@
                         <button type="button" onclick="selectAllCompareCountries()">Select all</button>
                         <button type="button" onclick="clearCompareCountryFilter()">Clear</button>
                     </div>
+                </div>
+
+                <div class="rv3-group">
+                    <label>Country Scope</label>
+                    <button type="button" id="compareCountryScopeToggle" class="rv3-scope-toggle" onclick="toggleCompareAdditionalCountries()">
+                        Show additional countries
+                    </button>
                 </div>
 
                 <div class="rv3-controls-right">
@@ -3356,7 +3416,7 @@
             {hts: "4813.20.00.00", material: "Tipping Paper", desc: "In rolls ≤5cm width", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "4813.90.00.00", material: "Plugwrap", desc: "Other cigarette paper", mfn: "Free", special: "Free (FTA countries)", col2: "60%"},
             {hts: "5502.10.00.00", material: "Filter Tow", desc: "Cellulose acetate tow", mfn: "7.5%", special: "Free (FTA countries)", col2: "45%"},
-            {hts: "5601.22.00.10", material: "Filter Rods", desc: "Man-made fiber rods for cigarettes", mfn: "6.3%", special: "Free (FTA countries)", col2: "74%"},
+            {hts: "5601.22.00.91", material: "Filter Rods", desc: "Man-made fiber rods for cigarettes", mfn: "6.3%", special: "Free (FTA countries)", col2: "74%"},
             {hts: "3506.91.50.00", material: "Adhesive", desc: "Adhesives based on rubber/plastic", mfn: "2.1%", special: "Free (FTA countries)", col2: "20%"},
             {hts: "3926.90.99.90", material: "Capsules", desc: "Other articles of plastics", mfn: "5.3%", special: "Free (FTA countries)", col2: "25%"},
             {hts: "2917.12.50.00", material: "Plasticizer", desc: "Adipic acid esters (plasticizers)", mfn: "6.5%", special: "Free (FTA countries)", col2: "25%"},
@@ -3374,7 +3434,7 @@
             {material: "Tipping Paper", hts: "4813.20", desc: "Paper for cigarette tips", mfnBase: 0, col2: 60},
             {material: "Plugwrap", hts: "4813.90", desc: "Other cigarette paper for plug wrap", mfnBase: 0, col2: 60},
             {material: "Filter Tow", hts: "5502.10", desc: "Cellulose acetate filament tow", mfnBase: 7.5, col2: 45},
-            {material: "Filter Rods", hts: "5601.22", desc: "Man-made fiber wadding (filter rods)", mfnBase: 6.3, col2: 74},
+            {material: "Filter Rods", hts: "5601.22.00.91", desc: "Man-made fiber wadding (filter rods)", mfnBase: 6.3, col2: 74},
             {material: "Adhesive", hts: "3506.91", desc: "Adhesives based on rubber or plastics", mfnBase: 2.1, col2: 20},
             {material: "Capsules", hts: "3926.90", desc: "Plastic articles (flavor capsules)", mfnBase: 5.3, col2: 25},
             {material: "Plasticizer", hts: "2917.12", desc: "Adipic acid esters (triacetin)", mfnBase: 6.5, col2: 25},
@@ -3503,6 +3563,20 @@
             }
         };
 
+        // Fallback scope used if /api/country-scope is unavailable.
+        const US_BUSINESS_COUNTRY_ISOS = new Set([
+            'AT', 'BR', 'CA', 'CN', 'CZ', 'DE', 'FR', 'ID',
+            'KR', 'MY', 'PH', 'PL', 'TH', 'US', 'ZA'
+        ]);
+        const US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL = {
+            'Cigarette Paper': ['AT', 'BR', 'FR', 'ID', 'PL', 'US'],
+            'Tipping Paper': ['AT', 'BR', 'CA', 'DE', 'MY', 'PH', 'ZA'],
+            Plugwrap: ['AT', 'BR', 'CZ', 'FR'],
+            'Filter Tow': ['DE'],
+            'Filter Rods': ['KR', 'TH'],
+            Plasticizer: ['CN']
+        };
+
         let activeDataset = 'US';
         let dutyData = [];
         let filteredData = [];
@@ -3510,6 +3584,8 @@
         let currentView = 'country';
         let selectedMaterials = []; // Changed to array for multi-select
         let selectedCountries = []; // Array for country multi-select
+        let showAdditionalCountries = false; // US matrix default = supplier countries only
+        let showAdditionalCompareCountries = false; // Compare default = supplier countries only
         let overrides = JSON.parse(localStorage.getItem('dutyOverrides') || '{}');
         let currentOverrideCell = null;
         // Row-level adjustments storage: { 'ISO': { tier2: 'XX', conversion: 'XX', conversionRate: 12.5 } }
@@ -3598,6 +3674,114 @@
             document.getElementById('pageSubtitle').textContent = dataset.subtitle;
             document.getElementById('datasetUSBtn').classList.toggle('active', activeDataset === 'US');
             document.getElementById('datasetEUBtn').classList.toggle('active', activeDataset === 'EU');
+            updateMatrixScopeToggleUi();
+        }
+
+        function isInUsBusinessScope(isoCode) {
+            return US_BUSINESS_COUNTRY_ISOS.has(String(isoCode || '').toUpperCase());
+        }
+
+        function getUsBusinessScopeByMaterialLabels(materialLabels = []) {
+            const scope = new Set();
+            if (!materialLabels.length) {
+                US_BUSINESS_COUNTRY_ISOS.forEach((iso) => scope.add(iso));
+                return scope;
+            }
+
+            materialLabels.forEach((materialLabel) => {
+                const mapped = US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL[materialLabel];
+                if (Array.isArray(mapped) && mapped.length > 0) {
+                    mapped.forEach((iso) => scope.add(String(iso).toUpperCase()));
+                } else {
+                    // If a material is not explicitly mapped, fall back to the full supplier scope.
+                    US_BUSINESS_COUNTRY_ISOS.forEach((iso) => scope.add(iso));
+                }
+            });
+
+            return scope;
+        }
+
+        function getCurrentUsScopeSet() {
+            if (activeDataset !== 'US' || showAdditionalCountries) return null;
+            const materialLabels = selectedMaterials
+                .map((materialKey) => materialColumns[materialKey])
+                .filter(Boolean);
+            return getUsBusinessScopeByMaterialLabels(materialLabels);
+        }
+
+        async function loadUsBusinessCountryScope() {
+            try {
+                const response = await fetch('/api/country-scope?destination=US&scope=business');
+                if (!response.ok) return;
+                const payload = await response.json();
+                const rows = Array.isArray(payload.rows) ? payload.rows : [];
+                if (!rows.length) return;
+                US_BUSINESS_COUNTRY_ISOS.clear();
+                rows.forEach((row) => {
+                    const iso = String(row.country_iso || '').toUpperCase();
+                    if (iso) US_BUSINESS_COUNTRY_ISOS.add(iso);
+                });
+
+                const materialMap = payload.material_country_iso_map;
+                if (materialMap && typeof materialMap === 'object') {
+                    Object.keys(US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL).forEach((key) => delete US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL[key]);
+                    Object.entries(materialMap).forEach(([material, isos]) => {
+                        if (!Array.isArray(isos)) return;
+                        const cleaned = isos.map((iso) => String(iso || '').toUpperCase()).filter(Boolean);
+                        if (cleaned.length > 0) {
+                            US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL[material] = [...new Set(cleaned)];
+                        }
+                    });
+                }
+            } catch (_) {
+                // Non-blocking: fallback set remains in place.
+            }
+        }
+
+        function updateMatrixScopeToggleUi() {
+            const btn = document.getElementById('matrixCountryScopeToggle');
+            const note = document.getElementById('matrixCountryScopeNote');
+            if (!btn || !note) return;
+
+            if (activeDataset !== 'US') {
+                btn.textContent = 'All countries (EU dataset)';
+                btn.disabled = true;
+                note.textContent = 'Country scope toggle applies to US dataset only';
+                return;
+            }
+
+            btn.disabled = false;
+            btn.textContent = showAdditionalCountries
+                ? 'Show supplier countries only'
+                : 'Show additional countries';
+            note.textContent = showAdditionalCountries
+                ? 'Showing all countries from Supabase'
+                : 'Default: supplier countries only';
+        }
+
+        async function toggleAdditionalCountries() {
+            if (activeDataset !== 'US') return;
+            showAdditionalCountries = !showAdditionalCountries;
+            selectedCountries = [];
+            document.getElementById('countrySearch').value = '';
+            updateMatrixScopeToggleUi();
+            await loadLiveRatesFromApi('US');
+            dataLoaded.US = true;
+        }
+
+        function updateCompareScopeToggleUi() {
+            const btn = document.getElementById('compareCountryScopeToggle');
+            if (!btn) return;
+            btn.textContent = showAdditionalCompareCountries
+                ? 'Show supplier countries only'
+                : 'Show additional countries';
+        }
+
+        function toggleCompareAdditionalCountries() {
+            showAdditionalCompareCountries = !showAdditionalCompareCountries;
+            updateCompareScopeToggleUi();
+            populateCompareCountryFilter();
+            updateCompareView();
         }
 
         function setDataStatus(message, isError = false) {
@@ -3886,7 +4070,7 @@
                 label.textContent = `${selectedMaterials.length} selected`;
             }
 
-            applyFilters();
+            populateCountryFilter();
         }
 
         function selectAllMaterials() {
@@ -3933,7 +4117,7 @@
 
             // Update button label
             const label = document.getElementById('countrySelectLabel');
-            const totalCountries = dutyData.length;
+            const totalCountries = document.querySelectorAll('#countryOptions input[type="checkbox"]').length;
             if (selectedCountries.length === 0) {
                 label.textContent = 'All Countries';
             } else if (selectedCountries.length === 1) {
@@ -3977,7 +4161,10 @@
 
         async function loadLiveRatesFromApi(datasetKey) {
             const dataset = DATASET_CONFIG[datasetKey];
-            const url = `/api/duty-rates?destination=${dataset.destination}&source=${dataset.source}`;
+            const scopeParam = datasetKey === 'US' && !showAdditionalCountries
+                ? '&scope=business'
+                : '';
+            const url = `/api/duty-rates?destination=${dataset.destination}&source=${dataset.source}${scopeParam}`;
             setDataStatus(`Loading ${datasetKey} data from Supabase...`);
 
             try {
@@ -4168,12 +4355,18 @@
                 if (iso) allIsos.add(iso);
             });
 
-            return [...allIsos]
+            const options = [...allIsos]
                 .map((iso) => ({
                     iso,
                     country: compareCountryNameLookup.get(iso) || iso
                 }))
                 .sort((a, b) => a.country.localeCompare(b.country));
+
+            if (showAdditionalCompareCountries) return options;
+            const materialKey = document.getElementById('compareMaterial')?.value;
+            const materialLabel = materialColumns[materialKey] || null;
+            const scopeSet = getUsBusinessScopeByMaterialLabels(materialLabel ? [materialLabel] : []);
+            return options.filter((option) => scopeSet.has(option.iso));
         }
 
         function populateCompareCountryFilter() {
@@ -4467,10 +4660,15 @@
 
         function processCompareRows(materialKey) {
             const baseRows = filterRowsByCompareDestination(buildCompareRows(materialKey));
+            const materialLabel = materialColumns[materialKey] || null;
+            const scopeSet = getUsBusinessScopeByMaterialLabels(materialLabel ? [materialLabel] : []);
+            const scopedRows = showAdditionalCompareCountries
+                ? baseRows
+                : baseRows.filter((row) => scopeSet.has(row.iso));
             const search = document.getElementById('compareSearchInput').value.toLowerCase().trim();
             const selectedCountrySet = new Set(getSelectedCompareCountryIsos());
 
-            const countryFilteredRows = baseRows.filter((row) => {
+            const countryFilteredRows = scopedRows.filter((row) => {
                 if (selectedCountrySet.size > 0 && !selectedCountrySet.has(row.iso)) return false;
                 return true;
             });
@@ -4985,6 +5183,8 @@
                 await loadCompareData();
             }
 
+            populateCompareCountryFilter();
+
             await ensureCompareMap();
 
             const { rows, totalRows, selectedCountryCount } = processCompareRows(materialKey);
@@ -5005,7 +5205,8 @@
             const countryScope = selectedCountryCount > 0
                 ? ` within ${selectedCountryCount} selected countries`
                 : '';
-            setCompareStatus(`Showing ${rows.length} of ${totalRows} countries${countryScope} for ${matName}.`);
+            const scopeLabel = showAdditionalCompareCountries ? 'all countries' : 'supplier countries';
+            setCompareStatus(`Showing ${rows.length} of ${totalRows} countries (${scopeLabel})${countryScope} for ${matName}.`);
         }
         // ========== END COMPARE VIEW LOGIC ==========
 
@@ -5048,10 +5249,12 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async function() {
+            await loadUsBusinessCountryScope();
             syncKpiCards();
             syncAuditDates();
             refreshHomeCountryCount();
             updateDatasetHeader();
+            updateCompareScopeToggleUi();
             renderMaterialTable();
             renderHTSTable();
 
@@ -5062,18 +5265,28 @@
         function populateCountryFilter() {
             const countryOptions = document.getElementById('countryOptions');
             countryOptions.innerHTML = '';
-            const countries = dutyData.map(d => ({country: d.country, iso: d.iso})).sort((a, b) => a.country.localeCompare(b.country));
+            const usScopeSet = getCurrentUsScopeSet();
+            const countries = dutyData
+                .filter((d) => !usScopeSet || usScopeSet.has(d.iso))
+                .map((d) => ({ country: d.country, iso: d.iso }))
+                .sort((a, b) => a.country.localeCompare(b.country));
+
+            // Drop selected countries that are not available in the current scope.
+            const availableIsoSet = new Set(countries.map((c) => c.iso));
+            selectedCountries = selectedCountries.filter((iso) => availableIsoSet.has(iso));
 
             countries.forEach(c => {
                 const div = document.createElement('div');
                 div.className = 'multiselect-option';
                 div.innerHTML = `
-                    <input type="checkbox" id="country_${c.iso}" value="${c.iso}" onchange="updateCountryFilter()">
+                    <input type="checkbox" id="country_${c.iso}" value="${c.iso}" onchange="updateCountryFilter()" ${selectedCountries.includes(c.iso) ? 'checked' : ''}>
                     <img src="https://flagcdn.com/18x14/${c.iso.toLowerCase()}.png" class="country-option-flag" onerror="this.style.display='none'">
                     <label for="country_${c.iso}">${c.country}</label>
                 `;
                 countryOptions.appendChild(div);
             });
+
+            updateCountryFilter();
         }
 
         function applyFilters() {
@@ -5081,9 +5294,11 @@
             const program = document.getElementById('programFilter').value;
             const rate = document.getElementById('rateFilter').value;
             const search = document.getElementById('searchBox').value.toLowerCase();
+            const usScopeSet = getCurrentUsScopeSet();
             // selectedMaterials and selectedCountries are updated by their respective functions
 
             filteredData = dutyData.filter(row => {
+                if (usScopeSet && !usScopeSet.has(row.iso)) return false;
                 if (region && row.region !== region) return false;
                 // Country filter - if countries selected, only show those
                 if (selectedCountries.length > 0 && !selectedCountries.includes(row.iso)) return false;
@@ -5307,7 +5522,11 @@
         }
 
         function updateStats() {
-            document.getElementById('countryCount').textContent = dutyData.length;
+            const usScopeSet = getCurrentUsScopeSet();
+            const scopedCountryCount = usScopeSet
+                ? dutyData.filter((row) => usScopeSet.has(row.iso)).length
+                : dutyData.length;
+            document.getElementById('countryCount').textContent = scopedCountryCount;
             document.getElementById('filteredCount').textContent = filteredData.length;
         }
 

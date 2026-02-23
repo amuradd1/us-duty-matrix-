@@ -1,5 +1,6 @@
 const express = require('express');
 const Anthropic = require('@anthropic-ai/sdk');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
@@ -8,6 +9,48 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const US_BUSINESS_COUNTRY_SCOPE_PATH = path.join(__dirname, 'data', 'us_business_country_scope.json');
+const US_BUSINESS_COUNTRY_SCOPE_BY_MATERIAL_PATH = path.join(__dirname, 'data', 'us_business_country_scope_by_material.json');
+
+function loadUsBusinessCountryScope() {
+    try {
+        const raw = fs.readFileSync(US_BUSINESS_COUNTRY_SCOPE_PATH, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+            .filter((row) => row && typeof row.country_iso === 'string')
+            .map((row) => ({
+                country_iso: String(row.country_iso).toUpperCase(),
+                country_name: row.country_name || null
+            }));
+    } catch (_) {
+        return [];
+    }
+}
+
+const US_BUSINESS_COUNTRY_SCOPE = loadUsBusinessCountryScope();
+const US_BUSINESS_COUNTRY_ISOS = US_BUSINESS_COUNTRY_SCOPE.map((row) => row.country_iso);
+
+function loadUsBusinessCountryScopeByMaterial() {
+    try {
+        const raw = fs.readFileSync(US_BUSINESS_COUNTRY_SCOPE_BY_MATERIAL_PATH, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+        const cleaned = {};
+        Object.entries(parsed).forEach(([material, isos]) => {
+            if (!Array.isArray(isos)) return;
+            const valid = isos
+                .map((iso) => String(iso || '').toUpperCase())
+                .filter(Boolean);
+            if (valid.length) cleaned[material] = [...new Set(valid)];
+        });
+        return cleaned;
+    } catch (_) {
+        return {};
+    }
+}
+
+const US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL = loadUsBusinessCountryScopeByMaterial();
 
 // Initialize Anthropic client
 const anthropic = new Anthropic({
@@ -158,7 +201,7 @@ app.get('/api/health', (req, res) => {
 
 // Temporary debug endpoint – shows raw Wove API response for a single HTS + country
 app.get('/api/debug-wove', async (req, res) => {
-    const { hsCode = '3506915000', country = 'CN' } = req.query;
+    const { hsCode = '3506915000', country = 'CN', entryDate } = req.query;
     const WOVE_CLIENT_ID = process.env.WOVE_CLIENT_ID;
     const WOVE_CLIENT_SECRET = process.env.WOVE_CLIENT_SECRET;
 
@@ -177,11 +220,12 @@ app.get('/api/debug-wove', async (req, res) => {
         if (!tokenData.access_token) return res.status(502).json({ error: 'Token fetch failed', tokenData });
 
         // Lookup
-        const url = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${country}&destinationCountry=US&includeFtaOptions=true`;
+        const entryDateQuery = entryDate ? `&entryDate=${encodeURIComponent(entryDate)}` : '';
+        const url = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${country}&destinationCountry=US&includeFtaOptions=true${entryDateQuery}`;
         const rateRes = await fetch(url, { headers: { Authorization: `Bearer ${tokenData.access_token}` } });
         const rawJson = await rateRes.json();
 
-        return res.json({ hsCode, country, raw: rawJson });
+        return res.json({ hsCode, country, entryDate: entryDate || null, raw: rawJson });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
@@ -198,7 +242,23 @@ app.get('/api/duty-rates', async (req, res) => {
 
     const source = req.query.source || 'WOVE';
     const destination = req.query.destination || 'US';
-    const url = `${SUPABASE_URL}/rest/v1/duty_rates?destination=eq.${encodeURIComponent(destination)}&source=eq.${encodeURIComponent(source)}&select=country_iso,material,rate,rate_type`;
+    const scope = req.query.scope || 'all';
+
+    const queryParts = [
+        `destination=eq.${encodeURIComponent(destination)}`,
+        `source=eq.${encodeURIComponent(source)}`,
+        'select=country_iso,material,rate,rate_type'
+    ];
+
+    if (
+        destination.toUpperCase() === 'US'
+        && scope === 'business'
+        && US_BUSINESS_COUNTRY_ISOS.length > 0
+    ) {
+        queryParts.push(`country_iso=in.(${US_BUSINESS_COUNTRY_ISOS.join(',')})`);
+    }
+
+    const url = `${SUPABASE_URL}/rest/v1/duty_rates?${queryParts.join('&')}`;
 
     try {
         const response = await fetch(url, {
@@ -231,6 +291,7 @@ app.get('/api/duty-rates', async (req, res) => {
         return res.json({
             source,
             destination,
+            scope,
             count: rows.length,
             rows
         });
@@ -240,6 +301,26 @@ app.get('/api/duty-rates', async (req, res) => {
             details: error.message
         });
     }
+});
+
+app.get('/api/country-scope', (req, res) => {
+    const destination = String(req.query.destination || 'US').toUpperCase();
+    const scope = String(req.query.scope || 'business').toLowerCase();
+
+    if (destination !== 'US' || scope !== 'business') {
+        return res.status(400).json({
+            error: 'Unsupported country scope request',
+            details: 'Only destination=US&scope=business is currently supported'
+        });
+    }
+
+    return res.json({
+        destination,
+        scope,
+        count: US_BUSINESS_COUNTRY_SCOPE.length,
+        rows: US_BUSINESS_COUNTRY_SCOPE,
+        material_country_iso_map: US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL
+    });
 });
 
 // Supabase countries proxy

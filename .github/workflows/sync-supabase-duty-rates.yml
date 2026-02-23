@@ -17,10 +17,10 @@ jobs:
         with:
           node-version: "20"
 
-      # ── Pass 1: Pre-SC ruling snapshot — entryDate=2026-02-25 (day BEFORE ruling)
-      # IEEPA surcharges were still in force on 25 Feb 2026.
+      # ── Pass 1: Pre-SC ruling snapshot — entryDate=2026-02-15 (validated baseline)
+      # IEEPA surcharges baseline before the ruling period switch.
       # Writes to source=WOVE / WOVE_STAGING
-      - name: Sync pre-SC ruling rates (WOVE — 25 Feb 2026, IEEPA in effect)
+      - name: Sync pre-SC ruling rates (WOVE — 15 Feb 2026 baseline)
         env:
           WOVE_CLIENT_ID: ${{ secrets.WOVE_CLIENT_ID }}
           WOVE_CLIENT_SECRET: ${{ secrets.WOVE_CLIENT_SECRET }}
@@ -31,7 +31,7 @@ jobs:
           WOVE_MAX_RETRIES: "6"
           WOVE_RETRY_BASE_MS: "1500"
           WOVE_RETRY_JITTER_MS: "400"
-          WOVE_ENTRY_DATE: "2026-02-25"
+          WOVE_ENTRY_DATE: "2026-02-15"
           WOVE_SOURCE_LIVE: "WOVE"
           WOVE_SOURCE_STAGING: "WOVE_STAGING"
         run: node scripts/populate_us_rates.js

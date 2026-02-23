@@ -101,6 +101,18 @@
   .tl-btn.active-both { background: #7c3aed; color: white; box-shadow: 0 2px 8px rgba(124,58,237,0.35); }
   .tl-date-label { font-size: 0.78rem; color: #94a3b8; font-weight: 500; }
   .tl-date-label span { color: #1e293b; font-weight: 700; }
+  .scope-toggle-btn {
+    border: 1px solid #dbe2ea;
+    background: #f8fafc;
+    color: #475569;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .scope-toggle-btn:hover { background: #eef2f7; color: #1e293b; }
 
   /* summary strip */
   .summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
@@ -134,9 +146,9 @@
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover { background: #f8fafc; }
 
-  .country-cell { display: flex; align-items: center; gap: 8px; min-width: 150px; }
+  .country-cell { display: flex; align-items: center; gap: 8px; min-width: 190px; }
   .flag { width: 22px; height: 15px; border-radius: 2px; object-fit: cover; }
-  .country-name { font-weight: 600; color: #1e293b; }
+  .country-name { font-weight: 600; color: #1e293b; white-space: normal; word-break: break-word; }
 
   /* rate pill */
   .rate-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 10px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; min-width: 52px; }
@@ -193,7 +205,7 @@
   .chart-title { font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
   .bar-list { display: flex; flex-direction: column; gap: 10px; }
   .bar-row { display: flex; align-items: center; gap: 10px; }
-  .bar-label { font-size: 0.78rem; font-weight: 600; color: #475569; width: 90px; text-align: right; }
+  .bar-label { font-size: 0.78rem; font-weight: 600; color: #475569; width: 170px; text-align: left; line-height: 1.2; }
   .bar-track { flex: 1; height: 28px; background: #f1f5f9; border-radius: 6px; position: relative; overflow: hidden; }
   .bar-pre-fill  { position: absolute; top: 6px; left: 0; height: 8px; border-radius: 4px; background: #fbbf24; opacity: 0.6; transition: width 0.4s; }
   .bar-post-fill { position: absolute; top: 14px; left: 0; height: 8px; border-radius: 4px; background: #dc2626; transition: width 0.5s; }
@@ -267,10 +279,10 @@
       <div class="group-sub">Cig Paper · Tipping · Plugwrap · Inner Bundling</div>
     </div>
     <div class="group-card filter" onclick="openGroup('filter')">
-      <span class="group-count">5 materials</span>
+      <span class="group-count">6 materials</span>
       <div class="group-icon">🔬</div>
       <div class="group-name">Filter Materials</div>
-      <div class="group-sub">Filter Tow · Filter Rods · Adhesive · Plasticizer · Adsorbent</div>
+      <div class="group-sub">Filter Tow · Filter Rods · Capsules · Adhesive · Plasticizer · Adsorbent</div>
     </div>
     <div class="group-card pack" onclick="openGroup('pack')">
       <span class="group-count">3 materials</span>
@@ -334,10 +346,11 @@
         </div>
       </div>
       <div class="tl-date-label" id="dateLabel">
-        Showing rates for <span>before 26 Feb 2026</span> (Pre-Supreme Court ruling)
+        Showing rates for <span>Pre-SC baseline snapshot: 15 Feb 2026</span>
       </div>
     </div>
     <div style="display:flex;gap:10px;">
+      <button id="materialScopeToggle" class="scope-toggle-btn" onclick="toggleMaterialAdditionalCountries()">Show additional countries</button>
       <select style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.83rem;background:white;">
         <option>All regions</option>
         <option>Asia</option>
@@ -362,7 +375,7 @@
   <!-- Note callout -->
   <div class="note-callout" id="rateNote">
     <div class="note-icon">⚠️</div>
-    <p id="noteText"><strong>Pre-Supreme Court ruling (before 26 Feb 2026):</strong> Rates shown reflect duties when IEEPA surcharges were still in effect.</p>
+    <p id="noteText"><strong>Pre-Supreme Court baseline (15 Feb 2026 snapshot):</strong> Rates shown reflect duties before the ruling period adjustment.</p>
   </div>
 
   <!-- Bar chart comparison (shown in "both" mode) -->
@@ -371,10 +384,10 @@
     <div class="bar-list" id="barList"></div>
     <div style="display:flex;gap:16px;margin-top:14px;">
       <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#94a3b8;">
-        <div style="width:12px;height:8px;background:#fbbf24;opacity:0.6;border-radius:2px;"></div> Pre-IEEPA
+        <div style="width:12px;height:8px;background:#fbbf24;opacity:0.6;border-radius:2px;"></div> Pre-SC (15 Feb 2026 snapshot)
       </div>
       <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#94a3b8;">
-        <div style="width:12px;height:8px;background:#dc2626;border-radius:2px;"></div> Post-IEEPA
+        <div style="width:12px;height:8px;background:#dc2626;border-radius:2px;"></div> Post-SC (26 Feb 2026 snapshot)
       </div>
     </div>
   </div>
@@ -384,8 +397,8 @@
     <div class="tl-table-header">
       <h2 id="tableTitle">Cigarette Paper — Duty Rates by Origin Country</h2>
       <div class="tl-legend" id="tableLegend">
-        <div class="tl-legend-item"><div class="tl-dot pre"></div> Pre-SC Ruling (before 26 Feb 2026)</div>
-        <div class="tl-legend-item"><div class="tl-dot post"></div> Post-SC Ruling (26 Feb 2026 onward)</div>
+        <div class="tl-legend-item"><div class="tl-dot pre"></div> Pre-SC (15 Feb 2026 snapshot)</div>
+        <div class="tl-legend-item"><div class="tl-dot post"></div> Post-SC (26 Feb 2026 snapshot)</div>
       </div>
     </div>
     <table>
@@ -420,10 +433,11 @@ const GROUP_META = {
   filter: {
     icon: '🔬',
     title: 'Filter Materials',
-    sub: 'Filter Tow · Filter Rods · Adhesive · Plasticizer · Adsorbent — US destination',
+    sub: 'Filter Tow · Filter Rods · Capsules · Adhesive · Plasticizer · Adsorbent — US destination',
     mats: [
       { id: 'Filter Tow', label: 'Filter Tow', hts: '5502.10.00.00' },
-      { id: 'Filter Rods', label: 'Filter Rods', hts: '5601.22.00.00' },
+      { id: 'Filter Rods', label: 'Filter Rods', hts: '5601.22.00.91' },
+      { id: 'Capsules', label: 'Capsules', hts: '3926.90.99.90' },
       { id: 'Adhesive', label: 'Adhesive', hts: '3506.91.50.00' },
       { id: 'Plasticizer', label: 'Plasticizer', hts: '2917.12.50.00' },
       { id: 'Adsorbent', label: 'Adsorbent', hts: '3802.10.00.00' }
@@ -455,9 +469,9 @@ const GROUP_META = {
 
 const COUNTRY_NAMES = {
   CN:'China', MX:'Mexico', CA:'Canada', AU:'Australia', CL:'Chile', CO:'Colombia', KR:'South Korea',
-  SG:'Singapore', HN:'Honduras', JP:'Japan', CH:'Switzerland', GB:'Great Britain', IN:'India',
+  SG:'Singapore', HN:'Honduras', JP:'Japan', CH:'Switzerland', GB:'United Kingdom', IN:'India',
   ID:'Indonesia', VN:'Vietnam', TH:'Thailand', MY:'Malaysia', BR:'Brazil', AR:'Argentina', TR:'Turkey',
-  ZA:'South Africa', EG:'Egypt', AE:'UAE', NO:'Norway', PK:'Pakistan', BD:'Bangladesh', LK:'Sri Lanka',
+  ZA:'South Africa', EG:'Egypt', AE:'United Arab Emirates', NO:'Norway', PK:'Pakistan', BD:'Bangladesh', LK:'Sri Lanka',
   AT:'Austria', BE:'Belgium', BG:'Bulgaria', HR:'Croatia', CY:'Cyprus', CZ:'Czech Republic', DK:'Denmark',
   EE:'Estonia', FI:'Finland', FR:'France', DE:'Germany', GR:'Greece', HU:'Hungary', IE:'Ireland',
   IT:'Italy', LV:'Latvia', LT:'Lithuania', LU:'Luxembourg', MT:'Malta', NL:'Netherlands', PL:'Poland',
@@ -465,9 +479,75 @@ const COUNTRY_NAMES = {
   TW:'Taiwan', PH:'Philippines', US:'United States'
 };
 
+const COUNTRY_NAME_RESOLVER = (typeof Intl !== 'undefined' && Intl.DisplayNames)
+  ? new Intl.DisplayNames(['en'], { type: 'region' })
+  : null;
+
+function getCountryName(isoCode) {
+  const iso = String(isoCode || '').toUpperCase();
+  if (!iso) return '';
+  if (COUNTRY_NAMES[iso]) return COUNTRY_NAMES[iso];
+  if (COUNTRY_NAME_RESOLVER) {
+    const resolved = COUNTRY_NAME_RESOLVER.of(iso);
+    if (resolved && resolved !== iso) return resolved;
+  }
+  return iso;
+}
+
+const US_BUSINESS_COUNTRY_ISOS = new Set([
+  'AT', 'BR', 'CA', 'CN', 'CZ', 'DE', 'FR', 'ID',
+  'KR', 'MY', 'PH', 'PL', 'TH', 'US', 'ZA'
+]);
+const US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL = {
+  'Cigarette Paper': ['AT', 'BR', 'FR', 'ID', 'PL', 'US'],
+  'Tipping Paper': ['AT', 'BR', 'CA', 'DE', 'MY', 'PH', 'ZA'],
+  Plugwrap: ['AT', 'BR', 'CZ', 'FR'],
+  'Filter Tow': ['DE'],
+  'Filter Rods': ['KR', 'TH'],
+  Plasticizer: ['CN']
+};
+
+async function loadUsBusinessCountryScope() {
+  try {
+    const response = await fetch('/api/country-scope?destination=US&scope=business');
+    if (!response.ok) return;
+    const payload = await response.json();
+    const rows = Array.isArray(payload.rows) ? payload.rows : [];
+    if (!rows.length) return;
+    US_BUSINESS_COUNTRY_ISOS.clear();
+    rows.forEach((row) => {
+      const iso = String(row.country_iso || '').toUpperCase();
+      if (iso) US_BUSINESS_COUNTRY_ISOS.add(iso);
+    });
+
+    const materialMap = payload.material_country_iso_map;
+    if (materialMap && typeof materialMap === 'object') {
+      Object.keys(US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL).forEach((key) => delete US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL[key]);
+      Object.entries(materialMap).forEach(([material, isos]) => {
+        if (!Array.isArray(isos)) return;
+        const cleaned = isos.map((iso) => String(iso || '').toUpperCase()).filter(Boolean);
+        if (cleaned.length > 0) {
+          US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL[material] = [...new Set(cleaned)];
+        }
+      });
+    }
+  } catch (_) {
+    // Keep fallback scope if API is unavailable.
+  }
+}
+
+function getBusinessScopeForMaterial(materialId) {
+  const mapped = US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL[materialId];
+  if (Array.isArray(mapped) && mapped.length > 0) {
+    return new Set(mapped.map((iso) => String(iso).toUpperCase()));
+  }
+  return new Set(US_BUSINESS_COUNTRY_ISOS);
+}
+
 let currentMode = 'pre';
 let currentGroup = 'paper';
 let currentMat = GROUP_META.paper.mats[0].id;
+let showAdditionalCountries = false;
 
 let preRows = [];
 let postRows = [];
@@ -481,6 +561,20 @@ function showHome() {
 
 function showMaterialHome() {
   showHome();
+}
+
+function updateMaterialScopeToggleUi() {
+  const btn = document.getElementById('materialScopeToggle');
+  if (!btn) return;
+  btn.textContent = showAdditionalCountries
+    ? 'Show supplier countries only'
+    : 'Show additional countries';
+}
+
+function toggleMaterialAdditionalCountries() {
+  showAdditionalCountries = !showAdditionalCountries;
+  updateMaterialScopeToggleUi();
+  renderAll();
 }
 
 async function ensureDataLoaded() {
@@ -528,7 +622,7 @@ function buildMergedRows(materialId) {
   const all = new Set([...preMap.keys(), ...postMap.keys()]);
   return Array.from(all).map((iso) => ({
     iso,
-    name: COUNTRY_NAMES[iso] || iso,
+    name: getCountryName(iso),
     pre: preMap.get(iso) || null,
     post: postMap.get(iso) || null
   })).sort((a, b) => {
@@ -570,22 +664,22 @@ function setMode(mode, btn) {
 function updateDateLabel() {
   const el = document.getElementById('dateLabel');
   if (currentMode === 'pre') {
-    el.innerHTML = 'Showing rates for <span>before 26 Feb 2026</span> — Pre-Supreme Court ruling (IEEPA in effect)';
+    el.innerHTML = 'Showing rates for <span>Pre-SC baseline snapshot: 15 Feb 2026</span>';
   } else if (currentMode === 'post') {
-    el.innerHTML = 'Showing rates for <span>26 Feb 2026 onward</span> — Post-Supreme Court ruling (IEEPA suspended)';
+    el.innerHTML = 'Showing rates for <span>Post-SC snapshot: 26 Feb 2026</span>';
   } else {
-    el.innerHTML = 'Comparing <span>Pre (&lt; 26 Feb 2026)</span> vs <span>Post (>= 26 Feb 2026)</span> side by side';
+    el.innerHTML = 'Comparing <span>15 Feb 2026</span> vs <span>26 Feb 2026</span> snapshots side by side';
   }
 }
 
 function updateNote() {
   const el = document.getElementById('noteText');
   if (currentMode === 'pre') {
-    el.innerHTML = '<strong>Pre-Supreme Court ruling (&lt; 26 Feb 2026):</strong> Rates when IEEPA surcharges were still in effect.';
+    el.innerHTML = '<strong>Pre-SC baseline (15 Feb 2026 snapshot):</strong> Rates captured before the ruling period adjustment.';
   } else if (currentMode === 'post') {
-    el.innerHTML = '<strong>Post-Supreme Court ruling (26 Feb 2026 onward):</strong> Rates after IEEPA suspension. MFN and Section 301 components still apply where relevant.';
+    el.innerHTML = '<strong>Post-SC snapshot (26 Feb 2026):</strong> Rates after the ruling baseline switch.';
   } else {
-    el.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = Pre-SC (&lt; 26 Feb 2026), Red = Post-SC (>= 26 Feb 2026), Delta shows change.';
+    el.innerHTML = '<strong>Side-by-side comparison:</strong> Amber = Pre-SC (15 Feb snapshot), Red = Post-SC (26 Feb snapshot), Delta shows change.';
   }
 }
 
@@ -613,6 +707,7 @@ async function openGroup(groupId) {
   document.querySelector('.tl-btn').classList.add('active-pre');
   updateDateLabel();
   updateNote();
+  updateMaterialScopeToggleUi();
 
   document.getElementById('homeView').style.display = 'none';
   document.getElementById('detailView').style.display = 'block';
@@ -629,13 +724,18 @@ function selectMat(el, materialId) {
 }
 
 function renderAll() {
+  updateMaterialScopeToggleUi();
   const meta = findMatMeta();
   const allRows = buildMergedRows(currentMat);
-  const rows = allRows.filter((r) => {
+  const modeRows = allRows.filter((r) => {
     if (currentMode === 'pre') return r.pre !== null;
     if (currentMode === 'post') return r.post !== null;
     return r.pre !== null || r.post !== null;
   });
+  const materialScopeSet = getBusinessScopeForMaterial(currentMat);
+  const rows = showAdditionalCountries
+    ? modeRows
+    : modeRows.filter((r) => materialScopeSet.has(r.iso));
 
   const preRates = rows.filter((r) => r.pre).map((r) => r.pre.rate);
   const postRates = rows.filter((r) => r.post).map((r) => r.post.rate);
@@ -647,8 +747,8 @@ function renderAll() {
 
   document.getElementById('summaryStrip').innerHTML = `
     <div class="s-card c-purple"><div class="s-label">Countries</div><div class="s-value">${rows.length}</div><div class="s-sub">sourced</div></div>
-    <div class="s-card c-amber"><div class="s-label">Pre-SC Avg</div><div class="s-value">${avgPre}${avgPre !== '—' ? '%' : ''}</div><div class="s-sub">before 26 Feb 2026</div></div>
-    <div class="s-card c-red"><div class="s-label">Post-SC Avg</div><div class="s-value">${avgPost}${avgPost !== '—' ? '%' : ''}</div><div class="s-sub">26 Feb 2026 onward</div></div>
+    <div class="s-card c-amber"><div class="s-label">Pre-SC Avg</div><div class="s-value">${avgPre}${avgPre !== '—' ? '%' : ''}</div><div class="s-sub">15 Feb 2026 snapshot</div></div>
+    <div class="s-card c-red"><div class="s-label">Post-SC Avg</div><div class="s-value">${avgPost}${avgPost !== '—' ? '%' : ''}</div><div class="s-sub">26 Feb 2026 snapshot</div></div>
     <div class="s-card c-blue"><div class="s-label">Duty-Free Origins</div><div class="s-value">${freeCount}</div><div class="s-sub">${currentMode === 'post' ? 'post-SC' : 'pre-SC'}</div></div>
   `;
 
@@ -674,7 +774,7 @@ function renderAll() {
     document.querySelector('.chart-title').textContent = `${meta.label} — Pre vs Post duty rate by origin country (top 10)`;
     document.getElementById('barList').innerHTML = top.map((r) => `
       <div class="bar-row">
-        <div class="bar-label">${(COUNTRY_NAMES[r.iso] || r.iso).split(' ')[0]}</div>
+        <div class="bar-label">${getCountryName(r.iso)}</div>
         <div class="bar-track">
           <div class="bar-pre-fill" style="width:${((r.pre.rate / maxRate) * 100).toFixed(1)}%"></div>
           <div class="bar-post-fill" style="width:${((r.post.rate / maxRate) * 100).toFixed(1)}%"></div>
@@ -692,7 +792,7 @@ function renderAll() {
   } else if (currentMode === 'post') {
     head = '<tr><th>Country</th><th>Post-SC Rate</th><th>Rate Type</th><th>HTS Code</th></tr>';
   } else {
-    head = '<tr><th>Country</th><th>Pre-SC <span style="color:#f59e0b">(before 26 Feb)</span></th><th>Post-SC <span style="color:#dc2626">(26 Feb onward)</span></th><th>Δ Change</th><th>Rate Type</th></tr>';
+    head = '<tr><th>Country</th><th>Pre-SC <span style="color:#f59e0b">(15 Feb snapshot)</span></th><th>Post-SC <span style="color:#dc2626">(26 Feb snapshot)</span></th><th>Δ Change</th><th>Rate Type</th></tr>';
   }
   document.getElementById('tableHead').innerHTML = head;
 
@@ -740,7 +840,10 @@ function renderAll() {
   document.getElementById('tableBody').innerHTML = bodyHtml;
 }
 
-renderAll();
+(async () => {
+  await loadUsBusinessCountryScope();
+  renderAll();
+})();
 </script>
 </body>
 </html>
