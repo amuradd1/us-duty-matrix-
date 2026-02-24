@@ -379,6 +379,14 @@
             padding: 3px;
         }
 
+        .route-v3 .rv3-snapshot-selector {
+            display: flex;
+            gap: 3px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 3px;
+        }
+
         .route-v3 .rv3-dest-option {
             border: none;
             border-radius: 8px;
@@ -415,6 +423,41 @@
             background: white;
             color: #1e293b;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .route-v3 .rv3-snapshot-option {
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #64748b;
+            font-size: 0.77rem;
+            font-weight: 700;
+            padding: 8px 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .route-v3 .rv3-snapshot-option:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.6);
+            color: #334155;
+        }
+
+        .route-v3 .rv3-snapshot-option.active-pre {
+            background: #d97706;
+            color: white;
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.32);
+        }
+
+        .route-v3 .rv3-snapshot-option.active-post {
+            background: #dc2626;
+            color: white;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.32);
+        }
+
+        .route-v3 .rv3-snapshot-option:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
         }
 
         .route-v3 .rv3-divider {
@@ -3227,6 +3270,14 @@
                     </div>
                 </div>
 
+                <div class="rv3-group">
+                    <label>US Snapshot</label>
+                    <div id="compareSnapshotSelector" class="rv3-snapshot-selector">
+                        <button class="rv3-snapshot-option active-pre" data-snapshot="pre" onclick="setCompareUsSnapshot(this)">Pre-SC (15 Feb)</button>
+                        <button class="rv3-snapshot-option" data-snapshot="post" onclick="setCompareUsSnapshot(this)">Post-SC (26 Feb+)</button>
+                    </div>
+                </div>
+
                 <div class="rv3-divider"></div>
 
                 <div class="rv3-group">
@@ -3785,6 +3836,30 @@
                 : 'Show additional countries';
         }
 
+        function updateCompareSnapshotToggleUi() {
+            const selector = document.getElementById('compareSnapshotSelector');
+            if (!selector) return;
+
+            const disabled = compareDestination === 'eu';
+            selector.querySelectorAll('.rv3-snapshot-option').forEach((button) => {
+                const snapshot = button.dataset.snapshot;
+                const isActive = snapshot === compareUsSnapshot;
+                button.disabled = disabled;
+                button.classList.remove('active-pre', 'active-post');
+                if (isActive) {
+                    button.classList.add(snapshot === 'post' ? 'active-post' : 'active-pre');
+                }
+            });
+        }
+
+        function setCompareUsSnapshot(buttonEl) {
+            const snapshot = buttonEl && buttonEl.dataset ? buttonEl.dataset.snapshot : null;
+            if (!snapshot || !COMPARE_US_SNAPSHOT_CONFIG[snapshot]) return;
+            compareUsSnapshot = snapshot;
+            updateCompareSnapshotToggleUi();
+            updateCompareView();
+        }
+
         function toggleCompareAdditionalCountries() {
             if (compareDestination !== 'us') return;
             showAdditionalCompareCountries = !showAdditionalCompareCountries;
@@ -4321,8 +4396,21 @@
         }
 
         // ========== COMPARE VIEW LOGIC ==========
-        let compareDataCache = { US: null, EU: null };
+        const COMPARE_US_SNAPSHOT_CONFIG = {
+            pre: {
+                source: 'WOVE',
+                label: 'Pre-SC (15 Feb 2026 snapshot)',
+                shortLabel: 'Pre-SC'
+            },
+            post: {
+                source: 'WOVE_TODAY',
+                label: 'Post-SC (26 Feb 2026 snapshot)',
+                shortLabel: 'Post-SC'
+            }
+        };
+        let compareDataCache = { US: { pre: null, post: null }, EU: null };
         let compareDestination = 'us'; // us | eu | compare
+        let compareUsSnapshot = 'pre'; // pre | post
         let compareLoadingPromise = null;
         let compareRowsForView = [];
         let compareSelectedIso = null;
@@ -4353,11 +4441,28 @@
             UAE: ['United Arab Emirates']
         };
 
+        function getCompareSnapshotConfig(snapshot = compareUsSnapshot) {
+            return COMPARE_US_SNAPSHOT_CONFIG[snapshot] || COMPARE_US_SNAPSHOT_CONFIG.pre;
+        }
+
+        function getActiveCompareUsRows() {
+            if (!compareDataCache.US) return [];
+            return compareDataCache.US[compareUsSnapshot] || [];
+        }
+
+        function hasCompareDataLoaded() {
+            return Array.isArray(compareDataCache.US?.pre)
+                && Array.isArray(compareDataCache.US?.post)
+                && Array.isArray(compareDataCache.EU);
+        }
+
         function getAllCompareCountryOptions() {
             const allIsos = new Set();
-            (compareDataCache.US || []).forEach((row) => {
-                const iso = String(row.country_iso || '').toUpperCase();
-                if (iso) allIsos.add(iso);
+            [compareDataCache.US?.pre, compareDataCache.US?.post].forEach((rows) => {
+                (rows || []).forEach((row) => {
+                    const iso = String(row.country_iso || '').toUpperCase();
+                    if (iso) allIsos.add(iso);
+                });
             });
             (compareDataCache.EU || []).forEach((row) => {
                 const iso = String(row.country_iso || '').toUpperCase();
@@ -4555,28 +4660,38 @@
         }
 
         async function loadCompareData() {
-            if (compareDataCache.US && compareDataCache.EU) return;
+            if (hasCompareDataLoaded()) return;
             if (compareLoadingPromise) return compareLoadingPromise;
 
-            setCompareStatus('Loading US and EU data...');
+            setCompareStatus('Loading US/EU snapshots...');
 
             compareLoadingPromise = (async () => {
-                let usRows = [];
+                let usPreRows = [];
+                let usPostRows = [];
                 let euRows = [];
-                let usErr = null;
+                let usPreErr = null;
+                let usPostErr = null;
                 let euErr = null;
 
                 try {
-                    const [usRes, euRes] = await Promise.all([
-                        fetch('/api/duty-rates?destination=US&source=WOVE'),
+                    const [usPreRes, usPostRes, euRes] = await Promise.all([
+                        fetch(`/api/duty-rates?destination=US&source=${COMPARE_US_SNAPSHOT_CONFIG.pre.source}`),
+                        fetch(`/api/duty-rates?destination=US&source=${COMPARE_US_SNAPSHOT_CONFIG.post.source}`),
                         fetch('/api/duty-rates?destination=EU&source=TARIC')
                     ]);
 
-                    if (usRes.ok) {
-                        const usPayload = await usRes.json();
-                        usRows = Array.isArray(usPayload.rows) ? usPayload.rows : [];
+                    if (usPreRes.ok) {
+                        const usPayload = await usPreRes.json();
+                        usPreRows = Array.isArray(usPayload.rows) ? usPayload.rows : [];
                     } else {
-                        usErr = `US HTTP ${usRes.status}`;
+                        usPreErr = `${COMPARE_US_SNAPSHOT_CONFIG.pre.source} HTTP ${usPreRes.status}`;
+                    }
+
+                    if (usPostRes.ok) {
+                        const usPayload = await usPostRes.json();
+                        usPostRows = Array.isArray(usPayload.rows) ? usPayload.rows : [];
+                    } else {
+                        usPostErr = `${COMPARE_US_SNAPSHOT_CONFIG.post.source} HTTP ${usPostRes.status}`;
                     }
 
                     if (euRes.ok) {
@@ -4586,19 +4701,21 @@
                         euErr = `EU HTTP ${euRes.status}`;
                     }
                 } catch (err) {
-                    usErr = usErr || err.message;
+                    usPreErr = usPreErr || err.message;
+                    usPostErr = usPostErr || err.message;
                     euErr = euErr || err.message;
                 }
 
-                compareDataCache.US = usRows;
+                compareDataCache.US.pre = usPreRows;
+                compareDataCache.US.post = usPostRows;
                 compareDataCache.EU = euRows;
                 populateCompareCountryFilter();
 
-                if (usErr && euErr) {
-                    setCompareStatus(`Failed loading compare datasets (${usErr}; ${euErr})`, true);
-                } else if (usErr || euErr) {
-                    const partialErr = usErr ? `US: ${usErr}` : `EU: ${euErr}`;
-                    setCompareStatus(`Loaded partial data (${partialErr})`, true);
+                const errors = [usPreErr, usPostErr, euErr].filter(Boolean);
+                if (errors.length === 3) {
+                    setCompareStatus(`Failed loading compare datasets (${errors.join('; ')})`, true);
+                } else if (errors.length > 0) {
+                    setCompareStatus(`Loaded partial data (${errors.join('; ')})`, true);
                 } else {
                     setCompareStatus('Data loaded. Adjust destination, material, or search.');
                 }
@@ -4613,12 +4730,13 @@
 
         function buildCompareRows(materialKey) {
             const materialName = materialColumns[materialKey];
-            if (!materialName || !compareDataCache.US || !compareDataCache.EU) return [];
+            if (!materialName || !Array.isArray(compareDataCache.EU)) return [];
 
+            const activeUsRows = getActiveCompareUsRows();
             const usRates = new Map();
             const euRates = new Map();
 
-            compareDataCache.US.forEach((row) => {
+            activeUsRows.forEach((row) => {
                 if (row.material !== materialName) return;
                 const iso = String(row.country_iso || '').toUpperCase();
                 if (!iso) return;
@@ -4847,6 +4965,7 @@
             if (compareDestination === 'compare') {
                 const usDisplay = formatCompareRate(row.usRate);
                 const euDisplay = formatCompareRate(row.euRate);
+                const usSnapshotLabel = getCompareSnapshotConfig().shortLabel;
                 let optimalClass = 'best-equal';
                 let optimalText = '= Same rate';
 
@@ -4860,7 +4979,7 @@
 
                 bodyHtml = `
                     <div class="tt-rates">
-                        <div class="tt-rate us"><div class="tt-label">🇺🇸 US</div><div class="tt-value">${usDisplay}</div></div>
+                        <div class="tt-rate us"><div class="tt-label">🇺🇸 US (${usSnapshotLabel})</div><div class="tt-value">${usDisplay}</div></div>
                         <div class="tt-rate eu"><div class="tt-label">🇪🇺 EU</div><div class="tt-value">${euDisplay}</div></div>
                     </div>
                     <div class="tt-optimal ${optimalClass}">${optimalText}</div>
@@ -4870,10 +4989,11 @@
                 const display = formatCompareRate(rate);
                 const basis = getCompareBasis(row);
                 const isUS = compareDestination === 'us';
+                const usSnapshotLabel = getCompareSnapshotConfig().shortLabel;
 
                 bodyHtml = `
                     <div class="tt-rate-single ${isUS ? 'us-bg' : 'eu-bg'}">
-                        <div class="tt-label">${isUS ? '🇺🇸 US Rate' : '🇪🇺 EU Rate'}</div>
+                        <div class="tt-label">${isUS ? `🇺🇸 US Rate (${usSnapshotLabel})` : '🇪🇺 EU Rate'}</div>
                         <div class="tt-value">${display}</div>
                     </div>
                     <div class="tt-basis">${basis}</div>
@@ -5007,18 +5127,19 @@
             const matName = materialColumns[materialKey] || materialKey;
             const mapTitle = document.getElementById('compareMapTitle');
             const tableTitle = document.getElementById('compareTableTitle');
+            const snapshotLabel = getCompareSnapshotConfig().shortLabel;
 
             if (!mapTitle || !tableTitle) return;
 
             if (compareDestination === 'us') {
-                mapTitle.innerHTML = `Best Source Countries for <span class="rv3-dest-label us-label">🇺🇸 US</span> — ${matName}`;
-                tableTitle.textContent = 'Source Countries Ranked by US Duty Rate';
+                mapTitle.innerHTML = `Best Source Countries for <span class="rv3-dest-label us-label">🇺🇸 US</span> — ${matName} (${snapshotLabel})`;
+                tableTitle.textContent = `Source Countries Ranked by US Duty Rate (${snapshotLabel})`;
             } else if (compareDestination === 'eu') {
                 mapTitle.innerHTML = `Best Source Countries for <span class="rv3-dest-label eu-label">🇪🇺 EU</span> — ${matName}`;
                 tableTitle.textContent = 'Source Countries Ranked by EU Duty Rate';
             } else {
-                mapTitle.innerHTML = `US vs EU Rate Comparison <span class="rv3-dest-label compare-label">⚖️ Compare</span> — ${matName}`;
-                tableTitle.textContent = 'Source Countries Ranked by Best Destination';
+                mapTitle.innerHTML = `US vs EU Rate Comparison <span class="rv3-dest-label compare-label">⚖️ Compare</span> — ${matName} (US ${snapshotLabel})`;
+                tableTitle.textContent = `Source Countries Ranked by Best Destination (US ${snapshotLabel})`;
             }
         }
 
@@ -5027,6 +5148,7 @@
             const tbody = document.getElementById('compareTableBody');
             const showCount = document.getElementById('compareShowCount');
             const totalCount = document.getElementById('compareTotalCount');
+            const snapshotLabel = getCompareSnapshotConfig().shortLabel;
 
             const isCompareMode = compareDestination === 'compare';
             showCount.textContent = String(rows.length);
@@ -5037,7 +5159,7 @@
                     <tr>
                         <th>Rank</th>
                         <th>Source Country</th>
-                        <th>🇺🇸 US Rate</th>
+                        <th>🇺🇸 US Rate (${snapshotLabel})</th>
                         <th>🇪🇺 EU Rate</th>
                         <th>Dumbbell</th>
                         <th>Best Dest.</th>
@@ -5046,11 +5168,14 @@
                 `;
             } else {
                 const flag = compareDestination === 'us' ? '🇺🇸' : '🇪🇺';
+                const rateHeader = compareDestination === 'us'
+                    ? `${flag} Rate (${snapshotLabel})`
+                    : `${flag} Rate`;
                 thead.innerHTML = `
                     <tr>
                         <th>Rank</th>
                         <th>Source Country</th>
-                        <th>${flag} Rate</th>
+                        <th>${rateHeader}</th>
                         <th>Rate Visual</th>
                         <th>Basis / Programme</th>
                     </tr>
@@ -5174,6 +5299,7 @@
             if (!['us', 'eu', 'compare'].includes(dest)) return;
             compareDestination = dest;
             updateCompareScopeToggleUi();
+            updateCompareSnapshotToggleUi();
 
             document.querySelectorAll('.rv3-dest-option').forEach((option) => {
                 option.classList.remove('active-us', 'active-eu', 'active-compare');
@@ -5190,9 +5316,10 @@
         async function updateCompareView() {
             const materialKey = document.getElementById('compareMaterial').value;
 
-            if (!compareDataCache.US || !compareDataCache.EU) {
+            if (!hasCompareDataLoaded()) {
                 await loadCompareData();
             }
+            updateCompareSnapshotToggleUi();
 
             populateCompareCountryFilter();
 
@@ -5219,7 +5346,15 @@
             const scopeLabel = (compareDestination === 'us' && !showAdditionalCompareCountries)
                 ? 'supplier countries'
                 : 'all countries';
-            setCompareStatus(`Showing ${rows.length} of ${totalRows} countries (${scopeLabel})${countryScope} for ${matName}.`);
+            const snapshotCfg = getCompareSnapshotConfig();
+            const snapshotLabel = compareDestination === 'eu'
+                ? ''
+                : ` using ${snapshotCfg.label}`;
+            const postMissing = compareUsSnapshot === 'post' && getActiveCompareUsRows().length === 0;
+            const postWarning = postMissing
+                ? ' Post-SC snapshot is not available yet (source=WOVE_TODAY).'
+                : '';
+            setCompareStatus(`Showing ${rows.length} of ${totalRows} countries (${scopeLabel})${countryScope} for ${matName}${snapshotLabel}.${postWarning}`, postMissing);
         }
         // ========== END COMPARE VIEW LOGIC ==========
 
@@ -5268,6 +5403,7 @@
             refreshHomeCountryCount();
             updateDatasetHeader();
             updateCompareScopeToggleUi();
+            updateCompareSnapshotToggleUi();
             renderMaterialTable();
             renderHTSTable();
 
