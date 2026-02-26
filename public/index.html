@@ -3602,7 +3602,8 @@
         const DATASET_CONFIG = {
             US: {
                 destination: 'US',
-                source: 'WOVE',
+                source: 'WOVE_TODAY',
+                fallbackSource: 'WOVE',
                 title: 'US Import Duty Matrix',
                 subtitle: 'Duty rates by material group, HTS code, and origin country'
             },
@@ -4264,8 +4265,32 @@
                     return;
                 }
 
-                const payload = await response.json();
-                const rows = Array.isArray(payload.rows) ? payload.rows : [];
+                let payload = await response.json();
+                let rows = Array.isArray(payload.rows) ? payload.rows : [];
+                let usedSource = dataset.source;
+
+                // If primary source is empty and a fallback is configured, try the fallback.
+                // This allows WOVE_TODAY to gracefully degrade to the WOVE pre-SC snapshot
+                // until the post-SC sync has been run.
+                if (rows.length === 0 && dataset.fallbackSource) {
+                    console.info(`${datasetKey}: primary source "${dataset.source}" returned no rows, falling back to "${dataset.fallbackSource}"`);
+                    const fallbackUrl = `/api/duty-rates?destination=${dataset.destination}&source=${dataset.fallbackSource}${scopeParam}`;
+                    try {
+                        const fbResponse = await fetch(fallbackUrl);
+                        if (fbResponse.ok) {
+                            const fbPayload = await fbResponse.json();
+                            const fbRows = Array.isArray(fbPayload.rows) ? fbPayload.rows : [];
+                            if (fbRows.length > 0) {
+                                rows = fbRows;
+                                usedSource = dataset.fallbackSource;
+                                setDataStatus(`Note: Showing pre-SC baseline rates — post-SC sync (${dataset.source}) not yet available.`, true);
+                            }
+                        }
+                    } catch (fbErr) {
+                        console.warn(`Fallback source "${dataset.fallbackSource}" also failed:`, fbErr.message);
+                    }
+                }
+
                 const availableCountries = new Set(rows.map((row) => String(row.country_iso || '').toUpperCase()).filter(Boolean));
 
                 if (availableCountries.size === 0) {
@@ -4320,8 +4345,10 @@
                     updateStats();
                 }
 
-                console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries`);
-                setDataStatus(`Loaded ${datasetKey} dataset from Supabase: ${dutyData.length} countries.`);
+                console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries (source: ${usedSource})`);
+                if (usedSource === dataset.source) {
+                    setDataStatus(`Loaded ${datasetKey} dataset from Supabase: ${dutyData.length} countries.`);
+                }
             } catch (error) {
                 console.warn(`Failed to load ${datasetKey} duty rates:`, error.message);
                 dutyData = [];
