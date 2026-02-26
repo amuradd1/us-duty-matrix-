@@ -3273,8 +3273,8 @@
                 <div class="rv3-group">
                     <label>US Snapshot</label>
                     <div id="compareSnapshotSelector" class="rv3-snapshot-selector">
-                        <button class="rv3-snapshot-option active-pre" data-snapshot="pre" onclick="setCompareUsSnapshot(this)">Pre-SC (15 Feb)</button>
-                        <button class="rv3-snapshot-option" data-snapshot="post" onclick="setCompareUsSnapshot(this)">Post-SC (26 Feb+)</button>
+                        <button class="rv3-snapshot-option" data-snapshot="pre" onclick="setCompareUsSnapshot(this)">Pre-SC (15 Feb)</button>
+                        <button class="rv3-snapshot-option active-post" data-snapshot="post" onclick="setCompareUsSnapshot(this)">Post-SC (26 Feb+)</button>
                     </div>
                 </div>
 
@@ -3602,7 +3602,8 @@
         const DATASET_CONFIG = {
             US: {
                 destination: 'US',
-                source: 'WOVE',
+                source: 'WOVE_TODAY',
+                fallbackSource: 'WOVE',
                 title: 'US Import Duty Matrix',
                 subtitle: 'Duty rates by material group, HTS code, and origin country'
             },
@@ -3629,6 +3630,7 @@
         };
 
         let activeDataset = 'US';
+        let activeUsSource = null; // tracks which Supabase source tag is currently loaded for the US tab
         let dutyData = [];
         let filteredData = [];
         let currentSort = {column: 'country', ascending: true};
@@ -4264,8 +4266,32 @@
                     return;
                 }
 
-                const payload = await response.json();
-                const rows = Array.isArray(payload.rows) ? payload.rows : [];
+                let payload = await response.json();
+                let rows = Array.isArray(payload.rows) ? payload.rows : [];
+                let usedSource = dataset.source;
+
+                // If primary source is empty and a fallback is configured, try the fallback.
+                // This allows WOVE_TODAY to gracefully degrade to the WOVE pre-SC snapshot
+                // until the post-SC sync has been run.
+                if (rows.length === 0 && dataset.fallbackSource) {
+                    console.info(`${datasetKey}: primary source "${dataset.source}" returned no rows, falling back to "${dataset.fallbackSource}"`);
+                    const fallbackUrl = `/api/duty-rates?destination=${dataset.destination}&source=${dataset.fallbackSource}${scopeParam}`;
+                    try {
+                        const fbResponse = await fetch(fallbackUrl);
+                        if (fbResponse.ok) {
+                            const fbPayload = await fbResponse.json();
+                            const fbRows = Array.isArray(fbPayload.rows) ? fbPayload.rows : [];
+                            if (fbRows.length > 0) {
+                                rows = fbRows;
+                                usedSource = dataset.fallbackSource;
+                                setDataStatus(`Note: Showing pre-SC baseline rates — post-SC sync (${dataset.source}) not yet available.`, true);
+                            }
+                        }
+                    } catch (fbErr) {
+                        console.warn(`Fallback source "${dataset.fallbackSource}" also failed:`, fbErr.message);
+                    }
+                }
+
                 const availableCountries = new Set(rows.map((row) => String(row.country_iso || '').toUpperCase()).filter(Boolean));
 
                 if (availableCountries.size === 0) {
@@ -4278,10 +4304,11 @@
                     return;
                 }
 
-                dutyData = cloneDutyData(staticDutyData).filter((row) => availableCountries.has(row.iso));
+                // Build a static metadata lookup (country name, region, program, etc.)
+                // We use static data ONLY for metadata — all material rates are reset to null
+                // so WOVE_TODAY live rates always win, matching what the compare tab shows.
+                const staticByIso = Object.fromEntries(staticDutyData.map(r => [r.iso, r]));
 
-                // Add rows for countries in API but not in staticDutyData
-                const staticIsos = new Set(dutyData.map(r => r.iso));
                 const countryNameMap = {};
                 try {
                     const cRes = await fetch('/api/countries');
@@ -4291,9 +4318,12 @@
                     }
                 } catch(e) { /* ignore */ }
 
+                dutyData = [];
                 availableCountries.forEach(iso => {
-                    if (!staticIsos.has(iso)) {
-                        const newRow = {
+                    const staticRow = staticByIso[iso];
+                    const newRow = staticRow
+                        ? { ...staticRow }
+                        : {
                             country: countryNameMap[iso] || iso,
                             iso: iso,
                             region: '-',
@@ -4302,26 +4332,30 @@
                             notes: '',
                             source: ''
                         };
-                        Object.keys(materialColumns).forEach(m => { newRow[m] = 0; });
-                        dutyData.push(newRow);
-                    }
+                    // Reset ALL material columns to null so live rates always overwrite
+                    // static hardcoded values (prevents stale pre-SC rates persisting).
+                    Object.keys(materialColumns).forEach(m => { newRow[m] = null; });
+                    dutyData.push(newRow);
                 });
 
-                const merged = mergeLiveRates(rows);
+                const merged = mergeLiveRates(rows, usedSource);
                 populateCountryFilter();
                 const homeCountryEl = document.getElementById('homeCountryCount');
                 if (homeCountryEl) homeCountryEl.textContent = String(dutyData.length);
 
-                if (merged.updatedCells > 0) {
-                    applyFilters();
-                } else {
-                    filteredData = [...dutyData];
-                    renderTable();
-                    updateStats();
-                }
+                applyFilters();
 
-                console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries`);
-                setDataStatus(`Loaded ${datasetKey} dataset from Supabase: ${dutyData.length} countries.`);
+                if (datasetKey === 'US') activeUsSource = usedSource;
+
+                console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries (source: ${usedSource})`);
+                if (usedSource === dataset.source) {
+                    const snapshotLabel = (datasetKey === 'US' && usedSource === 'WOVE_TODAY')
+                        ? ' (post-SC, 26 Feb 2026+)'
+                        : (datasetKey === 'US' && usedSource === 'WOVE')
+                            ? ' (pre-SC baseline)'
+                            : '';
+                    setDataStatus(`Loaded ${datasetKey} dataset from Supabase${snapshotLabel}: ${dutyData.length} countries.`);
+                }
             } catch (error) {
                 console.warn(`Failed to load ${datasetKey} duty rates:`, error.message);
                 dutyData = [];
@@ -4333,7 +4367,7 @@
             }
         }
 
-        function mergeLiveRates(rows) {
+        function mergeLiveRates(rows, sourceTag) {
             const updatesByCountry = new Map();
             const rateTypesByCountry = new Map();
 
@@ -4369,6 +4403,9 @@
                         updatedCells += 1;
                     }
                 });
+
+                // Stamp the source so stale static labels don't mislead Claude context
+                if (sourceTag) row.source = sourceTag;
 
                 // Update notes and program with API rate_type
                 const types = rateTypesByCountry.get(row.iso);
@@ -4410,7 +4447,7 @@
         };
         let compareDataCache = { US: { pre: null, post: null }, EU: null };
         let compareDestination = 'us'; // us | eu | compare
-        let compareUsSnapshot = 'pre'; // pre | post
+        let compareUsSnapshot = 'post'; // pre | post
         let compareLoadingPromise = null;
         let compareRowsForView = [];
         let compareSelectedIso = null;
@@ -6051,6 +6088,13 @@
             let context = '=== DASHBOARD CONTEXT ===\n';
             context += `Main View: ${currentMainView}\n`;
             context += `Active Dataset: ${activeDataset}\n`;
+
+            if (activeDataset === 'US' && activeUsSource) {
+                const isPostSC = activeUsSource === 'WOVE_TODAY';
+                context += `Data Source: ${activeUsSource} (${isPostSC ? 'post-SC ruling, 26 Feb 2026 — IEEPA reciprocal tariffs SUSPENDED' : 'pre-SC ruling baseline, 15 Feb 2026 — IEEPA reciprocal tariffs ACTIVE'})\n`;
+                context += `IMPORTANT: Rates below are ${isPostSC ? 'POST-SC (IEEPA suspended)' : 'PRE-SC (IEEPA still applied)'}. Do NOT conflate with the other snapshot.\n`;
+            }
+
             context += `Country Rows Loaded: ${dutyData.length}\n`;
             context += `Material Groups (${materialKeys.length}): ${materialList}\n`;
 
