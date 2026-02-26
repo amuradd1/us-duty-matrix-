@@ -3273,8 +3273,8 @@
                 <div class="rv3-group">
                     <label>US Snapshot</label>
                     <div id="compareSnapshotSelector" class="rv3-snapshot-selector">
-                        <button class="rv3-snapshot-option active-pre" data-snapshot="pre" onclick="setCompareUsSnapshot(this)">Pre-SC (15 Feb)</button>
-                        <button class="rv3-snapshot-option" data-snapshot="post" onclick="setCompareUsSnapshot(this)">Post-SC (26 Feb+)</button>
+                        <button class="rv3-snapshot-option" data-snapshot="pre" onclick="setCompareUsSnapshot(this)">Pre-SC (15 Feb)</button>
+                        <button class="rv3-snapshot-option active-post" data-snapshot="post" onclick="setCompareUsSnapshot(this)">Post-SC (26 Feb+)</button>
                     </div>
                 </div>
 
@@ -4437,7 +4437,7 @@
         };
         let compareDataCache = { US: { pre: null, post: null }, EU: null };
         let compareDestination = 'us'; // us | eu | compare
-        let compareUsSnapshot = 'pre'; // pre | post
+        let compareUsSnapshot = 'post'; // pre | post
         let compareLoadingPromise = null;
         let compareRowsForView = [];
         let compareSelectedIso = null;
