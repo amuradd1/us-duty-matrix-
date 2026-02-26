@@ -11,6 +11,47 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const US_BUSINESS_COUNTRY_SCOPE_PATH = path.join(__dirname, 'data', 'us_business_country_scope.json');
 const US_BUSINESS_COUNTRY_SCOPE_BY_MATERIAL_PATH = path.join(__dirname, 'data', 'us_business_country_scope_by_material.json');
+const WOVE_ENTRY_DATE_PRE_SC = '2026-02-15';
+const WOVE_ENTRY_DATE_POST_SC = '2026-02-26';
+const WOVE_DEFAULT_ORIGIN_FOR_BASE_LOOKUP = 'JP';
+const WOVE_TOKEN_TTL_MS = 45 * 60 * 1000;
+
+const MATERIAL_HS_CODES = {
+    'Cigarette Paper': '4813100000',
+    'Tipping Paper': '4813200000',
+    Plugwrap: '4813900000',
+    'Filter Tow': '5502100000',
+    'Filter Rods': '5601220091',
+    Adhesive: '3506915000',
+    Capsules: '3926909990',
+    Plasticizer: '2917125000',
+    Adsorbent: '3802100000',
+    'Board Packaging': '4819100000',
+    'Paper Packaging': '4819200000',
+    'MO Cans': '3923900000',
+    'Inner Bundling': '4811909000',
+    'Board Inner Frame': '4819100000'
+};
+
+const MATERIAL_QUERY_ALIASES = {
+    'Cigarette Paper': ['cigarette paper'],
+    'Tipping Paper': ['tipping paper'],
+    Plugwrap: ['plugwrap', 'plug wrap'],
+    'Filter Tow': ['filter tow'],
+    'Filter Rods': ['filter rods', 'filter rod'],
+    Adhesive: ['adhesive', 'adhesives'],
+    Capsules: ['capsules', 'capsule'],
+    Plasticizer: ['plasticizer', 'plasticizers'],
+    Adsorbent: ['adsorbent', 'activated carbon'],
+    'Board Packaging': ['board packaging', 'carton board', 'corrugated board'],
+    'Paper Packaging': ['paper packaging', 'folding cartons'],
+    'MO Cans': ['mo cans', 'modern oral cans', 'modern oral can'],
+    'Inner Bundling': ['inner bundling'],
+    'Board Inner Frame': ['board inner frame', 'inner frame']
+};
+
+let cachedWoveToken = null;
+let cachedWoveTokenFetchedAt = 0;
 
 function loadUsBusinessCountryScope() {
     try {
@@ -52,6 +93,186 @@ function loadUsBusinessCountryScopeByMaterial() {
 
 const US_BUSINESS_COUNTRY_ISOS_BY_MATERIAL = loadUsBusinessCountryScopeByMaterial();
 
+function parseJsonSafe(text) {
+    if (!text) return null;
+    try {
+        return JSON.parse(text);
+    } catch (_) {
+        return null;
+    }
+}
+
+function hasWoveCredentials() {
+    return Boolean(process.env.WOVE_CLIENT_ID && process.env.WOVE_CLIENT_SECRET);
+}
+
+function queryNeedsBaseDutyEnrichment(query) {
+    const text = String(query || '').toLowerCase();
+    if (!text) return false;
+    return /\b(base|mfn|breakdown|component|additional|section\s*301|section\s*232|section\s*122|ieepa|surcharge)\b/i.test(text);
+}
+
+function extractMaterialsFromQuery(query) {
+    const text = String(query || '').toLowerCase();
+    const found = new Set();
+
+    Object.entries(MATERIAL_QUERY_ALIASES).forEach(([material, aliases]) => {
+        if (aliases.some((alias) => text.includes(alias))) {
+            found.add(material);
+        }
+    });
+
+    return [...found];
+}
+
+function inferEntryDateFromContext(context) {
+    const text = String(context || '');
+    if (!text) return null;
+
+    if (/US Snapshot Selector:\s*pre/i.test(text)) {
+        return WOVE_ENTRY_DATE_PRE_SC;
+    }
+    if (/US Snapshot Selector:\s*post/i.test(text)) {
+        return WOVE_ENTRY_DATE_POST_SC;
+    }
+    if (/Active Dataset Source:\s*WOVE_TODAY\b/i.test(text) || /source=WOVE_TODAY\b/i.test(text)) {
+        return WOVE_ENTRY_DATE_POST_SC;
+    }
+    if (/Active Dataset Source:\s*WOVE\b/i.test(text) || /source=WOVE\b/i.test(text)) {
+        return WOVE_ENTRY_DATE_PRE_SC;
+    }
+    return null;
+}
+
+async function getWoveTokenCached() {
+    if (!hasWoveCredentials()) {
+        throw new Error('Missing WOVE_CLIENT_ID or WOVE_CLIENT_SECRET');
+    }
+
+    const now = Date.now();
+    if (cachedWoveToken && now - cachedWoveTokenFetchedAt < WOVE_TOKEN_TTL_MS) {
+        return cachedWoveToken;
+    }
+
+    const tokenRes = await fetch('https://api.wove.com/api/v1/external/auth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            grant_type: 'client_credentials',
+            client_id: process.env.WOVE_CLIENT_ID,
+            client_secret: process.env.WOVE_CLIENT_SECRET
+        })
+    });
+    const tokenBodyText = await tokenRes.text();
+    const tokenData = parseJsonSafe(tokenBodyText);
+
+    if (!tokenRes.ok || !tokenData || !tokenData.access_token) {
+        throw new Error(`Wove token fetch failed (${tokenRes.status})`);
+    }
+
+    cachedWoveToken = tokenData.access_token;
+    cachedWoveTokenFetchedAt = now;
+    return cachedWoveToken;
+}
+
+async function fetchWoveMaterialDetail(material, entryDate, originCountry = WOVE_DEFAULT_ORIGIN_FOR_BASE_LOOKUP) {
+    const hsCode = MATERIAL_HS_CODES[material];
+    if (!hsCode) {
+        return { material, error: 'Unknown material HTS mapping' };
+    }
+
+    const lookupUrl = `https://api.wove.com/api/v1/external/tariffs/lookup?hsCode=${hsCode}&originCountry=${originCountry}&destinationCountry=US&includeFtaOptions=true&entryDate=${entryDate}`;
+    let lookupData = null;
+    let lookupStatus = 0;
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+        const token = await getWoveTokenCached();
+        const lookupRes = await fetch(lookupUrl, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        lookupStatus = lookupRes.status;
+        const lookupText = await lookupRes.text();
+        lookupData = parseJsonSafe(lookupText);
+
+        if (lookupRes.status === 401 && attempt === 0) {
+            cachedWoveToken = null;
+            cachedWoveTokenFetchedAt = 0;
+            continue;
+        }
+        break;
+    }
+
+    if (!lookupData || !lookupData.success || !lookupData.data) {
+        return { material, hsCode, error: `Lookup failed (${lookupStatus || 'unknown'})` };
+    }
+
+    const raw = lookupData.data;
+    const baseRate = Number(raw.baseRate?.adValoremRate);
+    const applicableRate = Number(raw.applicableRate?.adValoremRate);
+    const additionalDuties = Array.isArray(raw.additionalDuties) ? raw.additionalDuties : [];
+
+    return {
+        material,
+        hsCode,
+        entryDate,
+        originCountry,
+        baseRate: Number.isFinite(baseRate) ? baseRate : null,
+        applicableRate: Number.isFinite(applicableRate) ? applicableRate : null,
+        baseProgram: raw.baseRate?.programCode || null,
+        applicableProgram: raw.applicableRate?.programCode || null,
+        additionalDuties: additionalDuties.map((duty) => ({
+            programCode: duty.programCode || null,
+            htsCode: duty.htsCode || null,
+            rate: Number.isFinite(Number(duty.rate)) ? Number(duty.rate) : null
+        }))
+    };
+}
+
+async function buildWoveBaseDutyEnrichment(query, context) {
+    const materials = extractMaterialsFromQuery(query);
+    if (!materials.length || !queryNeedsBaseDutyEnrichment(query)) {
+        return '';
+    }
+
+    if (!hasWoveCredentials()) {
+        return [
+            '=== WOVE MATERIAL ENRICHMENT ===',
+            'Unavailable: WOVE credentials are not configured on the server.'
+        ].join('\n');
+    }
+
+    const entryDate = inferEntryDateFromContext(context) || WOVE_ENTRY_DATE_POST_SC;
+    const materialSubset = materials.slice(0, 4);
+    const details = await Promise.all(
+        materialSubset.map((material) => fetchWoveMaterialDetail(material, entryDate))
+    );
+
+    const lines = [
+        '=== WOVE MATERIAL ENRICHMENT ===',
+        `Lookup basis: destination=US, origin=${WOVE_DEFAULT_ORIGIN_FOR_BASE_LOOKUP}, entryDate=${entryDate}`,
+        'Interpretation: baseRate = material MFN/base duty; applicableRate = effective duty after overlays.'
+    ];
+
+    details.forEach((detail) => {
+        if (detail.error) {
+            lines.push(`- ${detail.material}: unavailable (${detail.error})`);
+            return;
+        }
+
+        const extra = detail.additionalDuties.length > 0
+            ? detail.additionalDuties
+                .map((duty) => `${duty.programCode || 'additional'}${duty.rate !== null ? ` ${duty.rate}%` : ''}`)
+                .join(', ')
+            : 'none';
+
+        lines.push(
+            `- ${detail.material} | HTS ${detail.hsCode} | baseRate=${detail.baseRate !== null ? `${detail.baseRate}%` : 'N/A'} | applicableRate=${detail.applicableRate !== null ? `${detail.applicableRate}%` : 'N/A'} | additional=${extra}`
+        );
+    });
+
+    return lines.join('\n');
+}
+
 // Initialize Anthropic client
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY
@@ -65,6 +286,7 @@ CRITICAL RULES:
 2. The loaded context may represent US, EU, or compare-mode data. Respect dataset/source/snapshot labels in context.
 3. Do not mention specific companies, brands, or manufacturers.
 4. If data is missing for a query, return a concise explanation in JSON.
+5. If "WOVE MATERIAL ENRICHMENT" is present, use it for base/MFN/breakdown questions.
 
 RANKING RULES:
 1. Rank by requested metric exactly as asked.
@@ -138,6 +360,14 @@ app.post('/api/search', async (req, res) => {
         let systemPrompt = SYSTEM_PROMPT;
         if (context) {
             systemPrompt += `\n\nDASHBOARD DATA:\n${context}`;
+        }
+        try {
+            const enrichmentBlock = await buildWoveBaseDutyEnrichment(query, context);
+            if (enrichmentBlock) {
+                systemPrompt += `\n\n${enrichmentBlock}`;
+            }
+        } catch (enrichmentError) {
+            console.warn('Wove enrichment skipped:', enrichmentError.message);
         }
 
         const response = await anthropic.messages.create({
