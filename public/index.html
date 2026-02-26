@@ -4304,10 +4304,11 @@
                     return;
                 }
 
-                dutyData = cloneDutyData(staticDutyData).filter((row) => availableCountries.has(row.iso));
+                // Build a static metadata lookup (country name, region, program, etc.)
+                // We use static data ONLY for metadata — all material rates are reset to null
+                // so WOVE_TODAY live rates always win, matching what the compare tab shows.
+                const staticByIso = Object.fromEntries(staticDutyData.map(r => [r.iso, r]));
 
-                // Add rows for countries in API but not in staticDutyData
-                const staticIsos = new Set(dutyData.map(r => r.iso));
                 const countryNameMap = {};
                 try {
                     const cRes = await fetch('/api/countries');
@@ -4317,9 +4318,12 @@
                     }
                 } catch(e) { /* ignore */ }
 
+                dutyData = [];
                 availableCountries.forEach(iso => {
-                    if (!staticIsos.has(iso)) {
-                        const newRow = {
+                    const staticRow = staticByIso[iso];
+                    const newRow = staticRow
+                        ? { ...staticRow }
+                        : {
                             country: countryNameMap[iso] || iso,
                             iso: iso,
                             region: '-',
@@ -4328,9 +4332,10 @@
                             notes: '',
                             source: ''
                         };
-                        Object.keys(materialColumns).forEach(m => { newRow[m] = 0; });
-                        dutyData.push(newRow);
-                    }
+                    // Reset ALL material columns to null so live rates always overwrite
+                    // static hardcoded values (prevents stale pre-SC rates persisting).
+                    Object.keys(materialColumns).forEach(m => { newRow[m] = null; });
+                    dutyData.push(newRow);
                 });
 
                 const merged = mergeLiveRates(rows, usedSource);
@@ -4338,13 +4343,7 @@
                 const homeCountryEl = document.getElementById('homeCountryCount');
                 if (homeCountryEl) homeCountryEl.textContent = String(dutyData.length);
 
-                if (merged.updatedCells > 0) {
-                    applyFilters();
-                } else {
-                    filteredData = [...dutyData];
-                    renderTable();
-                    updateStats();
-                }
+                applyFilters();
 
                 if (datasetKey === 'US') activeUsSource = usedSource;
 
