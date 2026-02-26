@@ -3632,6 +3632,7 @@
         let activeDataset = 'US';
         let dutyData = [];
         let filteredData = [];
+        const datasetSourceUsed = { US: null, EU: null };
         let currentSort = {column: 'country', ascending: true};
         let currentView = 'country';
         let selectedMaterials = []; // Changed to array for multi-select
@@ -4284,6 +4285,7 @@
                 if (availableCountries.size === 0) {
                     dutyData = [];
                     filteredData = [];
+                    datasetSourceUsed[datasetKey] = sourceUsed;
                     populateCountryFilter();
                     renderTable();
                     updateStats();
@@ -4322,6 +4324,7 @@
                 });
 
                 const merged = mergeLiveRates(rows);
+                datasetSourceUsed[datasetKey] = sourceUsed || dataset.source;
                 populateCountryFilter();
                 const homeCountryEl = document.getElementById('homeCountryCount');
                 if (homeCountryEl) homeCountryEl.textContent = String(dutyData.length);
@@ -4343,6 +4346,7 @@
                 console.warn(`Failed to load ${datasetKey} duty rates:`, error.message);
                 dutyData = [];
                 filteredData = [];
+                datasetSourceUsed[datasetKey] = null;
                 populateCountryFilter();
                 renderTable();
                 updateStats();
@@ -5885,7 +5889,12 @@
             submitBtn.disabled = true;
 
             try {
-                if (!Array.isArray(dutyData) || dutyData.length === 0) {
+                if (currentMainView === 'compare') {
+                    if (!hasCompareDataLoaded()) {
+                        await loadCompareData();
+                    }
+                    await updateCompareView();
+                } else if (!Array.isArray(dutyData) || dutyData.length === 0) {
                     const fallbackDataset = activeDataset === 'EU' ? 'EU' : 'US';
                     await loadLiveRatesFromApi(fallbackDataset);
                 }
@@ -6033,15 +6042,27 @@
         function buildContext() {
             const materialKeys = Object.keys(materialColumns);
             const materialList = materialKeys.map((key) => `${key}=${materialColumns[key]}`).join(', ');
+            const activeSource = datasetSourceUsed[activeDataset] || DATASET_CONFIG[activeDataset]?.source || 'unknown';
 
             if (!Array.isArray(dutyData) || dutyData.length === 0) {
-                return [
+                let emptyContext = [
                     '=== DASHBOARD CONTEXT ===',
                     `Main View: ${currentMainView}`,
                     `Active Dataset: ${activeDataset}`,
+                    `Active Dataset Source: ${activeSource}`,
                     `Material Groups (${materialKeys.length}): ${materialList}`,
                     'No country rows are currently loaded in the matrix.'
                 ].join('\n');
+
+                if (currentMainView === 'compare') {
+                    const snapshotConfig = getCompareSnapshotConfig();
+                    emptyContext += '\n\n=== COMPARE VIEW STATE ===\n';
+                    emptyContext += `Compare Destination Selector: ${compareDestination}\n`;
+                    emptyContext += `US Snapshot Selector: ${compareUsSnapshot} (${snapshotConfig.label}; source=${snapshotConfig.source})\n`;
+                    emptyContext += `Compare Rows Visible: ${compareRowsForView.length}\n`;
+                }
+
+                return emptyContext;
             }
 
             const withAverages = dutyData.map((row) => {
@@ -6068,11 +6089,26 @@
             let context = '=== DASHBOARD CONTEXT ===\n';
             context += `Main View: ${currentMainView}\n`;
             context += `Active Dataset: ${activeDataset}\n`;
+            context += `Active Dataset Source: ${activeSource}\n`;
             context += `Country Rows Loaded: ${dutyData.length}\n`;
             context += `Material Groups (${materialKeys.length}): ${materialList}\n`;
 
             if (currentMainView === 'compare') {
+                const snapshotConfig = getCompareSnapshotConfig();
+                context += '\n=== COMPARE VIEW STATE ===\n';
                 context += `Compare Destination Selector: ${compareDestination}\n`;
+                context += `US Snapshot Selector: ${compareUsSnapshot} (${snapshotConfig.label}; source=${snapshotConfig.source})\n`;
+                context += `Compare Rows Visible: ${compareRowsForView.length}\n`;
+                if (compareRowsForView.length > 0) {
+                    context += '\n=== COMPARE ROWS (currently visible in UI order) ===\n';
+                    compareRowsForView.forEach((row, idx) => {
+                        const usRate = row.usRate === null ? 'N/A' : `${row.usRate}%`;
+                        const euRate = row.euRate === null ? 'N/A' : `${row.euRate}%`;
+                        const activeRate = getCompareActiveRate(row);
+                        const activeLabel = activeRate === null ? 'N/A' : `${activeRate}%`;
+                        context += `ROW ${idx + 1}: ${row.country} (${row.iso}) | usRate=${usRate} | euRate=${euRate} | activeRate=${activeLabel} | optimal=${row.optimal}\n`;
+                    });
+                }
             }
 
             context += '\n=== COUNTRIES RANKED BY AVERAGE DUTY (highest first) ===\n';
