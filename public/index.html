@@ -3630,6 +3630,7 @@
         };
 
         let activeDataset = 'US';
+        let activeUsSource = null; // tracks which Supabase source tag is currently loaded for the US tab
         let dutyData = [];
         let filteredData = [];
         let currentSort = {column: 'country', ascending: true};
@@ -4332,7 +4333,7 @@
                     }
                 });
 
-                const merged = mergeLiveRates(rows);
+                const merged = mergeLiveRates(rows, usedSource);
                 populateCountryFilter();
                 const homeCountryEl = document.getElementById('homeCountryCount');
                 if (homeCountryEl) homeCountryEl.textContent = String(dutyData.length);
@@ -4345,9 +4346,16 @@
                     updateStats();
                 }
 
+                if (datasetKey === 'US') activeUsSource = usedSource;
+
                 console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries (source: ${usedSource})`);
                 if (usedSource === dataset.source) {
-                    setDataStatus(`Loaded ${datasetKey} dataset from Supabase: ${dutyData.length} countries.`);
+                    const snapshotLabel = (datasetKey === 'US' && usedSource === 'WOVE_TODAY')
+                        ? ' (post-SC, 26 Feb 2026+)'
+                        : (datasetKey === 'US' && usedSource === 'WOVE')
+                            ? ' (pre-SC baseline)'
+                            : '';
+                    setDataStatus(`Loaded ${datasetKey} dataset from Supabase${snapshotLabel}: ${dutyData.length} countries.`);
                 }
             } catch (error) {
                 console.warn(`Failed to load ${datasetKey} duty rates:`, error.message);
@@ -4360,7 +4368,7 @@
             }
         }
 
-        function mergeLiveRates(rows) {
+        function mergeLiveRates(rows, sourceTag) {
             const updatesByCountry = new Map();
             const rateTypesByCountry = new Map();
 
@@ -4396,6 +4404,9 @@
                         updatedCells += 1;
                     }
                 });
+
+                // Stamp the source so stale static labels don't mislead Claude context
+                if (sourceTag) row.source = sourceTag;
 
                 // Update notes and program with API rate_type
                 const types = rateTypesByCountry.get(row.iso);
@@ -6078,6 +6089,13 @@
             let context = '=== DASHBOARD CONTEXT ===\n';
             context += `Main View: ${currentMainView}\n`;
             context += `Active Dataset: ${activeDataset}\n`;
+
+            if (activeDataset === 'US' && activeUsSource) {
+                const isPostSC = activeUsSource === 'WOVE_TODAY';
+                context += `Data Source: ${activeUsSource} (${isPostSC ? 'post-SC ruling, 26 Feb 2026 — IEEPA reciprocal tariffs SUSPENDED' : 'pre-SC ruling baseline, 15 Feb 2026 — IEEPA reciprocal tariffs ACTIVE'})\n`;
+                context += `IMPORTANT: Rates below are ${isPostSC ? 'POST-SC (IEEPA suspended)' : 'PRE-SC (IEEPA still applied)'}. Do NOT conflate with the other snapshot.\n`;
+            }
+
             context += `Country Rows Loaded: ${dutyData.length}\n`;
             context += `Material Groups (${materialKeys.length}): ${materialList}\n`;
 
