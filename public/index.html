@@ -3273,8 +3273,8 @@
                 <div class="rv3-group">
                     <label>US Snapshot</label>
                     <div id="compareSnapshotSelector" class="rv3-snapshot-selector">
-                        <button class="rv3-snapshot-option active-pre" data-snapshot="pre" onclick="setCompareUsSnapshot(this)">Pre-SC (15 Feb)</button>
-                        <button class="rv3-snapshot-option" data-snapshot="post" onclick="setCompareUsSnapshot(this)">Post-SC (26 Feb+)</button>
+                        <button class="rv3-snapshot-option" data-snapshot="pre" onclick="setCompareUsSnapshot(this)">Pre-SC (15 Feb)</button>
+                        <button class="rv3-snapshot-option active-post" data-snapshot="post" onclick="setCompareUsSnapshot(this)">Post-SC (26 Feb+)</button>
                     </div>
                 </div>
 
@@ -3602,7 +3602,8 @@
         const DATASET_CONFIG = {
             US: {
                 destination: 'US',
-                source: 'WOVE',
+                source: 'WOVE_TODAY',
+                fallbackSource: 'WOVE',
                 title: 'US Import Duty Matrix',
                 subtitle: 'Duty rates by material group, HTS code, and origin country'
             },
@@ -4248,24 +4249,36 @@
             const scopeParam = datasetKey === 'US' && !showAdditionalCountries
                 ? '&scope=business'
                 : '';
-            const url = `/api/duty-rates?destination=${dataset.destination}&source=${dataset.source}${scopeParam}`;
+            const sourceCandidates = [dataset.source, dataset.fallbackSource]
+                .filter(Boolean)
+                .filter((source, idx, arr) => arr.indexOf(source) === idx);
             setDataStatus(`Loading ${datasetKey} data from Supabase...`);
 
             try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    console.warn(`Live duty rates unavailable for ${datasetKey}:`, response.status);
-                    dutyData = [];
-                    filteredData = [];
-                    populateCountryFilter();
-                    renderTable();
-                    updateStats();
-                    setDataStatus(`Failed to load ${datasetKey} data from Supabase (HTTP ${response.status}).`, true);
-                    return;
+                let rows = [];
+                let sourceUsed = null;
+                const sourceErrors = [];
+
+                for (const source of sourceCandidates) {
+                    const url = `/api/duty-rates?destination=${dataset.destination}&source=${source}${scopeParam}`;
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        sourceErrors.push(`${source}: HTTP ${response.status}`);
+                        continue;
+                    }
+
+                    const payload = await response.json();
+                    const candidateRows = Array.isArray(payload.rows) ? payload.rows : [];
+                    sourceUsed = source;
+
+                    if (candidateRows.length > 0) {
+                        rows = candidateRows;
+                        break;
+                    }
+
+                    sourceErrors.push(`${source}: 0 rows`);
                 }
 
-                const payload = await response.json();
-                const rows = Array.isArray(payload.rows) ? payload.rows : [];
                 const availableCountries = new Set(rows.map((row) => String(row.country_iso || '').toUpperCase()).filter(Boolean));
 
                 if (availableCountries.size === 0) {
@@ -4274,7 +4287,8 @@
                     populateCountryFilter();
                     renderTable();
                     updateStats();
-                    setDataStatus(`No ${datasetKey} rows found in Supabase.`, true);
+                    const errorDetail = sourceErrors.length ? ` (${sourceErrors.join('; ')})` : '';
+                    setDataStatus(`No ${datasetKey} rows found in Supabase${errorDetail}.`, true);
                     return;
                 }
 
@@ -4321,7 +4335,10 @@
                 }
 
                 console.info(`${datasetKey} rates loaded: ${merged.updatedCells} cells across ${merged.updatedCountries} countries`);
-                setDataStatus(`Loaded ${datasetKey} dataset from Supabase: ${dutyData.length} countries.`);
+                const fallbackNote = sourceUsed && sourceUsed !== dataset.source
+                    ? ` (fallback source ${sourceUsed})`
+                    : '';
+                setDataStatus(`Loaded ${datasetKey} dataset from Supabase: ${dutyData.length} countries${fallbackNote}.`);
             } catch (error) {
                 console.warn(`Failed to load ${datasetKey} duty rates:`, error.message);
                 dutyData = [];
@@ -4410,7 +4427,7 @@
         };
         let compareDataCache = { US: { pre: null, post: null }, EU: null };
         let compareDestination = 'us'; // us | eu | compare
-        let compareUsSnapshot = 'pre'; // pre | post
+        let compareUsSnapshot = 'post'; // pre | post
         let compareLoadingPromise = null;
         let compareRowsForView = [];
         let compareSelectedIso = null;
