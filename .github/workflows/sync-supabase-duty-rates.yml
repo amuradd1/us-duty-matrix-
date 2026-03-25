@@ -1,13 +1,19 @@
 name: Sync Supabase Duty Rates
 
+# DISABLED — WOVE API billing suspended 2026-03-25.
+# Data already captured in Supabase (sources: WOVE, WOVE_TODAY).
+# Re-enable by restoring the 'on' triggers below when/if access is resumed.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "15 2 * * *"
+    inputs:
+      confirm:
+        description: 'Type CONFIRM to run (WOVE API disabled — may incur charges)'
+        required: true
 
 jobs:
   sync-duty-rates:
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'CONFIRM' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
