@@ -1,0 +1,6 @@
+.env
+portfolio_state.json
+market_state.json
+__pycache__/
+*.pyc
+.venv/
